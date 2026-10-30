@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>动态创意参考库</title>
+<meta name="description" content="浏览动态示例，寻找创意灵感，编辑并创建自己的动画参考。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="动态创意参考库">
+<meta property="og:title" content="动态创意参考库">
+<meta property="og:description" content="浏览、编辑和收藏动态创意示例。">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<script>
+/* Apply the saved theme and language before first paint. */
+(function () {
+  var d = document.documentElement, t = null, l = null, m = /[?&]lang=(ja|en|zh-Hans)(?:&|$)/.exec(location.search);
+  try { t = localStorage.getItem('mp-theme'); l = localStorage.getItem('mp-lang'); } catch (e) {}
+  if (m) l = m[1]; /* ?lang= (set when an agent opens the gallery) wins for this visit */
+  if (t === 'light' || t === 'dark') d.setAttribute('data-theme', t);
+  if (l !== 'ja' && l !== 'en' && l !== 'zh-Hans') l = 'zh-Hans';
+  d.lang = l;
+})();
+</script>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip" href="#gallery" data-t="skip">見本の一覧へ移動</a>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="logo" href="./" aria-label="动态创意参考库">动态创意参考库</a>
+    <nav class="top-nav" aria-label="サイト内" data-t-attr="aria-label:navLabel">
+      <a class="top-link top-how" href="#how" data-t="navHow">使い方</a>
+      <a class="top-link" href="found.html" data-t="navFound">事例</a>
+      <div class="seg" role="group" aria-label="言語" data-t-attr="aria-label:langLabel">
+        <button type="button" class="seg-b" data-lang="zh-Hans" aria-pressed="true" aria-label="简体中文">中文</button>
+        <button type="button" class="seg-b" data-lang="ja" aria-pressed="true" aria-label="日本語">JA</button>
+        <button type="button" class="seg-b" data-lang="en" aria-pressed="false" aria-label="English">EN</button>
+      </div>
+      <button type="button" class="icon-b" id="theme" aria-label="ダークモードに切り替える">
+        <svg class="i-moon" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M16.5 12.3A7 7 0 0 1 7.7 3.5a.6.6 0 0 0-.8-.7 7.6 7.6 0 1 0 10.3 10.3.6.6 0 0 0-.7-.8z" fill="currentColor"/></svg>
+        <svg class="i-sun" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="10" cy="10" r="3.6" fill="currentColor"/><g stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.3 4.3l1.4 1.4M14.3 14.3l1.4 1.4M4.3 15.7l1.4-1.4M14.3 5.7l1.4-1.4"/></g></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap" aria-labelledby="hero-h">
+    <div class="hero-copy">
+      <p class="eyebrow" data-t="eyebrow">AIに頼むための「名前」のライブラリ</p>
+      <h1 id="hero-h" data-t-html="h1">AIを<wbr>指揮する<wbr>クリエイティブ<wbr>ディレクターへ</h1>
+      <p class="lead" data-t="lead">モーショングラフィックス、カメラワーク、UIパーツ、LP・Webサイトの演出、写真の表現の名前を、動く見本つきで並べました。プロンプトをコピーすれば、動きの仕様と参考実装も一緒に渡せます。</p>
+      <dl class="facts">
+        <div><dt data-t="factMoves">名前</dt><dd id="fact-count"></dd></div>
+        <div><dt data-t="factPacks">パック</dt><dd id="fact-packs"></dd></div>
+        <div><dt data-t="factLicense">ライセンス</dt><dd>MIT</dd></div>
+      </dl>
+    </div>
+    <div class="hero-install">
+      <div class="install">
+        <h2 class="install-h" data-t="personalH">打造你的动态参考库</h2>
+        <p class="install-p" data-t="personalP">浏览、收藏和编辑现有示例，也可以创建属于自己的动画。</p>
+        <a class="btn btn-main" href="#gallery" data-t="personalAction">打开可视化编辑器</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="gallery" class="gallery" aria-labelledby="gallery-h">
+    <h2 id="gallery-h" class="sr" data-t="galleryH">見本の一覧</h2>
+    <div class="tools">
+      <div class="wrap tools-in">
+        <div class="chips" id="packs" role="group" aria-label="パックで絞り込む" data-t-attr="aria-label:packFilterLabel"></div>
+        <div class="tools-side">
+          <label class="search">
+            <span class="sr" data-t="searchLabel">見本を探す</span>
+            <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            <input type="search" id="q" autocomplete="off" spellcheck="false" placeholder="名前・番号・タグで探す" data-t-attr="placeholder:searchPh">
+          </label>
+          <button type="button" class="btn btn-ghost playtoggle" id="play" aria-pressed="true">
+            <svg class="i-pause" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="3" y="2.5" width="3.6" height="11" rx="1" fill="currentColor"/><rect x="9.4" y="2.5" width="3.6" height="11" rx="1" fill="currentColor"/></svg>
+            <svg class="i-play" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 2.6v10.8a.6.6 0 0 0 .9.5l9-5.4a.6.6 0 0 0 0-1l-9-5.4a.6.6 0 0 0-.9.5z" fill="currentColor"/></svg>
+            <span id="play-t">一時停止</span>
+          </button>
+        </div>
+        <div class="chips chips-sub" id="cats" role="group" aria-label="カテゴリで絞り込む" data-t-attr="aria-label:catFilterLabel" hidden></div>
+      </div>
+    </div>
+    <div class="wrap">
+      <p class="count" id="count" role="status" aria-live="polite"></p>
+      <div id="grid"></div>
+      <p class="empty" id="empty" hidden data-t="empty">見つかりませんでした。別の言葉や番号で探してみてください。</p>
+      <noscript><p class="empty">見本の再生には JavaScript が必要です。一覧は <a href="api/v1/ja/catalog.tsv">catalog.tsv</a> でも読めます。</p></noscript>
+    </div>
+  </section>
+
+  <section id="how" class="how wrap" aria-labelledby="how-h">
+    <h2 id="how-h" class="sec-h" data-t="howH">使い方</h2>
+    <ol class="steps">
+      <li><span class="step-n" aria-hidden="true">1</span><h3 data-t="s1h">浏览示例</h3><p data-t="s1p">通过分类或搜索找到合适的动作，点击卡片查看详情。</p></li>
+      <li><span class="step-n" aria-hidden="true">2</span><h3 data-t="s2h">选择效果</h3><p data-t="s2p">点击“选择”收集所需示例，可在底部添加用途备注。</p></li>
+      <li><span class="step-n" aria-hidden="true">3</span><h3 data-t="s3h">复制并使用</h3><p data-t="s3p">复制所选内容或单个示例的提示词，用于创作和交流。</p></li>
+    </ol>
+    <div class="how-more">
+      <div class="how-col">
+        <h3 data-t="editH">编辑和添加内容</h3>
+        <p data-t="editP">打开可视化编辑器，调整文字与播放速度，或通过模板创建新的动态示例。保存后返回首页刷新即可查看。</p>
+        <p><a href="#gallery" data-t="personalAction">打开可视化编辑器</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+
+
+<aside class="tray" id="tray" aria-labelledby="tray-count" hidden>
+  <div class="wrap tray-in">
+    <div class="tray-top">
+      <button type="button" class="tray-toggle" id="tray-toggle" aria-expanded="true" aria-controls="tray-body">
+        <span class="tray-count" id="tray-count">選んだ物 0個</span>
+        <svg class="tray-chev" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3.5 10l4.5-4.5 4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <p class="tray-wait" id="tray-wait" data-t="trayWait" hidden>AIが待っています。選んだら「AIに渡す」を押してください。</p>
+      <button type="button" class="btn btn-s btn-main tray-main" id="tray-main">選んだ物をコピー</button>
+    </div>
+    <div class="tray-body" id="tray-body">
+      <ol class="tray-list" id="tray-list"></ol>
+      <p class="tray-empty" id="tray-empty" data-t="trayEmpty" hidden>見本の「選ぶ」を押すと、ここに並びます。</p>
+      <div class="tray-row">
+        <label class="tray-note">
+          <span class="tray-note-l" data-t="noteLabel">メモ（任意）</span>
+          <input type="text" id="tray-note" maxlength="300" autocomplete="off" placeholder="例: 冒頭のタイトルに" data-t-attr="placeholder:notePh">
+        </label>
+        <div class="tray-acts">
+          <button type="button" class="btn btn-s" id="tray-copy" data-t="copyPicked" hidden>選んだ物をコピー</button>
+          <button type="button" class="btn btn-s" id="tray-share" data-t="shareUrl">選択を共有するURL</button>
+          <button type="button" class="btn btn-s btn-ghost" id="tray-clear" data-t="clearAll">すべて外す</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<dialog class="detail" id="detail" aria-labelledby="d-name">
+  <div class="d-bar">
+    <p class="d-id"><span id="d-id">#000</span><span class="d-where" id="d-where"></span></p>
+    <div class="d-nav">
+      <button type="button" class="icon-b playtoggle" id="d-play" aria-pressed="true" aria-label="一時停止">
+        <svg class="i-pause" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="3" y="2.5" width="3.6" height="11" rx="1" fill="currentColor"/><rect x="9.4" y="2.5" width="3.6" height="11" rx="1" fill="currentColor"/></svg>
+        <svg class="i-play" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 2.6v10.8a.6.6 0 0 0 .9.5l9-5.4a.6.6 0 0 0 0-1l-9-5.4a.6.6 0 0 0-.9.5z" fill="currentColor"/></svg>
+      </button>
+      <button type="button" class="icon-b" id="d-prev" aria-label="前の名前"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" class="icon-b" id="d-next" aria-label="次の名前"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" class="icon-b" id="d-close" aria-label="閉じる"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+  </div>
+  <div class="d-body">
+    <div class="d-stage"><canvas id="d-canvas" aria-hidden="true"></canvas></div>
+    <div class="d-head">
+      <h2 id="d-name" tabindex="-1"></h2>
+      <p class="d-sub" id="d-sub"></p>
+      <p class="d-meaning" id="d-meaning"></p>
+      <p class="d-summary" id="d-summary"></p>
+    </div>
+    <div class="d-main">
+      <h3 id="d-ask-h" data-t="dAsk">AIへの頼み方の例</h3>
+      <p class="d-ask" id="d-ask"></p>
+      <h3 data-t="dSpec">動きの仕様</h3>
+      <ul class="d-spec" id="d-spec"></ul>
+      <h3 data-t="dUse">使いどころ</h3>
+      <p id="d-use"></p>
+      <ul class="d-tags" id="d-tags" aria-label="タグ" data-t-attr="aria-label:tagsLabel"></ul>
+    </div>
+    <div class="d-side">
+      <button type="button" class="btn btn-pick" id="d-pick" aria-pressed="false"><span class="pick-box" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14"><path d="M3.5 8.4l3 3 6-6.6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span id="d-pick-t">選ぶ</span></button>
+      <a class="btn" id="d-edit" href="#" hidden>编辑此示例</a>
+      <button type="button" class="btn btn-main" id="d-copy-prompt" data-t="copyPrompt">プロンプトをコピー</button>
+      <button type="button" class="btn" id="d-copy-code" data-t="copyCode">コードをコピー</button>
+      <pre class="d-prompt" id="d-prompt" tabindex="0" aria-label="コピーされるプロンプト" data-t-attr="aria-label:promptLabel"></pre>
+      <details class="d-code">
+        <summary data-t="showCode">コードを見る</summary>
+        <pre id="d-code" tabindex="0"></pre>
+      </details>
+      <p class="d-links"><a id="d-kit" href="#"></a><a id="d-txt" href="#"></a></p>
+      <p class="sr" id="d-live" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</dialog>
+
+<p class="sr" id="live" role="status" aria-live="polite"></p>
+
+<script src="assets/runtime.js"></script>
+<script src="assets/catalog.js"></script>
+<script src="assets/zh-details.js?v=20261030-motioncheck2"></script>
+<script src="assets/zh-tags.js?v=20261030b"></script>
+<script src="data/visual-editor.js"></script>
+<script src="assets/animation-parameters.js"></script><script src="assets/visual-common.js"></script>
+<script src="assets/branding.js"></script>
+<script>MPBrand.apply(MPBrand.site, "home");</script>
+<script src="assets/site.js?v=20261030-visual-editor"></script>
+</body>
+</html>

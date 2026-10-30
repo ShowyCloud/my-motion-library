@@ -1,0 +1,1 @@
+MotionPrompt.pack('custom',function(){return {width:539,height:208,cycle:4,cells:(window.MP_EDITOR_DATA.custom||[]).map(function(item){return function(ctx,w,h,u){window.MPVisual.draw(ctx,w,h,u,item);};})};});
