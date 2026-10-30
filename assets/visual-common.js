@@ -16,7 +16,7 @@ V.call=function(ctx,cell,w,h,u,map,params,id){
  const draw=function(){if(!map||!Object.keys(map).length){cell(ctx,w,h,u);return;}let originals={};['fillText','strokeText','measureText'].forEach(k=>{originals[k]=ctx[k];ctx[k]=function(s,...rest){return originals[k].call(this,Object.prototype.hasOwnProperty.call(map,String(s))?map[String(s)]:s,...rest);};});try{cell(ctx,w,h,u);}finally{Object.keys(originals).forEach(k=>{ctx[k]=originals[k];});}};
  return g.MPParams?g.MPParams.withValues(id,params,draw):draw();
 };
-V.paramSummary=function(el){let values=el._visual&&el._visual.parameters||{},defs=(g.MP_PARAM_DEFS||{})[el.id]||[];return defs.filter(d=>Object.prototype.hasOwnProperty.call(values,d.key)).map(d=>d.label+'：'+values[d.key]+(d.unit?' '+d.unit:''));};
+V.paramSummary=function(el){let values=el._visual&&el._visual.parameters||{},defs=(g.MP_PARAM_DEFS||{})[el.id]||[];return defs.filter(d=>Object.prototype.hasOwnProperty.call(values,d.key)).map(d=>d.label+'：'+values[d.key]+(d.unit?' '+d.unit:'')+(d.note?'（'+d.note+'）':''));};
 
 g.MPVisual=V;
 })(window);

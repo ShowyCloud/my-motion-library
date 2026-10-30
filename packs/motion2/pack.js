@@ -99,7 +99,7 @@ MotionPrompt.pack('motion2', function () {
     u = snapU(u);
     stage(k);
     const T = CYC / 2, n = Math.floor(u / T), lu = u - n * T, dir = n % 2 ? -1 : 1;
-    const i = Math.min(FTAB.A.length - 1, Math.round(lu * 600)), q = FTAB.pos(lu);
+    const i = Math.min(FTAB.A.length - 1, Math.round(lu * EP("122", "value1", 600))), q = FTAB.pos(lu);
     const xs = dir > 0 ? 118 : w - 118, x = xs + dir * q * FTAB.D;
     const floor = h - 26, R = 38, cy = floor - R, a = dir * FTAB.A[i];
     k.fillStyle = C.navy3; rr(k, 26, floor, w - 52, 5, 2.5); k.fill();
@@ -114,7 +114,7 @@ MotionPrompt.pack('motion2', function () {
       const ang = dir > 0 ? ang0 : Math.PI - ang0; px += Math.cos(ang) * 14; py += Math.sin(ang) * 14; pts.push([px, py]);
     }
     k.lineCap = 'round'; k.lineJoin = 'round'; k.strokeStyle = C.coral;
-    for (let j = 1; j < pts.length; j++) { k.lineWidth = lerp(14, 6, j / pts.length); k.beginPath(); k.moveTo(pts[j - 1][0], pts[j - 1][1]); k.lineTo(pts[j][0], pts[j][1]); k.stroke(); }
+    for (let j = 1; j < pts.length; j++) { k.lineWidth = lerp(14, EP("122", "value2", 6), j / pts.length); k.beginPath(); k.moveTo(pts[j - 1][0], pts[j - 1][1]); k.lineTo(pts[j][0], pts[j][1]); k.stroke(); }
     k.fillStyle = C.coral; k.beginPath(); k.arc(px, py, 9, 0, 7); k.fill();
     // 体
     k.fillStyle = C.mint; k.beginPath(); k.arc(x, cy, R, 0, 7); k.fill();
@@ -139,7 +139,7 @@ MotionPrompt.pack('motion2', function () {
     u = snapU(u);
     stage(k);
     const T = CYC / 2, n = Math.floor(u / T), lu = u - n * T, t = lu - 0.1;
-    const floor = h - 26, R = 26, rest = floor - R, x = lerp(150, 390, eOut(P(lu, 0.1, 1.8)));
+    const floor = h - 26, R = 26, rest = floor - R, x = lerp(150, 390, eOut(P(lu, 0.1, EP("123", "value1", 1.8))));
     const hg = t < 0 ? BNC.d : bounceH(t), out = 1 - backIn(P(lu, 1.95, 2.25), 2);
     k.fillStyle = C.navy3; rr(k, 26, floor, w - 52, 5, 2.5); k.fill();
     // 着地の印
@@ -170,7 +170,7 @@ MotionPrompt.pack('motion2', function () {
     const X = w / 2 + dx, Y = 34 + dy;
     // 両わきの振動の線（揺れているあいだ、ずっと出ている）
     k.strokeStyle = '#fff'; k.lineCap = 'round'; k.lineWidth = 6;
-    [[86, 0.85], [110, 0.5]].forEach(([r, al], j) => { const fl = 0.55 + 0.45 * Math.abs(Math.sin(WGF * (41 + j * 12) * u)); k.globalAlpha = al * fl;[0, Math.PI].forEach(base => { k.beginPath(); k.arc(w / 2, 104, r, base - 0.42, base + 0.42); k.stroke(); }); });
+    [[86, 0.85], [110, 0.5]].forEach(([r, al], j) => { const fl = 0.55 + EP("124", "value1", 0.45) * Math.abs(Math.sin(WGF * (41 + j * 12) * u)); k.globalAlpha = al * fl;[0, Math.PI].forEach(base => { k.beginPath(); k.arc(w / 2, 104, r, base - 0.42, base + 0.42); k.stroke(); }); });
     k.globalAlpha = 1;
     k.save(); k.translate(X, Y); k.rotate(rot);
     // 舌（ベルと逆にふれる）
@@ -192,8 +192,8 @@ MotionPrompt.pack('motion2', function () {
     const b = 0.26 * g(0.2, 0.065) + 0.15 * g(0.44, 0.07) + 0.26 * Math.exp(-Math.pow((lu - T - 0.2) / 0.065, 2));
     for (const [t0, s] of [[0.16, 1], [0.4, 0.6]]) {
       const q = P(lu, t0, t0 + 0.8); if (q <= 0 || q >= 1) continue;
-      k.save(); k.translate(X, Y); const sc = 1.2 + 1.2 * eOut(q); k.scale(sc, sc); heartPath(k, 44);
-      k.strokeStyle = C.coral; k.globalAlpha = (1 - q) * 0.75 * s; k.lineWidth = (7 * (1 - q) + 1.5) / sc; k.stroke(); k.restore();
+      k.save(); k.translate(X, Y); const sc = 1.2 + EP("125", "value1", 1.2) * eOut(q); k.scale(sc, sc); heartPath(k, 44);
+      k.strokeStyle = C.coral; k.globalAlpha = (1 - q) * EP("125", "value2", 0.75) * s; k.lineWidth = (7 * (1 - q) + 1.5) / sc; k.stroke(); k.restore();
     }
     k.globalAlpha = 1;
     k.save(); k.translate(X, Y); k.scale(1 + b, 1 + b); heartPath(k, 44); k.fillStyle = C.coral; k.fill();
@@ -210,7 +210,7 @@ MotionPrompt.pack('motion2', function () {
     const th = -Math.PI + 2 * Math.PI * (u / CYC);
     // 通ったあとの線
     k.lineCap = 'round';
-    for (let j = 0; j < 24; j++) { const a = th - j * 0.03, b = th - (j + 1) * 0.03; k.strokeStyle = C.mint; k.globalAlpha = 0.9 * (1 - j / 24); k.lineWidth = 7 * (1 - j / 30); k.beginPath(); k.moveTo(MPX(a), MPY(a)); k.lineTo(MPX(b), MPY(b)); k.stroke(); }
+    for (let j = 0; j < 24; j++) { const a = th - j * 0.03, b = th - (j + 1) * EP("126", "value1", 0.03); k.strokeStyle = C.mint; k.globalAlpha = EP("126", "value2", 0.9) * (1 - j / 24); k.lineWidth = 7 * (1 - j / 30); k.beginPath(); k.moveTo(MPX(a), MPY(a)); k.lineTo(MPX(b), MPY(b)); k.stroke(); }
     k.globalAlpha = 1;
     const x = MPX(th), y = MPY(th), ang = Math.atan2(74 * Math.sin(th), 112 - 150 * Math.cos(th));
     k.save(); k.translate(x, y); k.rotate(ang);
@@ -225,7 +225,7 @@ MotionPrompt.pack('motion2', function () {
   CELLS[6] = (k, w, h, u) => {
     u = snapU(u);
     stage(k);
-    const q = u / CYC, fwd = q < 0.5, g = fwd ? 2 * q : 2 - 2 * q, X0 = 92, X1 = w - 92, base = 136, S = 48;
+    const q = u / CYC, fwd = q < 0.5, g = fwd ? EP("127", "value1", 2) * q : 2 - EP("127", "value1", 2) * q, X0 = 92, X1 = w - 92, base = 136, S = 48;
     const pos = gg => [lerp(X0, X1, gg), base - 62 * Math.abs(Math.sin(3 * Math.PI * gg))];
     k.save(); k.setLineDash([2, 12]); k.lineCap = 'round'; k.strokeStyle = C.navy3; k.lineWidth = 5; k.beginPath();
     for (let i = 0; i <= 150; i++) { const [px, py] = pos(i / 150); i ? k.lineTo(px, py - S / 2) : k.moveTo(px, py - S / 2); } k.stroke(); k.restore();
@@ -257,7 +257,7 @@ MotionPrompt.pack('motion2', function () {
     k.fillStyle = '#0A1230'; k.fillRect(0, 0, w, 26); k.fillRect(0, h - 26, w, 26);
     k.fillStyle = C.navy3; for (let x = 12; x < w; x += 34) { rr(k, x, 8, 18, 11, 3); k.fill(); rr(k, x, h - 19, 18, 11, 3); k.fill(); }
     const NS = 38, st = CYC / NS, fi = Math.floor(u / st), floor = h - 44;
-    const pose = f => { const t = f / NS, j = i => H01(f * 7919 + i * 131 + 77) - 0.5; return { x: lerp(-44, w + 44, t) + j(1) * 10, y: floor - 36 - 54 * Math.abs(Math.sin(t * Math.PI * 3)) + j(2) * 9, r: t * Math.PI * 4 + j(3) * 0.3, s: 1 + j(4) * 0.1 }; };
+    const pose = f => { const t = f / NS, j = i => H01(f * 7919 + i * 131 + 77) - 0.5; return { x: lerp(EP("128", "value2", -44), w + 44, t) + j(1) * 10, y: floor - 36 - EP("128", "value1", 54) * Math.abs(Math.sin(t * Math.PI * 3)) + j(2) * 9, r: t * Math.PI * 4 + j(3) * 0.3, s: 1 + j(4) * 0.1 }; };
     const draw = (p, a) => {
       k.globalAlpha = a;
       k.save(); k.translate(p.x + 5, p.y + 6); k.rotate(p.r); k.scale(p.s, p.s); k.fillStyle = 'rgba(0,0,0,.35)'; star(k, 0, 0, 38, 0, 0.5); k.fill(); k.restore();
@@ -285,12 +285,12 @@ MotionPrompt.pack('motion2', function () {
     const cw = Math.max(k.measureText('M').width, ...[...word].map(ch => k.measureText(ch).width)) + 16, x0 = w / 2 - cw * (N - 1) / 2, Y = h / 2 - 8;
     const step = Math.floor(u / (CYC / 76));
     for (let i = 0; i < N; i++) {
-      const tl = 0.45 + i * 0.18, tu = 1.85 + (N - 1 - i) * 0.08, locked = lu >= tl && lu < tu;
+      const tl = 0.45 + i * EP("129", "stagger", 0.18), tu = 1.85 + (N - 1 - i) * 0.08, locked = lu >= tl && lu < tu;
       let ch, col, sc = 1;
       if (locked) { ch = word[i]; const age = lu - tl; col = age < 0.22 ? C.yel : '#fff'; sc = 1 + 0.2 * Math.exp(-age * 14); }
       else { ch = SCR_GL[Math.floor(H01(step * 131 + i * 977 + n * 31) * SCR_GL.length)]; col = C.mint; }
       k.save(); k.translate(x0 + i * cw, Y); k.scale(sc, sc); k.globalAlpha = locked ? 1 : 0.75; txt(k, ch, 0, 0, f, col, 'center', 'middle'); k.restore();
-      const next = !locked && lu < tl && (i === 0 || lu >= 0.45 + (i - 1) * 0.18);
+      const next = !locked && lu < tl && (i === 0 || lu >= 0.45 + (i - 1) * EP("129", "stagger", 0.18));
       k.fillStyle = locked ? C.blue : next ? C.yel : C.navy3; rr(k, x0 + i * cw - cw / 2 + 8, Y + 58, cw - 16, 8, 4); k.fill();
     }
   };
@@ -299,10 +299,10 @@ MotionPrompt.pack('motion2', function () {
   // 10 ウェーブテキスト（1文字ずつ、波のように順に上下する）
   CELLS[9] = (k, w, h, u) => {
     stage(k);
-    const f = `800 70px ${DISP}`, cs = chars(k, '波浪文字', f, 4), Y = h / 2 + 2, ph = 2 * Math.PI * 3 * u / CYC;
+    const f = `800 70px ${DISP}`, cs = chars(k, '波浪文字', f, 4), Y = h / 2 + 2, ph = 2 * Math.PI * EP("130", "value1", 3) * u / CYC;
     cs.forEach((c, i) => {
       if (c.ch === ' ') return;
-      const s = Math.sin(ph - i * 0.62), y = -28 * s;
+      const s = Math.sin(ph - i * 0.62), y = EP("130", "value2", -28) * s;
       k.fillStyle = 'rgba(0,0,0,.3)'; k.beginPath(); k.ellipse(w / 2 + c.x, Y + 62, c.w * (0.42 - 0.12 * s), 4, 0, 0, 7); k.fill();
       k.save(); k.translate(w / 2 + c.x, Y + y); k.scale(1, 1 + 0.06 * s); txt(k, c.ch, 0, 0, f, mix('#FFFFFF', C.yel, clamp(s)), 'center', 'middle'); k.restore();
     });
@@ -315,7 +315,7 @@ MotionPrompt.pack('motion2', function () {
     stage(k);
     k.save(); k.setLineDash([14, 10]); k.strokeStyle = C.navy3; k.lineWidth = 5; k.lineCap = 'round'; k.beginPath(); TOP.pts.forEach((p, i) => i ? k.lineTo(p[0], p[1] + 6) : k.moveTo(p[0], p[1] + 6)); k.stroke(); k.restore();
     const f = `800 42px ${DISP}`, S = '沿线文字 • '; k.font = f;
-    const ws = [...S].map(ch => k.measureText(ch).width + 2), run = ws.reduce((a, b) => a + b, 0), L = TOP.cum[TOP.cum.length - 1], shift = (u / CYC) * run;
+    const ws = [...S].map(ch => k.measureText(ch).width + 2), run = ws.reduce((a, b) => a + b, 0), L = TOP.cum[TOP.cum.length - 1], shift = (u / CYC) * run * EP("131", "loops", 1);
     for (let r = -2; r * run + shift < L; r++) {
       let s = r * run + shift;
       [...S].forEach((ch, j) => {
@@ -331,7 +331,7 @@ MotionPrompt.pack('motion2', function () {
   // 12 可変フォントアニメーション（同じ単語の太さが、細→極太→細となめらかに変わる）
   CELLS[11] = (k, w, h, u) => {
     stage(k);
-    const v = 0.5 - 0.5 * Math.cos(2 * Math.PI * 2 * u / CYC), wt = Math.round(100 + 800 * v);
+    const v = 0.5 - EP("132", "value1", 0.5) * Math.cos(2 * Math.PI * EP("132", "value2", 2) * u / CYC), wt = Math.round(100 + 800 * v);
     txt(k, '运动', w / 2, 80, `${wt} 112px system-ui`, '#fff', 'center', 'middle', '2px');
     const x0 = 112, x1 = w - 112, y = 180, kx = x0 + (x1 - x0) * v;
     txt(k, '细', x0 - 34, y + 1, `300 30px ${JP}`, C.dim, 'center', 'middle');
@@ -360,7 +360,7 @@ MotionPrompt.pack('motion2', function () {
     stage(k);
     let fs = 172; while (fs > 90 && tw(k, '海洋', `900 ${fs}px system-ui`, '2px') > 500) fs -= 2;
     const font = `900 ${fs}px system-ui`, Y = h / 2 + 6;
-    const open = smooth(P(u, 3.45, 3.85)) * (1 - smooth(P(u, 4.25, 4.65)));
+    const open = smooth(P(u, 3.45, EP("133", "value1", 3.85))) * (1 - smooth(P(u, 4.25, 4.65)));
     TK.setTransform(1, 0, 0, 1, 0, 0); TK.globalCompositeOperation = 'source-over'; TK.clearRect(0, 0, w, h);
     txt(TK, '海洋', w / 2, Y, font, '#fff', 'center', 'middle', '2px');
     GK0.setTransform(1, 0, 0, 1, 0, 0); GK0.globalCompositeOperation = 'source-over'; GK0.clearRect(0, 0, w, h); seaPattern(GK0, w, h, u);
@@ -377,7 +377,7 @@ MotionPrompt.pack('motion2', function () {
     u = snapU(u);
     stage(k);
     const N = 12, X = w / 2, Y = h / 2, R = 58, spin = 2 * Math.PI * u / CYC;
-    const cnt = 1 + (N - 1) * (eIOs(P(u, 0.35, 1.7)) - eIOs(P(u, 3.6, 4.45)));
+    const cnt = 1 + (N - 1) * (eIOs(P(u, 0.35, EP("134", "value1", 1.7))) - eIOs(P(u, 3.6, 4.45)));
     for (let i = N - 1; i >= 0; i--) {
       const vis = i === 0 ? 1 : clamp(cnt - i); if (vis <= 0) continue;
       const ang = spin + (i === 0 ? 0 : (i - 1 + eOut(vis))) * 2 * Math.PI / N;
@@ -401,7 +401,7 @@ MotionPrompt.pack('motion2', function () {
       if (s % 2) { k.rotate(rot + (s + 1) * W8); k.scale(1, -1); } else k.rotate(rot + s * W8);
       k.beginPath(); k.moveTo(0, 0); k.arc(0, 0, RM + 60, -0.006, W8 + 0.006); k.closePath(); k.clip();
       for (const it of KAL) {
-        const r = mod(it.r0 + (u / CYC) * RM, RM), th = it.th + 0.08 * Math.sin(2 * Math.PI * u / CYC + it.ph), sz = (5 + r * 0.1) * it.sz;
+        const r = mod(it.r0 + (u / CYC) * RM, RM), th = it.th + EP("135", "value1", 0.08) * Math.sin(2 * Math.PI * u / CYC + it.ph), sz = (5 + r * 0.1) * it.sz;
         const a = smooth(P(r, 0, 30)) * (1 - smooth(P(r, RM - 70, RM))); if (a <= 0) continue;
         k.globalAlpha = a; k.fillStyle = it.col; k.save(); k.translate(Math.cos(th) * r, Math.sin(th) * r); k.rotate(r * 0.02);
         if (it.kind === 0) { k.beginPath(); k.arc(0, 0, sz, 0, 7); k.fill(); }
@@ -411,7 +411,7 @@ MotionPrompt.pack('motion2', function () {
       }
       k.globalAlpha = 1; k.restore();
     }
-    k.fillStyle = '#fff'; star(k, X, Y, 20 + 4 * Math.sin(2 * Math.PI * 2 * u / CYC), rot, 0.5, 8); k.fill();
+    k.fillStyle = '#fff'; star(k, X, Y, 20 + EP("135", "value2", 4) * Math.sin(2 * Math.PI * 2 * u / CYC), rot, 0.5, 8); k.fill();
   };
 
   // @element 16
@@ -441,7 +441,7 @@ MotionPrompt.pack('motion2', function () {
     const fi = Math.floor(u / (CYC / 47));
     k.lineCap = 'round'; k.lineJoin = 'round';
     LB.forEach((sh, si) => {
-      const q = sh.pts.map((p, j) => [p[0] + (H01(fi * 7919 + j * 131 + si * 17) - 0.5) * 7, p[1] + (H01(fi * 6007 + j * 97 + si * 29 + 5) - 0.5) * 7]);
+      const q = sh.pts.map((p, j) => [p[0] + (H01(fi * 7919 + j * 131 + si * 17) - 0.5) * EP("136", "value1", 7), p[1] + (H01(fi * 6007 + j * 97 + si * 29 + 5) - 0.5) * EP("136", "value2", 7)]);
       k.strokeStyle = sh.col; k.lineWidth = sh.w; k.beginPath();
       const n = q.length, mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
       if (sh.closed) { const m0 = mid(q[n - 1], q[0]); k.moveTo(m0[0], m0[1]); for (let j = 0; j < n; j++) { const m = mid(q[j], q[(j + 1) % n]); k.quadraticCurveTo(q[j][0], q[j][1], m[0], m[1]); } k.closePath(); }
@@ -533,7 +533,7 @@ MotionPrompt.pack('motion2', function () {
   // 17 プッシュ（次の画面が横から入ってきて、前の画面を一緒に押し出す）
   const SC17 = [scSea, scMtn];
   CELLS[16] = abCell((k, w, h, u, a, b) => {
-    const p = eIO(P(u, TA - 0.05, TB + 0.1)), dir = a === 0 ? -1 : 1;
+    const p = eIO(P(u, TA - EP("137", "lead", 0.05), TB + 0.1)), dir = a === 0 ? -1 : 1;
     if (p <= 0) return SC17[a](k, w, h);
     if (p >= 1) return SC17[b](k, w, h);
     k.save(); k.translate(dir * p * w, 0); SC17[a](k, w, h); k.restore();
@@ -545,7 +545,7 @@ MotionPrompt.pack('motion2', function () {
   // @element 18
   // 18 ブラインド（細い帯ごとのすき間がだんだん広がって、次の画面が開く）
   CELLS[17] = abCell((k, w, h, u, a, b) => {
-    const p = eIOs(P(u, TA - 0.1, TB + 0.15)), N = 7, sh = h / N, S = [scrA, scrB];
+    const p = eIOs(P(u, TA - 0.1, TB + 0.15)), N = EP("138", "count", 7), sh = h / N, S = [scrA, scrB];
     S[a](k, w, h);
     if (p <= 0) return;
     k.save(); k.beginPath(); for (let i = 0; i < N; i++) k.rect(0, i * sh, w, sh * p + (p > 0.999 ? 1 : 0)); k.clip(); S[b](k, w, h); k.restore();
@@ -564,11 +564,11 @@ MotionPrompt.pack('motion2', function () {
   }
   CELLS[18] = abCell((k, w, h, u, a, b) => {
     stage(k);
-    const phi = (Math.PI / 2) * eIO(P(u, TA - 0.05, TB + 0.1)), c = Math.cos(phi), s = Math.sin(phi), HW = CFW / 2, D = 820, X = w / 2, Y = h / 2 - 4;
+    const phi = (Math.PI / 2) * eIO(P(u, TA - 0.05, TB + 0.1)), c = Math.cos(phi), s = Math.sin(phi), HW = CFW / 2, D = EP("139", "value1", 820), X = w / 2, Y = h / 2 - 4;
     const rot = (x, z) => [x * c - z * s, x * s + z * c];
     const FL = rot(-HW, HW), FR = rot(HW, HW), BR = rot(HW, -HW);
     const pj = p => { const f = D / (D - (p[1] - HW)); return [X + p[0] * f, f]; };
-    k.fillStyle = 'rgba(0,0,0,.3)'; k.beginPath(); k.ellipse(X, h - 16, HW * (c + s) * 0.95, 7, 0, 0, 7); k.fill();
+    k.fillStyle = 'rgba(0,0,0,.3)'; k.beginPath(); k.ellipse(X, h - 16, HW * (c + s) * EP("139", "value2", 0.95), 7, 0, 0, 7); k.fill();
     const face = (img, P0, P1, shade) => {
       const A0 = pj(P0), A1 = pj(P1); if (A1[0] - A0[0] < 1) return;
       const STEP = 2;
@@ -595,7 +595,7 @@ MotionPrompt.pack('motion2', function () {
   }
   function clipHalf(poly, d, s0, keepLess) { const out = [], f = p => (p[0] - CW) * d[0] + (p[1] - CH) * d[1] - s0; for (let i = 0; i < poly.length; i++) { const A = poly[i], B = poly[(i + 1) % poly.length], fa = f(A), fb = f(B), ia = keepLess ? fa <= 0 : fa >= 0, ib = keepLess ? fb <= 0 : fb >= 0; if (ia) out.push(A); if (ia !== ib) { const t = fa / (fa - fb); out.push([lerp(A[0], B[0], t), lerp(A[1], B[1], t)]); } } return out; }
   CELLS[19] = abCell((k, w, h, u, a, b) => {
-    const dl = Math.hypot(1, 0.42), d = [-1 / dl, -0.42 / dl], sM = 600 * eIOs(P(u, TA - 0.15, TB + 0.25));
+    const dl = Math.hypot(1, 0.42), d = [-1 / dl, -0.42 / dl], sM = EP("140", "value1", 600) * eIOs(P(u, TA - 0.15, TB + 0.25));
     paper(k, w, h, b);
     if (sM >= 599) return;
     const rect = [[0, 0], [w, 0], [w, h], [0, h]], rest = clipHalf(rect, d, sM, false), corner = clipHalf(rect, d, sM, true);
@@ -605,7 +605,7 @@ MotionPrompt.pack('motion2', function () {
       k.save(); polyPath(k, corner); k.clip();
       const mx = w + d[0] * sM, my = h + d[1] * sM, gr = k.createLinearGradient(mx, my, mx - d[0] * 50, my - d[1] * 50);
       gr.addColorStop(0, 'rgba(15,26,61,.35)'); gr.addColorStop(1, 'rgba(15,26,61,0)'); k.fillStyle = gr; k.fillRect(0, 0, w, h); k.restore();
-      const flap = corner.map(p => { const s = (p[0] - w) * d[0] + (p[1] - h) * d[1], m = 2 * (sM - s); return [p[0] + m * d[0], p[1] + m * d[1]]; });
+      const flap = corner.map(p => { const s = (p[0] - w) * d[0] + (p[1] - h) * d[1], m = EP("140", "value2", 2) * (sM - s); return [p[0] + m * d[0], p[1] + m * d[1]]; });
       k.save(); k.shadowColor = 'rgba(0,0,0,.35)'; k.shadowBlur = 14; k.shadowOffsetX = 4; k.shadowOffsetY = 4;
       polyPath(k, flap); k.fillStyle = a ? '#EADBB8' : '#E3E6EF'; k.fill(); k.restore();
       k.strokeStyle = 'rgba(255,255,255,.8)'; k.lineWidth = 2; polyPath(k, flap); k.stroke();
@@ -617,7 +617,7 @@ MotionPrompt.pack('motion2', function () {
   const SMC = mkCanvas(CW, CH), SMK = SMC.getContext('2d');
   const BLV = [1, 2, 3, 4, 6, 8, 11, 15, 20, 27, 36];
   CELLS[20] = abCell((k, w, h, u, a, b) => {
-    const S = [scField, scCity], p = P(u, TA - 0.3, TB + 0.4), tri = 1 - Math.abs(2 * p - 1), bs = BLV[Math.round(tri * (BLV.length - 1))];
+    const S = [scField, scCity], p = P(u, TA - 0.3, TB + 0.4), tri = 1 - Math.abs(EP("141", "value1", 2) * p - 1), bs = BLV[Math.round(tri * (BLV.length - 1))];
     const scr = p < 0.5 ? a : b;
     if (bs <= 1) return S[scr](k, w, h);
     TK.setTransform(1, 0, 0, 1, 0, 0); TK.globalCompositeOperation = 'source-over'; TK.clearRect(0, 0, w, h); S[scr](TK, w, h);
@@ -658,7 +658,7 @@ MotionPrompt.pack('motion2', function () {
     TK.setTransform(1, 0, 0, 1, 0, 0); TK.globalCompositeOperation = 'source-over'; TK.clearRect(0, 0, w, h); S[a](TK, w, h);
     for (const s of SHARDS.sh) {
       const t = u - tb - s.dl; let al = 1, x = 0, y = 0, rt = 0, sc = 1;
-      if (t > 0) { x = s.vx * t; y = s.vy * t + 0.5 * 1300 * t * t; rt = s.spin * t; sc = 1 - 0.35 * Math.min(1, t); al = 1 - P(t, 0.55, 1.0); }
+      if (t > 0) { x = s.vx * t; y = s.vy * t + 0.5 * 1300 * t * t; rt = s.spin * t; sc = 1 - 0.35 * Math.min(1, t); al = 1 - P(t, 0.55, EP("142", "value1", 1.0)); }
       if (al <= 0) continue;
       k.save(); k.globalAlpha = al; k.translate(s.c[0] + x, s.c[1] + y); k.rotate(rt); k.scale(sc, sc); k.translate(-s.c[0], -s.c[1]);
       polyPath(k, s.poly); k.save(); k.clip(); k.drawImage(TMP, 0, 0); k.restore();
@@ -680,8 +680,8 @@ MotionPrompt.pack('motion2', function () {
     u = snapU(u);
     stage(k);
     const X = 200, Y = 156, SP = 30, SC = 0.85;
-    const ex = i => backOut(P(u, 0.45 + i * 0.08, 1.2 + i * 0.08), 1.3) * (1 - eIO(P(u, 3.25 + (3 - i) * 0.07, 3.95 + (3 - i) * 0.07)));
-    const E = XL.map((_, i) => ex(i)), zs = E.map((e, i) => i * 7 + e * i * SP + 3 * Math.sin(2 * Math.PI * 2 * u / CYC + i) * clamp(e));
+    const ex = i => backOut(P(u, 0.45 + i * 0.08, 1.2 + i * 0.08), 1.3) * (1 - eIO(P(u, 3.25 + (3 - i) * EP("143", "value2", 0.07), 3.95 + (3 - i) * EP("143", "value2", 0.07))));
+    const E = XL.map((_, i) => ex(i)), zs = E.map((e, i) => i * 7 + e * i * SP + EP("143", "value1", 3) * Math.sin(2 * Math.PI * 2 * u / CYC + i) * clamp(e));
     k.fillStyle = 'rgba(0,0,0,.3)'; k.beginPath(); k.ellipse(X, Y + 40, 64, 13, 0, 0, 7); k.fill();
     // 縦の補助線（ばらけたときだけ）
     const e3 = clamp(E[3]); if (e3 > 0.03) { k.save(); k.setLineDash([4, 7]); k.strokeStyle = C.dim; k.lineWidth = 2; k.globalAlpha = e3;[[-27, -50], [27, 50], [-27, 50]].forEach(([px, py]) => { const [ix, iy] = ISO(px * SC, py * SC); k.beginPath(); k.moveTo(X + ix, Y + iy - zs[0]); k.lineTo(X + ix, Y + iy - zs[3]); k.stroke(); }); k.restore(); }
@@ -703,7 +703,7 @@ MotionPrompt.pack('motion2', function () {
   // 24 スプリットスクリーン（1枚の画面が2つ、3つに分かれて、別々の場面が同時に動く）
   CELLS[23] = (k, w, h, u) => {
     u = snapU(u);
-    const s2 = eIO(P(u, 0.45, 0.95)), s3 = eIO(P(u, 1.4, 1.9)), m = eIO(P(u, 3.75, 4.4));
+    const s2 = eIO(P(u, 0.45, EP("144", "value1", 0.95))), s3 = eIO(P(u, 1.4, 1.9)), m = eIO(P(u, 3.75, 4.4));
     let b1 = lerp(lerp(w, w / 2, s2), w / 3, s3), b2 = lerp(w, 2 * w / 3, s3);
     b1 = lerp(b1, w, m); b2 = lerp(b2, w, m);
     pnSea(k, 0, b1, h, u, false);

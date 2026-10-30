@@ -228,14 +228,14 @@ MotionPrompt.pack('camera2', function () {
 
   // @element 02
   // 02 バレルロール: レンズの軸（画面の中央）でカメラを1回転
-  CELLS[1] = shot(camCell((k, w, h, p) => world(k, w, h, cam({ roll: p * Math.PI * 2 }), { person: { z: 7 } }),
-    p => `↻ ${Math.round(p * 360)}°`, 0.5, 3.6));
+  CELLS[1] = shot(camCell((k, w, h, p) => world(k, w, h, cam({ roll: p * Math.PI * EP("170", "value1", 2) }), { person: { z: 7 } }),
+    p => `↻ ${Math.round(p * EP("170", "value2", 360))}°`, 0.5, 3.6));
 
   // @element 03
   // 03 ハイパーラプス: 街路を前へ進みながらのタイムラプス（太陽・雲・人影が早送り）。#039 タイムラプスはカメラが動かない
   const HL_BLD = [[-7.5, 4, 9, 5], [7.5, 3.4, 12, 9], [-7.5, 3.6, 14, 13], [7.5, 4, 8, 18], [-7.5, 3.2, 11, 22], [7.5, 3.6, 15, 27], [-7.5, 4, 9, 31], [7.5, 3.2, 12, 36], [-7.5, 3.6, 13, 40], [7.5, 4, 10, 45], [-7.5, 3.4, 16, 50], [7.5, 3.6, 9, 55]];
   CELLS[2] = shot(camCell((k, w, h, p) => {
-    const z = lerp(0, 22, p), a = lerp(-1.25, 1.25, p);
+    const z = lerp(0, EP("171", "value1", 22), p), a = lerp(-1.25, EP("171", "value2", 1.25), p);
     const clouds = [[-20 + mod(p * 140, 80) - 10, 18, z + 90, 2.2], [-50 + mod(p * 140 + 40, 80), 24, z + 120, 3], [-10 + mod(p * 140 + 20, 80) - 30, 13, z + 70, 1.6]];
     const ex = HL_BLD.map(([x, bw, bh, zz]) => [x, 0, zz, (kk, s) => building(kk, s, bw, bh)]);
     for (let i = 0; i < 6; i++) { const ph = mod(p * 6 + i / 6, 1), dir = i % 2 ? 1 : -1; ex.push([dir * lerp(-5.5, 5.5, ph), 0, 7 + i * 7, (kk) => { kk.fillStyle = i % 3 ? C.g4 : C.blueM; kk.fillRect(-0.12, 0, 0.24, 0.9); kk.beginPath(); kk.arc(0, 1.05, 0.13, 0, 7); kk.fill(); }]); }
@@ -246,7 +246,7 @@ MotionPrompt.pack('camera2', function () {
         HL_BLD.forEach(([x, bw, bh, zz]) => { if (zz < cc.z + 1) return; const L = bh * 0.9; const q1 = proj(cc, x - bw / 2, 0, zz), q2 = proj(cc, x + bw / 2, 0, zz), q3 = proj(cc, x + bw / 2 - Math.sin(a) * L, 0, zz - Math.cos(a) * L * 0.4 - 1), q4 = proj(cc, x - bw / 2 - Math.sin(a) * L, 0, zz - Math.cos(a) * L * 0.4 - 1); if (q3.z < NEAR || q4.z < NEAR) return; kk.beginPath(); kk.moveTo(q1.x, q1.y); kk.lineTo(q2.x, q2.y); kk.lineTo(q3.x, q3.y); kk.lineTo(q4.x, q4.y); kk.fill(); });
       }
     });
-  }, p => { const m = Math.round(lerp(6 * 60, 18 * 60, p) / 10) * 10; return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')} · ${Math.round(lerp(0, 22, p))}m`; }, 0.4, 4.1));
+  }, p => { const m = Math.round(lerp(6 * 60, 18 * 60, p) / 10) * 10; return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')} · ${Math.round(lerp(0, EP("171", "value1", 22), p))}m`; }, 0.4, 4.1));
 
   // @element 04
   // 04 長回し: 歩く人物をカットなしで追い続ける1ショット。画面下の帯は1本のまま（#041 ジャンプカットのように割れない）
@@ -254,7 +254,7 @@ MotionPrompt.pack('camera2', function () {
     const uu = Math.min(u, CYC - RESET);
     const draw = (kk, t) => {
       const p = t / (CYC - RESET);
-      const x = lerp(-3.4, 2.8, p), z = lerp(5.2, 9.6, p), cx = lerp(0, 1.4, p);
+      const x = lerp(-3.4, EP("172", "value1", 2.8), p), z = lerp(5.2, 9.6, p), cx = lerp(0, 1.4, p);
       world(kk, w, h, cam({ x: cx, y: 1.4, yaw: Math.atan2(x - cx, z) * 0.8 }), { person: { x, z, walk: t * 7 }, fg: [[-2.6, 3.4], [3.6, 4.6, 'rock']] });
       strip(kk, w, h, [[0, CYC, '单镜头·无剪切', C.blue]], t);
     };
@@ -266,8 +266,8 @@ MotionPrompt.pack('camera2', function () {
   // @element 05
   // 05 ステディカム: 低い周波数の小さなうねりだけで、なめらかに前進しながら人物を追う（#034 手持ちの細かい揺れとの違い）
   CELLS[4] = shot((k, w, h, u) => {
-    const v = 8 / CYC, z = u * v, T = u * 2 * Math.PI / CYC;   // 1周で8m進む＝格子（2m）と木（8m）の並びが継ぎ目なく戻る
-    const c = cam({ z, y: 1.45 + 0.035 * Math.sin(T * 2), x: 0.05 * Math.sin(T), yaw: 0.012 * Math.sin(T + 1), roll: 0.006 * Math.sin(T * 2 + 0.5), pitch: -0.02 });
+    const v = 8 / CYC, z = u * v, T = u * EP("173", "value1", 2) * Math.PI / CYC;   // 1周で8m進む＝格子（2m）と木（8m）の並びが継ぎ目なく戻る
+    const c = cam({ z, y: 1.45 + EP("173", "value2", 0.035) * Math.sin(T * 2), x: 0.05 * Math.sin(T), yaw: 0.012 * Math.sin(T + 1), roll: 0.006 * Math.sin(T * 2 + 0.5), pitch: -0.02 });
     const ex = [], L = 8, base = Math.floor(z / L) * L;
     for (let i = 0; i < 10; i++) { const zz = base + i * L; ex.push([-5, 0, zz + 2, (kk, s) => tree(kk, s, 3.6)]); ex.push([5, 0, zz + 6, (kk, s) => tree(kk, s, 3.2, C.blueXL)]); }
     world(k, w, h, c, { buildings: false, trees: false, extra: ex, mtnZ: z, sun: [30, 30, z + 170], gridX: 20, person: { z: z + 5, walk: T * 5 } });
@@ -277,9 +277,9 @@ MotionPrompt.pack('camera2', function () {
   // @element 06
   // 06 フォローショット: 蛇行して歩く人物の後ろを、少し遅れて同じ道筋でついていく（#029 トラッキングは真横に並ぶ）
   CELLS[5] = shot(camCell((k, w, h, p) => {
-    const path = s => [1.8 * Math.sin(s * 2.2), 4 + s * 9];
+    const path = s => [EP("174", "value2", 1.8) * Math.sin(s * 2.2), 4 + s * 9];
     const [px, pz] = path(p), [cx, cz] = path(p - 0.4);
-    world(k, w, h, cam({ x: cx, z: cz, y: 1.5, yaw: Math.atan2(px - cx, pz - cz) }), { person: { x: px, z: pz, walk: p * 30 }, fg: [[-2.4, 7], [2.6, 9.5, 'rock'], [-1.5, 12]] });
+    world(k, w, h, cam({ x: cx, z: cz, y: 1.5, yaw: Math.atan2(px - cx, pz - cz) }), { person: { x: px, z: pz, walk: p * EP("174", "value1", 30) }, fg: [[-2.4, 7], [2.6, 9.5, 'rock'], [-1.5, 12]] });
   }, p => `跟随 ${Math.hypot(1.8 * Math.sin(p * 2.2) - 1.8 * Math.sin((p - 0.4) * 2.2), 3.6).toFixed(1)}m`, 0.3, 4.2));
 
   // @element 07
@@ -287,7 +287,7 @@ MotionPrompt.pack('camera2', function () {
   CELLS[6] = shot((k, w, h, u) => {
     const q = u / CYC;
     world(k, w, h, cam({ y: 1.4 }), {
-      person: { x: lerp(-6.2, 6.2, q), z: 6.5, walk: u * 7 },
+      person: { x: lerp(-6.2, EP("175", "value1", 6.2), q), z: 6.5, walk: u * 7 },
       extra: [[lerp(16, -16, q), 0, 15, (kk) => { kk.fillStyle = C.g4; rr(kk, -1.9, 0.35, 3.8, 0.75, 0.25); kk.fill(); rr(kk, -1.1, 0.95, 2.1, 0.62, 0.28); kk.fill(); kk.fillStyle = C.ink; [-1.15, 1.15].forEach(x => { kk.beginPath(); kk.arc(x, 0.34, 0.34, 0, 7); kk.fill(); }); }]],
       after: (kk) => {   // 三脚の印（左下）
         kk.strokeStyle = C.g4; kk.lineWidth = 2.2; kk.lineCap = 'round'; const x = -w / 2 + 38, y = h / 2 - 20;
@@ -301,7 +301,7 @@ MotionPrompt.pack('camera2', function () {
   // @element 08
   // 08 フライスルー: 壁の窓へ向かって飛び、通り抜けて向こうの場所へ出る（#035 FPV は木の間を抜けていく）
   CELLS[7] = shot(camCell((k, w, h, p) => {
-    const z = lerp(0, 12.5, p), WZ = 8;
+    const z = lerp(0, EP("176", "value1", 12.5), p), WZ = 8;
     world(k, w, h, cam({ z, y: 1.3 }), {
       buildings: true, person: { x: 0.3, z: 14.5 },
       extra: [[0, 0, WZ, (kk, s) => {   // 窓のあいた壁（偶奇塗り）
@@ -310,22 +310,22 @@ MotionPrompt.pack('camera2', function () {
         kk.strokeStyle = C.g2; kk.lineWidth = 1.2 / s; kk.beginPath(); kk.moveTo(-40, 14); kk.lineTo(40, 14); kk.stroke();
       }]]
     });
-  }, p => { const d = 8 - lerp(0, 12.5, p); return d > 0 ? `距窗口 ${d.toFixed(1)}m` : '通过'; }, 0.5, 3.6));
+  }, p => { const d = 8 - lerp(0, EP("176", "value1", 12.5), p); return d > 0 ? `距窗口 ${d.toFixed(1)}m` : '通过'; }, 0.5, 3.6));
 
   // @element 09
   // 09 ローアングル: カメラを地面近くに下げ、見上げる。人物が大きく、建物が高く見える
-  CELLS[8] = shot(camCell((k, w, h, p) => world(k, w, h, cam({ y: lerp(1.5, 0.35, p), pitch: lerp(0, 0.32, p) }), { person: { z: 4.5 }, tower: [-3, 22] }),
-    p => `↗ ${Math.round(lerp(0, 0.32, p) * 57.3)}° · ${lerp(1.5, 0.35, p).toFixed(1)}m`, 0.6, 2.2));
+  CELLS[8] = shot(camCell((k, w, h, p) => world(k, w, h, cam({ y: lerp(1.5, EP("177", "value1", 0.35), p), pitch: lerp(0, 0.32, p) }), { person: { z: 4.5 }, tower: [-3, 22] }),
+    p => `↗ ${Math.round(lerp(0, 0.32, p) * 57.3)}° · ${lerp(1.5, EP("177", "value1", 0.35), p).toFixed(1)}m`, 0.6, 2.2));
 
   // @element 10
   // 10 ハイアングル: カメラを高い位置へ上げ、見下ろす。人物が小さく見える（#031 クレーンアップは上がり続けて全体を見せる）
-  CELLS[9] = shot(camCell((k, w, h, p) => world(k, w, h, cam({ y: lerp(1.5, 4.5, p), pitch: lerp(0, -0.5, p) }), { person: { z: 5 } }),
-    p => `↘ ${Math.round(lerp(0, 0.5, p) * 57.3)}° · ${lerp(1.5, 4.5, p).toFixed(1)}m`, 0.6, 2.2));
+  CELLS[9] = shot(camCell((k, w, h, p) => world(k, w, h, cam({ y: lerp(1.5, EP("178", "value1", 4.5), p), pitch: lerp(0, -0.5, p) }), { person: { z: 5 } }),
+    p => `↘ ${Math.round(lerp(0, 0.5, p) * 57.3)}° · ${lerp(1.5, EP("178", "value1", 4.5), p).toFixed(1)}m`, 0.6, 2.2));
 
   // @element 11
   // 11 POVショット: 登場人物の目で見た画。歩く上下動と画面下の両手で一人称だと分かる。前の人物が振り向いて手を振る
   CELLS[10] = shot(camCell((k, w, h, p, u) => {
-    const z = lerp(0, 3.2, p), T = u * 2 * Math.PI / CYC;
+    const z = lerp(0, EP("179", "value1", 3.2), p), T = u * EP("179", "value2", 2) * Math.PI / CYC;
     const bob = Math.sin(T * 6) * 0.03 * (p > 0 && p < 1 ? 1 : 0);
     world(k, w, h, cam({ z, y: 1.6 + bob, roll: Math.sin(T * 3) * 0.008 * (p > 0 && p < 1 ? 1 : 0) }), {
       person: { z: 7.5, armUp: u > 1.6 && u < 3.4, walk: 0 }, fg: [[-1.8, 2.6], [2.2, 3.8]],
@@ -339,8 +339,8 @@ MotionPrompt.pack('camera2', function () {
   // @element 12
   // 12 オーバーザショルダー: 手前の人物の肩と後頭部を画面の端に入れ、肩越しに相手を撮る。手前はぼけ、相手にピント
   CELLS[11] = shot(camCell((k, w, h, p, u) => {
-    world(k, w, h, cam({ z: lerp(0, 0.35, p), y: 1.55, yaw: 0.05 }), {
-      person: { x: 0.32, z: 3.1, walk: 0.35 * Math.sin(u * 5) }, blurFg: 2.6,
+    world(k, w, h, cam({ z: lerp(0, EP("180", "value2", 0.35), p), y: 1.55, yaw: 0.05 }), {
+      person: { x: 0.32, z: 3.1, walk: EP("180", "value1", 0.35) * Math.sin(u * 5) }, blurFg: 2.6,
       extra: [[-0.62, 0, 1.15, (kk) => { kk.fillStyle = C.g4; kk.beginPath(); kk.arc(0, 1.63, 0.17, 0, 7); kk.fill(); rr(kk, -0.34, 0.9, 0.68, 0.6, 0.14); kk.fill(); }, true]]
     });
   }, p => '过肩'));
@@ -348,7 +348,7 @@ MotionPrompt.pack('camera2', function () {
   // @element 13
   // 13 バーズアイ: 真上（ピッチ -90°）から真下を見る。道・人・車・木がすべて上から見た形になる（10 ハイアングルは斜めから）
   CELLS[12] = shot(camCell((k, w, h, p) => {
-    const c = cam({ y: lerp(9, 15, p), pitch: -Math.PI / 2 });
+    const c = cam({ y: lerp(9, EP("181", "value1", 15), p), pitch: -Math.PI / 2 });
     const ex = [[0, 0, 0, (kk, s) => {   // 地面（格子と道）を1枚のスプライトとして描く
       kk.fillStyle = C.g1; kk.fillRect(-1.6, -16, 3.2, 32);
       kk.strokeStyle = C.grid; kk.lineWidth = 1.3 / s; kk.beginPath();
@@ -361,13 +361,13 @@ MotionPrompt.pack('camera2', function () {
     ex.push([-0.8, 0, lerp(3.4, -3.4, p), (kk) => { kk.fillStyle = C.blue; rr(kk, -0.9, -2, 1.8, 4, 0.4); kk.fill(); kk.fillStyle = '#fff'; kk.fillRect(-0.7, 0.3, 1.4, 0.8); kk.fillRect(-0.7, -1.2, 1.4, 0.6); }]);
     ex.push([0.9, 0, lerp(-2.6, 2.6, p), (kk) => { kk.fillStyle = C.blue; kk.beginPath(); kk.ellipse(0, 0, 0.24, 0.12, 0, 0, 7); kk.fill(); kk.beginPath(); kk.arc(0, 0, 0.16, 0, 7); kk.fill(); }]);
     world(k, w, h, c, { grid: false, mountains: false, buildings: false, trees: false, sun: null, extra: ex });
-  }, p => `↓ 90° · ${lerp(9, 15, p).toFixed(0)}m`));
+  }, p => `↓ 90° · ${lerp(9, EP("181", "value1", 15), p).toFixed(0)}m`));
 
   // @element 14
   // 14 ディープフォーカス: 手前の花から奥の建物まで、全部に同時にピントが合う（#033 ラックフォーカスは片方ずつ）
   CELLS[13] = shot(camCell((k, w, h, p) => {
     world(k, w, h, cam({ y: 1.1 }), {
-      person: { x: 0.9, z: 9 }, blurFg: 5 * (1 - p), blurBg: 6 * (1 - p),
+      person: { x: 0.9, z: 9 }, blurFg: EP("182", "value2", 5) * (1 - p), blurBg: 6 * (1 - p),
       extra: [[-0.75, 0, 2.0, (kk, s) => { kk.fillStyle = C.g3; kk.fillRect(-0.025, 0, 0.05, 0.75); kk.fillStyle = C.blueM; for (let i = 0; i < 6; i++) { kk.beginPath(); kk.ellipse(Math.cos(i) * 0.09, 0.8 + Math.sin(i) * 0.09, 0.08, 0.05, i, 0, 7); kk.fill(); } kk.fillStyle = C.blue; kk.beginPath(); kk.arc(0, 0.8, 0.05, 0, 7); kk.fill(); }, true]],
       after: (kk, cc) => {   // ピントの枠を手前と奥の両方に（合うにつれて濃く）
         kk.globalAlpha = p; kk.strokeStyle = C.blue; kk.lineWidth = 2; kk.beginPath();
@@ -375,21 +375,21 @@ MotionPrompt.pack('camera2', function () {
         kk.stroke(); kk.globalAlpha = 1;
       }
     });
-  }, p => { const a = lerp(1.8, 16, p); return `f/${a < 10 ? a.toFixed(1) : Math.round(a)}`; }));
+  }, p => { const a = lerp(1.8, EP("182", "value1", 16), p); return `f/${a < 10 ? a.toFixed(1) : Math.round(a)}`; }));
 
   // @element 15
   // 15 エスタブリッシングショット: 広角・高い位置から街全体を見せる引きの画。ゆっくり寄りながら場所の表示が出る
   CELLS[14] = shot(camCell((k, w, h, p, u) => {
     const clouds = [[-30, 20, 110, 2.6], [20, 26, 150, 3.2], [60, 17, 95, 2]];
-    world(k, w, h, cam({ f: 220, y: 4.5, pitch: -0.06, z: lerp(-5, -2.5, p) }), { city: true, clouds, tower: [16, 36], person: { x: -1, z: 12 } });
-    const a = P(u, 0.9, 1.3);   // 場所の表示（左下）
+    world(k, w, h, cam({ f: 220, y: 4.5, pitch: -0.06, z: lerp(-5, EP("183", "value2", -2.5), p) }), { city: true, clouds, tower: [16, 36], person: { x: -1, z: 12 } });
+    const a = P(u, 0.9, EP("183", "value1", 1.3));   // 場所の表示（左下）
     if (a > 0) { k.save(); k.globalAlpha = a; k.translate(30, h - 52 + (1 - a) * 8); k.fillStyle = 'rgba(255,255,255,.9)'; rr(k, 0, 0, 158, 30, 6); k.fill(); k.fillStyle = C.blue; k.fillRect(0, 0, 4, 30); txt(k, '外景·城市·日', 14, 15.5, `600 14px ${MONO}`, C.ink, 'left', 'middle'); k.restore(); }
   }, p => `${mm(220)} 广角`, 0.3, 4.2));
 
   // @element 16
   // 16 エクストリームクローズアップ: 顔のクローズアップから、目だけが画面を埋めるまで寄る
   CELLS[15] = shot(camCell((k, w, h, p) => {
-    const f = 610 * Math.pow(2040 / 610, p);
+    const f = EP("184", "value1", 610) * Math.pow(2040 / 610, p);
     world(k, w, h, cam({ f, x: -0.06, y: 1.66 }), {
       blurBg: 3, trees: true,
       extra: [[0, 0, 1.3, (kk) => {   // 目のある顔
@@ -397,7 +397,7 @@ MotionPrompt.pack('camera2', function () {
         [[-0.06, 1.66], [0.06, 1.66]].forEach(([x, y]) => { kk.fillStyle = '#fff'; kk.beginPath(); kk.ellipse(x, y, 0.045, 0.028, 0, 0, 7); kk.fill(); kk.fillStyle = C.ink; kk.beginPath(); kk.arc(x + 0.008, y, 0.016, 0, 7); kk.fill(); kk.fillStyle = '#fff'; kk.beginPath(); kk.arc(x + 0.014, y + 0.007, 0.005, 0, 7); kk.fill(); kk.strokeStyle = '#fff'; kk.lineWidth = 0.012; kk.beginPath(); kk.arc(x, y + 0.02, 0.05, Math.PI * 1.15, Math.PI * 1.85); kk.stroke(); });
       }]]
     });
-  }, p => `${mm(610 * Math.pow(2040 / 610, p))} ${p > 0.85 ? '大特写' : '特写'}`));
+  }, p => `${mm(EP("184", "value1", 610) * Math.pow(2040 / 610, p))} ${p > 0.85 ? '大特写' : '特写'}`));
 
   // @element 17
   // 17 インサートショット: 同じ場面の細部（手元の時計）を1.3秒だけ差し込み、元の画に戻る
@@ -411,8 +411,8 @@ MotionPrompt.pack('camera2', function () {
       k.fillStyle = C.blue; k.save(); k.rotate(-0.35); rr(k, -300, -46, 600, 92, 30); k.fill(); k.restore();
       k.fillStyle = '#fff'; k.beginPath(); k.arc(0, 0, 58, 0, 7); k.fill(); k.strokeStyle = C.ink; k.lineWidth = 5; k.stroke();
       k.strokeStyle = C.ink; k.lineWidth = 4; k.lineCap = 'round'; k.beginPath(); k.moveTo(0, 0); k.lineTo(0, -34); k.moveTo(0, 0); k.lineTo(26, 14); k.stroke();
-      const a = (u - INS[0]) / (INS[1] - INS[0]) * Math.PI * 2 - Math.PI / 2;   // 秒針が1周
-      k.strokeStyle = C.blue; k.lineWidth = 2; k.beginPath(); k.moveTo(0, 0); k.lineTo(Math.cos(a) * 44, Math.sin(a) * 44); k.stroke();
+      const a = (u - INS[0]) / (INS[1] - INS[0]) * Math.PI * EP("185", "value1", 2) - Math.PI / 2;   // 秒針が1周
+      k.strokeStyle = C.blue; k.lineWidth = 2; k.beginPath(); k.moveTo(0, 0); k.lineTo(Math.cos(a) * EP("185", "value2", 44), Math.sin(a) * 44); k.stroke();
       k.restore();
     }
     strip(k, w, h, [[0, INS[0], 'A', C.g2], [INS[0], INS[1], '详情', C.blue], [INS[1], CYC, 'A', C.g2]], u);
@@ -426,7 +426,7 @@ MotionPrompt.pack('camera2', function () {
     const draw = (kk, t) => {
       const q = eIOs(P(t, T0, T1));
       // テイク1とテイク2は姿勢が違う。モーフ中は同じ（補間した）位置に2つの姿勢を重ねて溶かす
-      const pose = (k2, m) => world(k2, w, h, cam({ y: 1.45, z: 0 }), { person: { x: lerp(-0.4, 0.35, q), z: 3.3, walk: (m ? 0.55 : -0.45) + 0.12 * Math.sin(t * 3) }, trees: true, buildings: true });
+      const pose = (k2, m) => world(k2, w, h, cam({ y: 1.45, z: 0 }), { person: { x: lerp(-0.4, EP("186", "value2", 0.35), q), z: 3.3, walk: (m ? 0.55 : -0.45) + EP("186", "value1", 0.12) * Math.sin(t * 3) }, trees: true, buildings: true });
       const bl = Math.sin(q * Math.PI) * 2.2;
       kk.save(); kk.filter = bl > 0.05 ? `blur(${bl.toFixed(2)}px)` : 'none';
       blend(kk, k2 => pose(k2, false), k2 => pose(k2, true), q);
@@ -454,7 +454,7 @@ MotionPrompt.pack('camera2', function () {
   // @element 19
   // 19 フェードアウト: 画面全体が黒へ沈んで終わり、黒から次の場面が明けてくる
   CELLS[18] = shot(abCell((k, w, h, u, A, B) => {
-    const out = eIOs(P(u, 1.4, 2.6)), inn = eIOs(P(u, 3.1, 4.3));
+    const out = eIOs(P(u, 1.4, EP("187", "value1", 2.6))), inn = eIOs(P(u, 3.1, 4.3));
     if (u < 2.9) A(k, w, h); else B(k, w, h);
     const a = u < 2.9 ? out : 1 - inn;
     if (a > 0) { k.fillStyle = `rgba(20,20,24,${a.toFixed(3)})`; k.fillRect(0, 0, w, h); }
@@ -463,7 +463,7 @@ MotionPrompt.pack('camera2', function () {
   // @element 20
   // 20 アイリスアウト: 人物を中心に丸い窓が閉じて黒になり、次の場面は丸い窓が開いて現れる
   CELLS[19] = shot(abCell((k, w, h, u, A, B) => {
-    const out = eIOs(P(u, 1.3, 2.7)), inn = eIOs(P(u, 3.1, 4.4));
+    const out = eIOs(P(u, 1.3, EP("188", "value1", 2.7))), inn = eIOs(P(u, 3.1, 4.4));
     const first = u < 2.9, cur = first ? A : B;
     cur(k, w, h);
     // 窓の中心は、いま映っている場面の主役（Aは人物の頭、Bは車）
@@ -481,10 +481,10 @@ MotionPrompt.pack('camera2', function () {
   const CUT = [1.7, 3.0];
   CELLS[20] = shot((k, w, h, u) => {
     const away = u >= CUT[0] && u < CUT[1];
-    if (!away) world(k, w, h, cam({ y: 1.4 }), { person: { x: 0, z: 5.5, walk: 0.45 * Math.sin(u * 6) }, extra: [[0.9, 0, 5.6, (kk) => { kk.fillStyle = C.g3; kk.fillRect(-0.3, 0, 0.6, 1.1); kk.fillRect(-0.4, 1.05, 0.8, 0.1); }]] });
+    if (!away) world(k, w, h, cam({ y: 1.4 }), { person: { x: 0, z: 5.5, walk: EP("189", "value1", 0.45) * Math.sin(u * 6) }, extra: [[0.9, 0, 5.6, (kk) => { kk.fillStyle = C.g3; kk.fillRect(-0.3, 0, 0.6, 1.1); kk.fillRect(-0.4, 1.05, 0.8, 0.1); }]] });
     else {
       const t = u - CUT[0], ex = [];
-      [[-1.6, 3.2], [-0.2, 3.6], [1.3, 3.1], [0.6, 4.4], [-1.1, 4.6]].forEach(([x, z], i) => ex.push([x, 0, z, (kk) => { kk.save(); kk.translate(0, Math.abs(Math.sin(t * 9 + i)) * 0.05); person(kk, 1, { armUp: true, col: i % 2 ? C.blue : C.blueM }); kk.restore(); }]));
+      [[-1.6, 3.2], [-0.2, 3.6], [1.3, 3.1], [0.6, 4.4], [-1.1, 4.6]].forEach(([x, z], i) => ex.push([x, 0, z, (kk) => { kk.save(); kk.translate(0, Math.abs(Math.sin(t * 9 + i)) * EP("189", "value2", 0.05)); person(kk, 1, { armUp: true, col: i % 2 ? C.blue : C.blueM }); kk.restore(); }]));
       world(k, w, h, cam({ y: 1.6, pitch: -0.08 }), { buildings: false, trees: false, mountains: false, sun: null, extra: ex });
     }
     strip(k, w, h, [[0, CUT[0], 'A', C.g2], [CUT[0], CUT[1], '另一个目标', C.blue], [CUT[1], CYC, 'A', C.g2]], u);
@@ -496,7 +496,7 @@ MotionPrompt.pack('camera2', function () {
   const XC = [0, 1.1, 2.0, 2.7, 3.3, 3.8, 4.2, 4.5, CYC];
   CELLS[21] = shot((k, w, h, u) => {
     const r = P(u, CYC - 0.3, CYC);
-    const runA = (kk, t) => world(kk, w, h, cam({ y: 1.3 }), { person: { x: -0.3, z: lerp(15, 4.5, t / CYC), walk: t * 12 }, fg: [[-2.2, 3.5], [-2.2, 6.5], [-2.2, 9.5], [-2.2, 12.5]] });
+    const runA = (kk, t) => world(kk, w, h, cam({ y: 1.3 }), { person: { x: -0.3, z: lerp(15, EP("190", "value2", 4.5), t / CYC), walk: t * EP("190", "value1", 12) }, fg: [[-2.2, 3.5], [-2.2, 6.5], [-2.2, 9.5], [-2.2, 12.5]] });
     const carB = (kk, t) => world(kk, w, h, cam({ y: 1.6, pitch: 0.06 }), { city: true, mountains: false, trees: false, sun: [-26, 40, 150], extra: [[1.0, 0, lerp(17, 4.5, t / CYC), CAR[3]]] });
     let i = 0; while (u >= XC[i + 1]) i++;
     const isA = i % 2 === 0;
@@ -516,7 +516,7 @@ MotionPrompt.pack('camera2', function () {
   CELLS[22] = shot((k, w, h, u, cyc) => {
     const T0 = 1.5, T1 = 3.3, SLOW = 0.1;
     const tj = u < T0 ? u : u < T1 ? T0 + (u - T0) * SLOW : u - (T1 - T0) * (1 - SLOW);   // 実時間→映像時間
-    const q = P(tj, 0.6, 2.6), e = eIO(P(u, T0, T1));
+    const q = P(tj, 0.6, EP("191", "value1", 2.6)), e = eIO(P(u, T0, T1));
     const a = cyc % 2 === 0 ? lerp(-0.6, 0.6, e) : lerp(0.6, -0.6, e), R = 6, P0 = [0, 0, 9];
     const c = cam({ x: P0[0] + Math.sin(a) * R, z: P0[2] - Math.cos(a) * R, yaw: -a, y: 1.6, pitch: -0.05 });
     world(k, w, h, c, {
@@ -539,7 +539,7 @@ MotionPrompt.pack('camera2', function () {
   ];
   CELLS[23] = shot((k, w, h, u) => {
     let i = 0, t0 = 0; while (i < MT.length - 1 && u >= t0 + MT[i][0]) { t0 += MT[i][0]; i++; }
-    const r = P(u, CYC - 0.3, CYC);
+    const r = P(u, CYC - EP("192", "fade", 0.3), CYC);
     blend(k, kk => MT[i][2](kk, w, h, u - t0), kk => MT[0][2](kk, w, h, 0), eIOs(r));   // 最後の0.3秒で最初のカットへ戻す
     const segs = []; let s = 0; MT.forEach(([d, day], j) => { segs.push([s, s + d, '', j === i ? C.blue : C.g2]); s += d; });
     strip(k, w, h, segs, u);

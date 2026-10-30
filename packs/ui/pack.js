@@ -96,7 +96,7 @@ MotionPrompt.pack('ui', function () {
   CELLS[1] = ui((w, h, t) => {
     strokeRR(24, 14, 110, 34, 8, C.line2, 1.5); text('菜单', 79, 31, 15, '#555', 600, 'center');
     bar(160, 26, 140, C.line2, 11); pageLines(24, 70, 494); fillRR(24, 138, 494, 42, 8, C.block);
-    const a = eo(seg(t, 1.0, 1.38)) * (1 - eio(seg(t, 3.3, 3.65)));
+    const a = eo(seg(t, 1.0, EP("050", "value1", 1.38))) * (1 - eio(seg(t, 3.3, 3.65)));
     if (a > 0) {
       X.fillStyle = `rgba(18,20,28,${.36 * a})`; X.fillRect(0, 0, w, h);
       const pw = 210, px = -pw + pw * a;
@@ -112,7 +112,7 @@ MotionPrompt.pack('ui', function () {
   CELLS[2] = ui((w, h, t) => {
     pageLines(24, 16, 494); fillRR(24, 76, 239, 54, 8, C.block); fillRR(279, 76, 239, 54, 8, C.block);
     fillRR(186, 144, 170, 36, 18, C.blue); text('查看详情', 271, 162, 15, '#fff', 600, 'center');
-    const open = eo(seg(t, 1.05, 1.45));
+    const open = eo(seg(t, 1.05, EP("051", "value1", 1.45)));
     const drag = eio(seg(t, 3.0, 3.6));
     const a = open * (1 - drag);
     if (open > 0 && a > 0.001) {
@@ -130,7 +130,7 @@ MotionPrompt.pack('ui', function () {
   // @element 04
   // 04 アコーディオン（Accordion）
   CELLS[3] = ui((w, h, t) => {
-    const ex = eio(seg(t, 1.0, 1.35)) * (1 - eio(seg(t, 3.3, 3.62)));
+    const ex = eio(seg(t, 1.0, EP("052", "value1", 1.35))) * (1 - eio(seg(t, 3.3, 3.62)));
     let y = 12; const H0 = 34, EX = 58;
     for (let i = 0; i < 3; i++) {
       const extra = i === 0 ? EX * ex : 0;
@@ -147,7 +147,7 @@ MotionPrompt.pack('ui', function () {
   // 05 ドロップダウン（Dropdown menu）
   CELLS[4] = ui((w, h, t) => {
     bar(24, 14, 90, C.line2, 10);
-    const open = eo(seg(t, 1.0, 1.25)) * (1 - eio(seg(t, 2.3, 2.45)));
+    const open = eo(seg(t, 1.0, EP("053", "value1", 1.25))) * (1 - eio(seg(t, 2.3, 2.45)));
     const chosen = seg(t, 2.32, 2.42) * (1 - seg(t, 3.9, 4.08));
     const ph = (1 - seg(t, 2.2, 2.3)) + seg(t, 4.1, 4.3); // プレースホルダーは先に消し、名前が消えてから戻す（重ねない）
     strokeRR(24, 34, 260, 38, 8, open > .1 || (chosen > 0 && t < 2.9) ? C.blue : C.line2, open > .1 ? 2 : 1.5);
@@ -171,7 +171,7 @@ MotionPrompt.pack('ui', function () {
     pageLines(24, 16, 494);
     bar(24, 116, 150, C.line2, 11); ring(196, 121, 13, C.blue, 2.2); text('?', 196, 122, 16, C.blue, 700, 'center', NUMF);
     fillRR(24, 146, 494, 34, 8, C.block);
-    const a = eo(seg(t, 1.15, 1.35)) * (1 - seg(t, 3.25, 3.45));
+    const a = eo(seg(t, EP("054", "value1", 1.15), 1.35)) * (1 - seg(t, 3.25, EP("054", "value2", 3.45)));
     if (a > 0) {
       X.save(); X.globalAlpha = a; const yy = 64 + 6 * (1 - a);
       fillRR(196 - 92, yy, 184, 36, 8, C.dark);
@@ -188,7 +188,7 @@ MotionPrompt.pack('ui', function () {
     pageLines(24, 16, 494);
     strokeRR(24, 112, 108, 36, 8, C.blue, 2); text('详情', 78, 130, 15, C.blue, 600, 'center');
     fillRR(24, 160, 494, 22, 6, C.block);
-    const a = eo(seg(t, 1.0, 1.28)) * (1 - eio(seg(t, 3.3, 3.5)));
+    const a = eo(seg(t, 1.0, EP("055", "value1", 1.28))) * (1 - eio(seg(t, 3.3, 3.5)));
     if (a > 0) {
       X.save(); X.globalAlpha = a; X.translate(6 * (1 - a), 0);
       const px = 156, py = 62, pw = 300, ph = 120;
@@ -207,7 +207,7 @@ MotionPrompt.pack('ui', function () {
   CELLS[7] = ui((w, h, t) => {
     bar(24, 16, 90, C.line2, 10); strokeRR(24, 34, 300, 34, 7, C.line2, 1.5); bar(24, 82, 90, C.line2, 10); strokeRR(24, 100, 300, 34, 7, C.line2, 1.5);
     fillRR(24, 146, 110, 36, 8, C.blue); text('保存', 79, 164, 16, '#fff', 600, 'center');
-    const tin = eo(seg(t, 1.05, 1.4)), tout = eio(seg(t, 3.2, 3.55));
+    const tin = eo(seg(t, 1.05, EP("056", "value1", 1.4))), tout = eio(seg(t, 3.2, 3.55));
     if (tin > 0 && tout < 1) {
       const tw0 = 214, th = 52, tx = w - 18 - tw0 + (1 - tin) * 240 + tout * 240, ty = h - 16 - th;
       shadowed(() => fillRR(tx, ty, tw0, th, 10, C.dark), 18, 6, .25);
@@ -222,7 +222,7 @@ MotionPrompt.pack('ui', function () {
   // 09 タブ（Tabs）
   CELLS[8] = ui((w, h, t) => {
     const labs = ['概述', '费用', '评论'], xs = [24, 114, 204], ws = [70, 70, 100];
-    const c1 = eio(seg(t, 1.0, 1.25)), c2 = eio(seg(t, 2.2, 2.45)), c3 = eio(seg(t, 3.4, 3.65));
+    const c1 = eio(seg(t, 1.0, 1.25)), c2 = eio(seg(t, 2.2, 2.45)), c3 = eio(seg(t, EP("057", "value1", 3.4), 3.65));
     const pos = c1 + c2 - 2 * c3; // 0 -> 1 -> 2 -> 0
     const fi = Math.floor(pos), fr = pos - fi, gi = Math.min(2, fi + 1);
     const ux = lerp(xs[fi], xs[gi], fr), uw = lerp(ws[fi], ws[gi], fr);
@@ -231,7 +231,7 @@ MotionPrompt.pack('ui', function () {
     X.fillStyle = C.line; X.fillRect(0, 50, w, 2); fillRR(ux, 48, uw, 4, 2, C.blue);
     // 中身（切替時にクロスフェード）
     const tabAlpha = [
-      1 - seg(t, 1.0, 1.2) + seg(t, 3.45, 3.65),
+      1 - seg(t, 1.0, EP("057", "value2", 1.2)) + seg(t, 3.45, 3.65),
       seg(t, 1.1, 1.3) - seg(t, 2.2, 2.4),
       seg(t, 2.3, 2.5) - seg(t, 3.4, 3.6)];
     tabAlpha.forEach((a, i) => {
@@ -247,7 +247,7 @@ MotionPrompt.pack('ui', function () {
   // @element 10
   // 10 カルーセル（Carousel）
   CELLS[9] = ui((w, h, t) => {
-    const p = eio(seg(t, 1.0, 1.4)) + eio(seg(t, 2.1, 2.5)) + eio(seg(t, 3.2, 3.6));
+    const p = eio(seg(t, 1.0, EP("058", "value1", 1.4))) + eio(seg(t, 2.1, 2.5)) + eio(seg(t, 3.2, 3.6));
     const sw = 330, gap = 18, cx = w / 2;
     X.save(); X.beginPath(); X.rect(0, 0, w, 160); X.clip();
     for (let j = Math.floor(p) - 2; j <= Math.floor(p) + 2; j++) {
@@ -266,7 +266,7 @@ MotionPrompt.pack('ui', function () {
   // @element 11
   // 11 トグルスイッチ（Toggle switch）
   CELLS[10] = ui((w, h, t) => {
-    const st = [eo(seg(t, 1.0, 1.2)) * (1 - eo(seg(t, 3.0, 3.2))), eo(seg(t, 1.8, 2.0)) * (1 - eo(seg(t, 3.6, 3.8))), 0];
+    const st = [eo(seg(t, 1.0, EP("059", "value1", 1.2))) * (1 - eo(seg(t, 3.0, EP("059", "value2", 3.2)))), eo(seg(t, 1.8, 2.0)) * (1 - eo(seg(t, 3.6, 3.8))), 0];
     for (let i = 0; i < 3; i++) {
       const y = 14 + i * 60; bar(24, y + 10, [170, 140, 190][i], C.line2, 11); bar(24, y + 30, [260, 220, 240][i], C.line, 8);
       if (i < 2) { X.fillStyle = C.line; X.fillRect(24, y + 52, 494, 1.5); }
@@ -280,7 +280,7 @@ MotionPrompt.pack('ui', function () {
   // @element 12
   // 12 セグメントコントロール（Segmented control）
   CELLS[11] = ui((w, h, t) => {
-    const pos = eio(seg(t, 1.0, 1.25)) + eio(seg(t, 2.1, 2.35)) - 2 * eio(seg(t, 3.3, 3.55));
+    const pos = eio(seg(t, 1.0, EP("060", "value1", 1.25))) + eio(seg(t, 2.1, 2.35)) - 2 * eio(seg(t, 3.3, 3.55));
     const sx = 121, sy = 12, sw = 300, sh = 40, cw = sw / 3;
     fillRR(sx, sy, sw, sh, 10, '#efedeb');
     shadowed(() => fillRR(sx + 4 + pos * cw, sy + 4, cw - 8, sh - 8, 8, C.blue), 6, 2, .2);
@@ -296,7 +296,7 @@ MotionPrompt.pack('ui', function () {
   // 13 チップ（Filter chips）
   CELLS[12] = ui((w, h, t) => {
     const chips = ['全部', '新品', '热门', '免费']; let x = 24; const pos = [];
-    const on = [0, eo(seg(t, 0.95, 1.1)) * (1 - eo(seg(t, 3.0, 3.15))), 0, eo(seg(t, 1.75, 1.9)) * (1 - eo(seg(t, 3.6, 3.75)))];
+    const on = [0, eo(seg(t, EP("061", "value1", 0.95), 1.1)) * (1 - eo(seg(t, 3.0, EP("061", "value2", 3.15)))), 0, eo(seg(t, 1.75, 1.9)) * (1 - eo(seg(t, 3.6, 3.75)))];
     chips.forEach((s, i) => {
       const k = on[i], cw0 = tw(s, 15, 600) + 32 + (k > 0 ? 18 * k : 0);
       fillRR(x, 12, cw0, 34, 17, k > .5 ? C.lb : '#fff'); strokeRR(x, 12, cw0, 34, 17, k > .5 ? C.blue : C.line2, 1.5);
@@ -318,7 +318,7 @@ MotionPrompt.pack('ui', function () {
   // 14 レンジスライダー（Range slider）
   CELLS[13] = ui((w, h, t) => {
     // つまみ2つで範囲を選ぶ：下限 ¥1,000→¥3,000、上限 ¥10,000→¥8,000、のち元へ戻す
-    const LO = tt => .1 + .2 * eio(seg(tt, 1.0, 1.6)) - .2 * eio(seg(tt, 3.55, 3.9));
+    const LO = tt => .1 + .2 * eio(seg(tt, 1.0, EP("062", "value1", 1.6))) - .2 * eio(seg(tt, 3.55, 3.9));
     const HI = tt => 1.0 - .2 * eio(seg(tt, 2.1, 2.6)) + .2 * eio(seg(tt, 2.95, 3.3));
     const x0 = 54, x1 = 488, ty = 120, X_ = v => lerp(x0, x1, v);
     const lo = LO(t), hi = HI(t), lx = X_(lo), hx = X_(hi);
@@ -354,7 +354,7 @@ MotionPrompt.pack('ui', function () {
   // 15 ステッパー（Stepper (+/−)）
   CELLS[14] = ui((w, h, t) => {
     bar(171, 24, 90, C.line2, 10);
-    const plus = [.9, 1.35, 1.8], minus = [2.8, 3.25, 3.7];
+    const plus = [EP("063", "first", .9), 1.35, 1.8], minus = [2.8, 3.25, 3.7];
     let n = 1; plus.forEach(c => { if (t >= c) n++; }); minus.forEach(c => { if (t >= c) n--; });
     const last = [...plus, ...minus].filter(c => t >= c).pop();
     const pop = last !== undefined ? 1 - seg(t, last, last + .25) : 0;
@@ -373,12 +373,12 @@ MotionPrompt.pack('ui', function () {
   // 16 ページネーション（Pagination）
   CELLS[15] = ui((w, h, t) => {
     const page = t < 1.05 ? 0 : t < 2.15 ? 1 : t < 3.35 ? 2 : 0;
-    const fade = Math.min(...[1.05, 2.15, 3.35].map(c => Math.abs(t - c) < .2 ? Math.abs(t - c) / .2 : 1));
+    const fade = Math.min(...[1.05, 2.15, 3.35].map(c => Math.abs(t - c) < .2 ? Math.abs(t - c) / EP("064", "value2", .2) : 1));
     X.save(); X.globalAlpha = fade;
     for (let k = 0; k < 3; k++) { const y = 10 + k * 40; fillRR(24, y, 52, 32, 6, (k + page) % 3 === 0 ? C.mb : C.line); bar(90, y + 4, [200, 160, 240, 180][(k + page) % 4], C.line2, 10); bar(90, y + 20, [320, 280, 360][(k + 2 * page) % 3], C.line, 7); }
     X.restore();
     const items = ['‹', '1', '2', '3', '4', '5', '›'], d = 36, g = 8, total = items.length * d + (items.length - 1) * g, x0 = (w - total) / 2;
-    const pos = eio(seg(t, 1.0, 1.2)) + eio(seg(t, 2.1, 2.3)) - 2 * eio(seg(t, 3.3, 3.5));
+    const pos = eio(seg(t, 1.0, 1.2)) + eio(seg(t, 2.1, EP("064", "value1", 2.3))) - 2 * eio(seg(t, 3.3, 3.5));
     circle(x0 + (1 + pos) * (d + g) + d / 2, 160, d / 2, C.blue);
     items.forEach((s, i) => { const cx = x0 + i * (d + g) + d / 2; const on = i >= 1 && i <= 5 && Math.abs(pos - (i - 1)) < .5; text(s, cx, 161, i === 0 || i === 6 ? 22 : 16, on ? '#fff' : '#666', 700, 'center', NUMF); });
     const px = i => x0 + i * (d + g) + d / 2 + 4;
@@ -388,7 +388,7 @@ MotionPrompt.pack('ui', function () {
   // @element 17
   // 17 ハンバーガーメニュー（Hamburger menu）
   CELLS[16] = ui((w, h, t) => {
-    const a = eio(seg(t, 1.0, 1.3)) * (1 - eio(seg(t, 3.3, 3.6)));
+    const a = eio(seg(t, 1.0, EP("065", "value1", 1.3))) * (1 - eio(seg(t, 3.3, 3.6)));
     pageLines(24, 66, 494); fillRR(24, 134, 494, 46, 8, C.block);
     if (a > 0) {
       X.save(); X.beginPath(); X.rect(0, 44, w, h); X.clip();
@@ -411,7 +411,7 @@ MotionPrompt.pack('ui', function () {
   // @element 18
   // 18 パンくずリスト（Breadcrumbs）
   CELLS[17] = ui((w, h, t) => {
-    const up = eio(seg(t, 1.0, 1.25)) * (1 - eio(seg(t, 2.7, 2.95))); // 1=「講座」の階層にいる
+    const up = eio(seg(t, 1.0, EP("066", "value1", 1.25))) * (1 - eio(seg(t, 2.7, 2.95))); // 1=「講座」の階層にいる
     let x = 24; const y = 24;
     text('首页', x, y, 17, C.blue, 600); x += tw('首页', 17, 600) + 10; text('›', x, y, 17, '#aaa', 500); x += 18;
     const kx = x, kw = tw('课程', 17, 700);
@@ -429,7 +429,7 @@ MotionPrompt.pack('ui', function () {
   // @element 19
   // 19 メガメニュー（Mega menu）
   CELLS[18] = ui((w, h, t) => {
-    const a = eo(seg(t, 1.05, 1.3)) * (1 - eio(seg(t, 3.15, 3.4)));
+    const a = eo(seg(t, EP("067", "value1", 1.05), 1.3)) * (1 - eio(seg(t, EP("067", "value2", 3.15), 3.4)));
     pageLines(24, 62, 494); fillRR(24, 130, 494, 50, 8, C.block);
     X.fillStyle = '#fff'; X.fillRect(0, 0, w, 42); X.fillStyle = C.line; X.fillRect(0, 42, w, 1.5);
     fillRR(24, 14, 70, 16, 4, C.mb);
@@ -450,7 +450,7 @@ MotionPrompt.pack('ui', function () {
   // 20 ステップインジケーター（Step indicator）
   CELLS[19] = ui((w, h, t) => {
     const clicks = [.9, 1.7, 2.5]; let step = 0; clicks.forEach(c => { if (t >= c) step++; });
-    const reset = seg(t, 3.75, 4.05), back = seg(t, 4.05, 4.3);
+    const reset = seg(t, 3.75, EP("068", "value1", 4.05)), back = seg(t, 4.05, 4.3);
     const showStep = reset >= 1 ? 0 : step;
     const xs = [80, 207, 334, 461], labs = ['输入', '确认', '付款', '已完成'];
     const prog = clicks.reduce((s, c) => s + eio(seg(t, c, c + .3)), 0);
@@ -472,7 +472,7 @@ MotionPrompt.pack('ui', function () {
   // @element 21
   // 21 スケルトン（Skeleton screen）
   CELLS[20] = ui((w, h, t) => {
-    const sk = seg(t, 1.05, 1.2) * (1 - seg(t, 3.0, 3.3));
+    const sk = seg(t, 1.05, 1.2) * (1 - seg(t, 3.0, EP("069", "value1", 3.3)));
     ring(w - 40, 26, 14, C.line2, 1.8); X.beginPath(); X.arc(w - 40, 26, 7, -Math.PI * .1, Math.PI * 1.4); X.strokeStyle = '#666'; X.lineWidth = 2.2; X.stroke();
     bar(24, 20, 160, C.line2, 12);
     for (let k = 0; k < 2; k++) {
@@ -501,8 +501,8 @@ MotionPrompt.pack('ui', function () {
   // @element 22
   // 22 スピナー（Spinner）
   CELLS[21] = ui((w, h, t) => {
-    const load = seg(t, 1.05, 1.2) * (1 - seg(t, 2.95, 3.05));
-    const done = seg(t, 2.95, 3.15) * (1 - seg(t, 3.75, 4.0));
+    const load = seg(t, EP("070", "value1", 1.05), 1.2) * (1 - seg(t, 2.95, 3.05));
+    const done = seg(t, 2.95, EP("070", "value2", 3.15)) * (1 - seg(t, 3.75, 4.0));
     pageLines(24, 18, 494); strokeRR(24, 90, 494, 34, 7, C.line2, 1.5);
     fillRR(w / 2 - 60, 140, 120, 40, 8, C.blue); text('发送', w / 2, 160, 16, '#fff', 600, 'center');
     const ov = Math.max(load, done);
@@ -529,7 +529,7 @@ MotionPrompt.pack('ui', function () {
       const last = arr.filter(c => t >= c).pop(), pop = 1 - seg(t, last, last + .3);
       const s = (n === 1 ? eo(seg(t, .7, .9)) : 1) * (1 + .3 * pop) * (1 - clear);
       // 届いた合図の波紋
-      const k = seg(t, last, last + .5); if (k > 0 && k < 1) ring(bx + 12, by - 12, 12 + 16 * k, `rgba(31,90,232,${.5 * (1 - k)})`, 2.5);
+      const k = seg(t, last, last + .5); if (k > 0 && k < 1) ring(bx + 12, by - 12, 12 + 16 * k, `rgba(31,90,232,${EP("071", "value1", .5) * (1 - k)})`, 2.5);
       X.save(); X.translate(bx + 12, by - 12); X.scale(s, s); circle(0, 0, 12, C.blue); ring(0, 0, 12, '#fff', 2.5); text(String(n), 0, 1, 14, '#fff', 800, 'center', NUMF); X.restore();
     }
     bar(24, 76, 220, C.line2, 12); bar(24, 102, 494); bar(24, 120, 400); fillRR(24, 140, 494, 40, 8, C.block);
@@ -539,7 +539,7 @@ MotionPrompt.pack('ui', function () {
   // @element 24
   // 24 エンプティステート（Empty state）
   CELLS[23] = ui((w, h, t) => {
-    const r1 = eio(seg(t, 0.95, 1.25)), r2 = eio(seg(t, 1.65, 1.95));
+    const r1 = eio(seg(t, 0.95, EP("072", "value1", 1.25))), r2 = eio(seg(t, 1.65, 1.95));
     const back = eo(seg(t, 3.35, 3.7));
     const empty = seg(t, 1.95, 2.3) * (1 - seg(t, 3.25, 3.45));
     bar(24, 14, 130, C.line2, 11);

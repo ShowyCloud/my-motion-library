@@ -163,7 +163,7 @@ MotionPrompt.pack('lp', function () {
   // 02 スクロールでフェードイン（画面に入った要素が、下から浮かび上がって現れる）
   CELLS[1] = (k, w, h, u) => {
     frame(k);
-    const SY = t => steps([[0.35, 0], [1.0, 95], [1.5, 95], [2.1, 200], [3.2, 200], [4.4, 0]], t), y = SY(u);
+    const SY = t => steps([[0.35, 0], [1.0, EP("074", "value1", 95)], [1.5, EP("074", "value1", 95)], [2.1, 200], [3.2, 200], [4.4, 0]], t), y = SY(u);
     const LINE = VH * 0.85, DUR = 0.7, RISE = 28;
     view(k, () => {
       k.save(); k.translate(0, -y);
@@ -188,7 +188,7 @@ MotionPrompt.pack('lp', function () {
   // 03 追従ヘッダー（スクロールすると、ヘッダーが画面の上で止まってついてくる）
   CELLS[2] = (k, w, h, u) => {
     frame(k);
-    const y = steps([[0.4, 0], [1.3, 110], [1.9, 110], [2.8, 250], [3.4, 250], [4.4, 0]], u);
+    const y = steps([[0.4, 0], [1.3, EP("075", "value1", 110)], [1.9, EP("075", "value1", 110)], [2.8, 250], [3.4, 250], [4.4, 0]], u);
     const STRIP = 22;
     view(k, () => {
       k.save(); k.translate(0, -y);
@@ -211,7 +211,7 @@ MotionPrompt.pack('lp', function () {
   // 04 ピン留め（セクションが画面に止まったまま、中身だけがスクロールで進む）
   CELLS[3] = (k, w, h, u) => {
     frame(k);
-    const y = steps([[0.3, 0], [3.0, 500], [3.5, 500], [4.5, 0]], u);
+    const y = steps([[0.3, 0], [3.0, EP("076", "value1", 500)], [3.5, EP("076", "value1", 500)], [4.5, 0]], u);
     const PIN0 = 110, PD = 300;
     const top = y < PIN0 ? PIN0 - y : y < PIN0 + PD ? 0 : PIN0 + PD - y, p = clamp((y - PIN0) / PD);
     // 中身は 1/3・2/3 の所で次のステップへ（前後 ±0.07 の範囲で easeInOut）
@@ -243,7 +243,7 @@ MotionPrompt.pack('lp', function () {
   // 05 横スクロール（縦にスクロールすると、カードの列が横へ流れる）
   CELLS[4] = (k, w, h, u) => {
     frame(k);
-    const y = steps([[0.3, 0], [3.0, 420], [3.5, 420], [4.5, 0]], u);
+    const y = steps([[0.3, 0], [3.0, EP("077", "value1", 420)], [3.5, EP("077", "value1", 420)], [4.5, 0]], u);
     const PIN0 = 40, PD = 380, N = 4, PWD = 200, GAP = 20;
     const top = y < PIN0 ? PIN0 - y : 0, p = clamp((y - PIN0) / PD);
     const travel = 34 * 2 + N * PWD + (N - 1) * GAP - VW;
@@ -267,7 +267,7 @@ MotionPrompt.pack('lp', function () {
   CELLS[5] = (k, w, h, u) => {
     frame(k);
     const T = CYC / 2, lu = mod(u, T), dir = u < T ? 1 : -1, from = u < T ? 0 : VH, DRIFT = 34;
-    const y = from + dir * (DRIFT * eOut(P(lu, 0.45, 0.85)) + (VH - DRIFT) * eOut(P(lu, 0.9, 1.5)));
+    const y = from + dir * (DRIFT * eOut(P(lu, 0.45, EP("078", "value1", 0.85))) + (VH - DRIFT) * eOut(P(lu, 0.9, 1.5)));
     view(k, () => {
       k.save(); k.translate(0, -y);
       for (let i = 0; i < 2; i++) {
@@ -288,7 +288,7 @@ MotionPrompt.pack('lp', function () {
   CELLS[6] = (k, w, h, u) => {
     frame(k);
     const MAX = 430;
-    const y = steps([[0.3, 0], [0.75, 110], [1.15, 110], [1.6, 220], [2.0, 220], [2.45, 330], [2.85, 330], [3.3, MAX], [3.75, MAX], [4.55, 0]], u);
+    const y = steps([[0.3, 0], [0.75, EP("079", "value1", 110)], [1.15, EP("079", "value1", 110)], [1.6, 220], [2.0, 220], [2.45, 330], [2.85, 330], [3.3, MAX], [3.75, MAX], [4.55, 0]], u);
     view(k, () => {
       k.save(); k.translate(0, -y);
       txt(k, '第一个网页设计', 70, 44, `800 20px ${JP}`, C.ink); bars(k, 70, 56, 120, 1, C.faint, 5);
@@ -305,7 +305,7 @@ MotionPrompt.pack('lp', function () {
   // 08 マーカーアニメーション（大事な言葉が画面に入ると、蛍光ペンの線が左から引かれる）
   CELLS[7] = (k, w, h, u) => {
     frame(k);
-    const SY = t => steps([[0.35, 0], [1.0, 90], [1.6, 90], [2.2, 180], [3.3, 180], [4.4, 0]], t), y = SY(u);
+    const SY = t => steps([[0.35, 0], [1.0, EP("080", "value1", 90)], [1.6, EP("080", "value1", 90)], [2.2, 180], [3.3, 180], [4.4, 0]], t), y = SY(u);
     const LINE = VH * 0.8, DUR = 0.8, MARK = '#FFE36B', F = `800 20px ${JP}`;
     const rows = [[190, ['日常膳食', '只需 10 分钟', '我能做到。']], [290, ['即使这是你的第一次', '不会失败的食谱', '只是。']]];
     view(k, () => {
@@ -335,7 +335,7 @@ MotionPrompt.pack('lp', function () {
       for (let i = 0; i < 3; i++) {
         const inside = t => { const [x, y] = cur(t); return x > CX[i] && x < CX[i] + CWD && y > CY && y < CY + CHT; };
         const q = trans(inside, u, 0.3), x = CX[i], y = CY - LIFT * q;
-        k.save(); k.shadowColor = `rgba(28,35,51,${0.08 + 0.14 * q})`; k.shadowBlur = 6 + 16 * q; k.shadowOffsetY = 2 + 10 * q;
+        k.save(); k.shadowColor = `rgba(28,35,51,${0.08 + EP("081", "value1", 0.14) * q})`; k.shadowBlur = 6 + 16 * q; k.shadowOffsetY = 2 + EP("081", "value2", 10) * q;
         k.fillStyle = '#fff'; rr(k, x, y, CWD, CHT, 10); k.fill(); k.restore();
         pic(k, x + 8, y + 8, CWD - 16, 66, i, 6);
         txt(k, ['山间旅馆', '海滨旅馆', '星星旅馆'][i], x + 12, y + 96, `800 13px ${JP}`, C.ink); bars(k, x + 12, y + 106, 100, 1);
@@ -348,7 +348,7 @@ MotionPrompt.pack('lp', function () {
   // 10 ホバーで画像ズーム（枠はそのままで、中の写真だけがゆっくり拡大する）
   CELLS[9] = (k, w, h, u) => {
     frame(k);
-    const FX = [22, 267], FY = 16, FW = 222, FH = 118, ZOOM = 0.15;
+    const FX = [22, 267], FY = 16, FW = 222, FH = 118, ZOOM = EP("082", "value1", 0.15);
     const cur = t => path([[0, 60, 160], [0.5, 120, 70], [1.8, 140, 84], [2.2, 370, 70], [3.4, 390, 84], [3.9, 470, 160], [4.8, 60, 160]], t);
     view(k, () => {
       for (let i = 0; i < 2; i++) {
@@ -365,7 +365,7 @@ MotionPrompt.pack('lp', function () {
   // 11 マウスストーカー（カーソルのあとを、丸が少し遅れて追いかける）
   CELLS[10] = (k, w, h, u) => {
     frame(k);
-    const cur = t => [255 + 175 * Math.sin(2 * Math.PI * t / CYC), 86 + 46 * Math.sin(4 * Math.PI * t / CYC)];
+    const cur = t => [255 + EP("083", "value1", 175) * Math.sin(2 * Math.PI * t / CYC), 86 + EP("083", "value2", 46) * Math.sin(4 * Math.PI * t / CYC)];
     // 毎フレーム（60fps）残りの距離の 12% ずつ近づく
     let t = u - 2, [fx, fy] = cur(t);
     for (let i = 0; i < 120; i++) { t += 1 / 60; const [tx, ty] = cur(t); fx += (tx - fx) * 0.12; fy += (ty - fy) * 0.12; }
@@ -382,13 +382,13 @@ MotionPrompt.pack('lp', function () {
   // 12 マグネティックボタン（カーソルが近づくと、ボタンが吸い寄せられ、離れるとぷるんと戻る）
   CELLS[11] = (k, w, h, u) => {
     frame(k);
-    const BX = VW / 2, BY = 84, R = 110, PULL = 0.35;
+    const BX = VW / 2, BY = 84, R = EP("084", "value1", 110), PULL = 0.35;
     const cur = t => path([[0, -20, 130], [0.9, 170, 104], [1.5, 300, 62], [2.1, 318, 110], [2.7, 205, 66], [3.1, 250, 92], [3.6, 545, 120], [4.8, 545, 120]], t);
     const inside = t => { const [x, y] = cur(t); return Math.hypot(x - BX, y - BY) < R; };
     // 範囲に入った時刻から 60fps で目標（カーソルとの差 × 0.35）へ毎フレーム 18% ずつ近づく
     const pull = t => {
       let t0 = t; for (let i = 0; i < 600 && inside(t0 - 1 / 120); i++) t0 -= 1 / 120;
-      let ox = 0, oy = 0; for (let s = t0; s <= t; s += 1 / 60) { const [x, y] = cur(s); ox += ((x - BX) * PULL - ox) * 0.18; oy += ((y - BY) * PULL - oy) * 0.18; }
+      let ox = 0, oy = 0; for (let s = t0; s <= t; s += 1 / 60) { const [x, y] = cur(s); ox += ((x - BX) * PULL - ox) * EP("084", "value2", 0.18); oy += ((y - BY) * PULL - oy) * 0.18; }
       return [ox, oy];
     };
     let ox = 0, oy = 0;
@@ -422,7 +422,7 @@ MotionPrompt.pack('lp', function () {
       for (const [tc, px, py] of TAPS) {
         const d = u - tc; if (d < 0 || d > 0.8) continue;
         const Rm = Math.max(Math.hypot(px - B.x, py - B.y), Math.hypot(px - B.x - B.w, py - B.y), Math.hypot(px - B.x, py - B.y - B.h), Math.hypot(px - B.x - B.w, py - B.y - B.h));
-        k.fillStyle = `rgba(255,255,255,${0.4 * (1 - P(d, 0.3, 0.8))})`; k.beginPath(); k.arc(px, py, Rm * eOut(P(d, 0, DUR)), 0, 7); k.fill();
+        k.fillStyle = `rgba(255,255,255,${0.4 * (1 - P(d, 0.3, EP("085", "value1", 0.8)))})`; k.beginPath(); k.arc(px, py, Rm * eOut(P(d, 0, DUR)), 0, 7); k.fill();
       }
       k.restore();
       txt(k, '发送', VW / 2, B.y + B.h / 2 + 1, `800 17px ${JP}`, '#fff', 'center', 'middle');
@@ -434,7 +434,7 @@ MotionPrompt.pack('lp', function () {
   // 14 下線アニメーション（リンクにカーソルを乗せると下線が左から伸び、離れると右へ抜ける）
   CELLS[13] = (k, w, h, u) => {
     frame(k);
-    const LINKS = ['服务', '成就', '公司简介'], F = `800 20px ${JP}`, GAP = 56, LY = 84, DUR = 0.3;
+    const LINKS = ['服务', '成就', '公司简介'], F = `800 20px ${JP}`, GAP = 56, LY = 84, DUR = EP("086", "dur", 0.3);
     view(k, () => {
       logo(k, 22, 28); bars(k, 90, 132, 331, 2, C.faint, 6, 12, 0.6);
       k.font = F; const ws = LINKS.map(s => k.measureText(s).width); let x = (VW - ws.reduce((a, b) => a + b, 0) - GAP * (LINKS.length - 1)) / 2;
@@ -461,7 +461,7 @@ MotionPrompt.pack('lp', function () {
   CELLS[14] = (k, w, h, u) => {
     frame(k);
     const F = { x: 76, y: 14, w: 359, h: 140 };
-    const pos = steps([[0.75, 0.5], [1.55, 0.2], [2.65, 0.82], [3.55, 0.5]], u), hx = F.x + F.w * pos, hy = F.y + F.h / 2;
+    const pos = steps([[0.75, 0.5], [1.55, EP("087", "value1", 0.2)], [2.65, 0.82], [3.55, 0.5]], u), hx = F.x + F.w * pos, hy = F.y + F.h / 2;
     const drag = u > 0.68 && u < 3.62;
     const [cx, cy] = u < 0.7 ? path([[0, 430, 160], [0.62, hx, hy + 4]], u) : drag ? [hx, hy + 4] : path([[3.6, hx, hy + 4], [4.3, 430, 160], [4.8, 430, 160]], u);
     view(k, () => {
@@ -487,7 +487,7 @@ MotionPrompt.pack('lp', function () {
     frame(k);
     const OX = WIN.x, OY = WIN.y + WIN.bar;               // カーソルは窓の外（タブ・アドレスバー）まで出るので、カードの座標で描く
     const [cx, cy] = path([[0, 440, 150], [0.7, 300, 120], [1.25, 360, -18], [1.9, 372, -20], [2.6, 366, 38], [3.3, 366, 38], [4.4, 440, 150], [4.8, 440, 150]], u);
-    const CLOSE = 2.9;
+    const CLOSE = EP("088", "value1", 2.9);
     let TRIG = 0.7; while (TRIG < 1.3 && path([[0.7, 300, 120], [1.25, 360, -18]], TRIG)[1] >= 0) TRIG += 1 / 240;   // 表示域の上端（y = 0）を越えた時刻（約1.07秒）
     const m = eOut(P(u, TRIG + 0.05, TRIG + 0.45)) * (1 - P(u, CLOSE + 0.03, CLOSE + 0.25));
     const D = { x: 125.5, y: 18, w: 260, h: 132 };
@@ -513,7 +513,7 @@ MotionPrompt.pack('lp', function () {
   // 17 ローディング画面（数字が100%まで進むと、幕が上がってページが現れる）
   CELLS[16] = (k, w, h, u) => {
     frame(k);
-    const n = Math.round(100 * eOut(P(u, 0.25, 2.1)));
+    const n = Math.round(100 * eOut(P(u, 0.25, EP("089", "value1", 2.1))));
     const cy = u < 4.25 ? -VH * eIO(P(u, 2.3, 2.85)) : -VH * (1 - eIO(P(u, 4.25, 4.75)));
     const show = eOut(P(u, 2.35, 2.95));
     view(k, () => {
@@ -536,7 +536,7 @@ MotionPrompt.pack('lp', function () {
   // 18 遅延読み込み（画面に入った画像だけ、その時点で読み込まれて表示される）
   CELLS[17] = (k, w, h, u) => {
     frame(k);
-    const SY = t => steps([[0.35, 0], [1.1, 110], [1.7, 110], [2.5, 225], [3.5, 225], [4.5, 0]], t), y = SY(u);
+    const SY = t => steps([[0.35, 0], [1.1, EP("090", "value1", 110)], [1.7, EP("090", "value1", 110)], [2.5, 225], [3.5, 225], [4.5, 0]], t), y = SY(u);
     const COLX = [15, 180, 345], IW = 151, IH = 92, ROWS = [12, 168, 276], WAIT = 0.45, FADE = 0.35;
     view(k, () => {
       k.save(); k.translate(0, -y);
@@ -563,7 +563,7 @@ MotionPrompt.pack('lp', function () {
     frame(k);
     // 1周期で 3件（156px）ぶん進む。周期の終わりは始まりと同じ見た目（内容は3件ごとにくり返す）
     const PITCH = 52, BATCH = 3, L0 = 6, TL = 2.6;
-    const y = steps([[0.25, 38], [0.85, 116], [1.15, 116], [1.75, 194], [4.8, 194]], u);
+    const y = steps([[0.25, 38], [0.85, EP("091", "value1", 116)], [1.15, EP("091", "value1", 116)], [1.75, 194], [4.8, 194]], u);
     const n = u < TL ? L0 : L0 + BATCH, end = 10 + n * PITCH;
     view(k, () => {
       k.fillStyle = C.soft; k.fillRect(0, 0, VW, VH);
@@ -586,7 +586,7 @@ MotionPrompt.pack('lp', function () {
   CELLS[19] = (k, w, h, u) => {
     frame(k, u >= 1.3 && u < 3.5 ? 'example.com/works/02' : 'example.com/works');
     const CLK = [0.8, 3.0];
-    const cover = t0 => eIO(P(u, t0, t0 + 0.4)), uncover = t0 => eIO(P(u, t0, t0 + 0.45));
+    const cover = t0 => eIO(P(u, t0, t0 + EP("092", "dur", 0.4))), uncover = t0 => eIO(P(u, t0, t0 + 0.45));
     // 幕の左端: 入る −VW→0、出る 0→VW
     const xs = u < 1.4 ? -VW * (1 - cover(0.9)) : u < 3.1 ? VW * uncover(1.4) : u < 3.6 ? -VW * (1 - cover(3.1)) : VW * uncover(3.6);
     const pageB = u >= 1.3 && u < 3.5;
@@ -611,7 +611,7 @@ MotionPrompt.pack('lp', function () {
   CELLS[20] = (k, w, h, u) => {
     frame(k);
     const TO = 296;   // 「料金」セクションの頭（330）− ヘッダーの高さ（34）
-    const y = TO * eIO(P(u, 0.95, 2.0)) * (1 - eIO(P(u, 3.15, 4.2)));
+    const y = TO * eIO(P(u, 0.95, EP("093", "value1", 2.0))) * (1 - eIO(P(u, 3.15, 4.2)));
     const [cx, cy] = path([[0, 380, 132], [0.75, 360, 18], [1.0, 360, 18], [2.9, 478, 140], [3.25, 478, 140], [4.8, 380, 132]], u);
     view(k, () => {
       k.save(); k.translate(0, -y);
@@ -638,7 +638,7 @@ MotionPrompt.pack('lp', function () {
   // 22 マーキー（文字の帯が、途切れずに横へ流れ続ける）
   CELLS[21] = (k, w, h, u) => {
     frame(k);
-    const WORDS = ['网页设计', '品牌设计', '动态设计', '界面体验'], F = `800 30px ${EN}`, GAPW = 64;
+    const WORDS = ['网页设计', '品牌设计', '动态设计', '界面体验'], F = `800 30px ${EN}`, GAPW = EP("094", "value1", 64);
     view(k, () => {
       bars(k, 34, 20, 180, 1, C.ink, 10); bars(k, 34, 38, 300, 1);
       k.fillStyle = C.ink; k.fillRect(0, 58, VW, 58);
@@ -659,7 +659,7 @@ MotionPrompt.pack('lp', function () {
   CELLS[22] = (k, w, h, u) => {
     frame(k);
     const a = 2 * Math.PI * u / CYC;                        // 4.8秒で1周
-    const BLOBS = [[C.acc, 150, 60, 230, 70, 30, 0], ['#FFB08F', 380, 40, 210, 60, 40, 2.1], [C.blue, 330, 150, 240, 80, 30, 4.2], ['#9DB6FB', 90, 170, 200, 50, 35, 1.0]];
+    const BLOBS = [[C.acc, 150, 60, 230, EP("095", "amp", 70), 30, 0], ['#FFB08F', 380, 40, 210, 60, 40, 2.1], [C.blue, 330, 150, 240, 80, 30, 4.2], ['#9DB6FB', 90, 170, 200, 50, 35, 1.0]];
     view(k, () => {
       k.fillStyle = '#FFF1EB'; k.fillRect(0, 0, VW, VH);
       for (const [col, x0, y0, r, ax, ay, ph] of BLOBS) {
@@ -678,7 +678,7 @@ MotionPrompt.pack('lp', function () {
   CELLS[23] = (k, w, h, u) => {
     frame(k);
     const bob = (T, A, ph) => -A * Math.sin(2 * Math.PI * u / T + ph);   // 上下（easeInOut に近いサイン波）
-    const y1 = bob(2.4, 8, 0), y2 = bob(1.6, 6, 1.2), y3 = bob(2.4, 6, 2.4);
+    const y1 = bob(2.4, EP("096", "amp", 8), 0), y2 = bob(1.6, 6, 1.2), y3 = bob(2.4, 6, 2.4);
     view(k, () => {
       k.fillStyle = C.soft; k.fillRect(0, 0, VW, VH);
       txt(k, '在应用程序中，', 34, 62, `800 24px ${JP}`, C.ink); txt(k, '变得更加敏捷。', 34, 94, `800 24px ${JP}`, C.ink);

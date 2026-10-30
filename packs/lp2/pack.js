@@ -189,7 +189,7 @@ MotionPrompt.pack('lp2', function () {
   CELLS[1] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
-    const p = steps([[0.3, 0], [2.6, 1], [3.2, 1], [4.4, 0]], u), y = p * 40;
+    const p = steps([[0.3, 0], [2.6, EP("146", "value1", 1)], [3.2, EP("146", "value1", 1)], [4.4, 0]], u), y = p * 40;
     const LINES = ['日常微小用心累积', '一点一滴改变生活', '让每一天更有意义'], F = `800 27px ${JP}`;
     const total = LINES.join('').length;
     view(k, () => {
@@ -215,7 +215,7 @@ MotionPrompt.pack('lp2', function () {
   CELLS[2] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
-    const s = steps([[0.3, 0], [1.1, 1], [1.6, 1], [2.4, 2], [3.2, 2], [4.4, 0]], u);
+    const s = steps([[0.3, 0], [1.1, EP("147", "value1", 1)], [1.6, EP("147", "value1", 1)], [2.4, 2], [3.2, 2], [4.4, 0]], u);
     const CARDS = [[C.blueL, C.ink, C.acc, '01', '计划', 0], [C.ink, '#fff', C.acc, '02', '制作', 2], [C.acc, '#fff', '#fff', '03', '交付', 1]];
     const X = 70, CWD = 371, CHT = 124, STEP = 170;
     view(k, () => {
@@ -243,7 +243,7 @@ MotionPrompt.pack('lp2', function () {
     frame(k);
     const y = steps([[0.3, 0], [1.2, VH], [1.8, VH], [2.7, 2 * VH], [3.3, 2 * VH], [4.4, 0]], u), s = y / VH;
     const BG = ['#FFEBD9', '#1E2A4A', '#DDE6FF'], DK = [0, 1, 0];
-    const i0 = Math.min(1, Math.floor(s)), t = eIOs(clamp((s - i0 - 0.05) / 0.9));
+    const i0 = Math.min(1, Math.floor(s)), t = eIOs(clamp((s - i0 - 0.05) / EP("148", "value1", 0.9)));
     const bg = mix(BG[i0], BG[i0 + 1], t), dk = lerp(DK[i0], DK[i0 + 1], t);
     const fg = mix(C.ink, '#FFFFFF', dk), bc = mix('#E3C9B4', '#45507A', dk);
     view(k, () => {
@@ -259,7 +259,7 @@ MotionPrompt.pack('lp2', function () {
       // 朝: 太陽 / 夜: 月と星 / 休日: 山の写真
       k.fillStyle = C.acc; k.beginPath(); k.arc(380, 84, 34, 0, 7); k.fill();
       k.strokeStyle = C.acc; k.lineWidth = 4; k.lineCap = 'round';
-      for (let j = 0; j < 8; j++) { const a = j * Math.PI / 4; k.beginPath(); k.moveTo(380 + Math.cos(a) * 44, 84 + Math.sin(a) * 44); k.lineTo(380 + Math.cos(a) * 54, 84 + Math.sin(a) * 54); k.stroke(); }
+      for (let j = 0; j < 8; j++) { const a = j * Math.PI / EP("148", "value2", 4); k.beginPath(); k.moveTo(380 + Math.cos(a) * 44, 84 + Math.sin(a) * 44); k.lineTo(380 + Math.cos(a) * 54, 84 + Math.sin(a) * 54); k.stroke(); }
       k.fillStyle = '#FFE5DB'; k.beginPath(); k.arc(380, VH + 84, 36, 0, 7); k.fill();
       k.fillStyle = bg; k.beginPath(); k.arc(396, VH + 72, 32, 0, 7); k.fill();
       k.fillStyle = '#FFE5DB';[[300, 50], [450, 40], [330, 130], [470, 120]].forEach(([a, b]) => { k.beginPath(); k.arc(a, VH + b, 2.5, 0, 7); k.fill(); });
@@ -274,7 +274,7 @@ MotionPrompt.pack('lp2', function () {
   CELLS[4] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
-    const SY = t => steps([[0.3, 0], [1.1, 170], [1.5, 170], [1.9, 100], [2.4, 100], [2.9, 230], [3.3, 230], [4.3, 0]], t), y = SY(u);
+    const SY = t => steps([[0.3, 0], [1.1, EP("149", "value1", 170)], [1.5, EP("149", "value1", 170)], [1.9, 100], [2.4, 100], [2.9, 230], [3.3, 230], [4.3, 0]], t), y = SY(u);
     // 最後に動いた向きが「下」なら隠す（ページの一番上にいるときは出す）
     const hidden = t => { const yt = SY(t); if (yt < 34) return false; for (let i = 0, tt = t; i < 600; i++, tt -= 1 / 120) { const d = SY(tt) - SY(tt - 1 / 120); if (Math.abs(d) > 1e-4) return d > 0; } return false; };
     const q = trans(hidden, u, 0.3, eIOs);
@@ -298,9 +298,9 @@ MotionPrompt.pack('lp2', function () {
   CELLS[5] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
-    const y = steps([[0.3, 0], [0.9, 100], [1.35, 100], [1.95, 200], [2.4, 200], [3.0, 300], [3.5, 300], [4.4, 0]], u);
+    const y = steps([[0.3, 0], [0.9, EP("150", "value1", 100)], [1.35, EP("150", "value1", 100)], [1.95, 200], [2.4, 200], [3.0, 300], [3.5, 300], [4.4, 0]], u);
     const NAMES = ['简介', '如何使用', '费用', '常见问题'], TX = 160;
-    const act = t => { const yy = steps([[0.3, 0], [0.9, 100], [1.35, 100], [1.95, 200], [2.4, 200], [3.0, 300], [3.5, 300], [4.4, 0]], t); let a = 0; for (let i = 0; i < 4; i++) if (i * 100 <= yy + 40) a = i; return a; };
+    const act = t => { const yy = steps([[0.3, 0], [0.9, EP("150", "value1", 100)], [1.35, EP("150", "value1", 100)], [1.95, 200], [2.4, 200], [3.0, 300], [3.5, 300], [4.4, 0]], t); let a = 0; for (let i = 0; i < 4; i++) if (i * 100 <= yy + 40) a = i; return a; };
     view(k, () => {
       k.save(); k.beginPath(); k.rect(TX - 10, 0, VW, VH); k.clip(); k.translate(0, -y);
       NAMES.forEach((s, i) => {
@@ -335,7 +335,7 @@ MotionPrompt.pack('lp2', function () {
       txt(k, '博客', 70, 32, `800 11px ${EN}`, C.acc, 'left', 'alphabetic', '2px');
       txt(k, '周末可以做的一次小旅行', 70, 58, `800 19px ${JP}`, C.ink);
       pic(k, 70, 72, 371, 100, 2, 8);
-      for (let b = 0; b < 3; b++) { const y0 = 192 + b * 82; k.fillStyle = C.ink; rr(k, 70, y0, 150, 9, 4.5); k.fill(); bars(k, 70, y0 + 22, 371, 4, C.faint, 6, 12); }
+      for (let b = 0; b < 3; b++) { const y0 = 192 + b * EP("151", "value1", 82); k.fillStyle = C.ink; rr(k, 70, y0, 150, 9, 4.5); k.fill(); bars(k, 70, y0 + 22, 371, 4, C.faint, 6, 12); }
       k.fillStyle = C.ink; k.fillRect(0, 438, VW, 80); logo(k, 70, 454, '#fff'); bars(k, 300, 451, 140, 1, 'rgba(255,255,255,.3)');
       k.restore();
       const tb = eOut(clamp((y - 80) / 60));
@@ -357,7 +357,7 @@ MotionPrompt.pack('lp2', function () {
     u = snapU(u);
     frame(k);
     const p = steps([[0.3, 0], [2.3, 1], [3.0, 1], [4.4, 0]], u);
-    const x = lerp(178, 0, p), y = lerp(58, 0, p), ww = lerp(155, VW, p), hh = lerp(90, VH, p);
+    const x = lerp(EP("152", "value1", 178), 0, p), y = lerp(EP("152", "value2", 58), 0, p), ww = lerp(155, VW, p), hh = lerp(90, VH, p);
     view(k, () => {
       const a = 1 - clamp(p * 2.2);
       k.save(); k.globalAlpha = a;
@@ -380,7 +380,7 @@ MotionPrompt.pack('lp2', function () {
   CELLS[8] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
-    const BX = VW / 2, BY = 82, BW = 220, BH = 132, MAXA = 0.32, D = 520;
+    const BX = VW / 2, BY = 82, BW = 220, BH = 132, MAXA = 0.32, D = EP("153", "value2", 520);
     const cur = t => path([[0, 80, 190], [0.6, 190, 40], [1.2, 335, 50], [1.8, 330, 125], [2.4, 180, 122], [3.0, 258, 80], [3.6, 470, 190], [4.7, 80, 190]], t);
     const inside = t => { const [x, y] = cur(t); return Math.abs(x - BX) < BW / 2 && Math.abs(y - BY) < BH / 2; };
     const q = trans(inside, u, 0.4, eOut), [cx, cy] = cur(u);
@@ -401,7 +401,7 @@ MotionPrompt.pack('lp2', function () {
     txt(g, '会员卡', 18, 104, `700 11px ${EN}`, 'rgba(255,255,255,.8)', 'left', 'alphabetic', '2px');
     txt(g, '0123  4567  8910', 18, 122, `700 13px ${EN}`, '#fff', 'left', 'alphabetic', '1px');
     const gx = (nx * 0.5 + 0.5) * BW, gy = (ny * 0.5 + 0.5) * BH, gl = g.createRadialGradient(gx, gy, 0, gx, gy, 130);
-    gl.addColorStop(0, `rgba(255,255,255,${0.42 * q})`); gl.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gl; g.fillRect(0, 0, BW, BH);
+    gl.addColorStop(0, `rgba(255,255,255,${EP("153", "value1", 0.42) * q})`); gl.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gl; g.fillRect(0, 0, BW, BH);
     g.restore();
     // 縦の傾き（横の帯で描く）→ 横の傾き（縦の帯で描く）
     const d = TDK; d.clearRect(0, 0, TD.width, TD.height);
@@ -428,7 +428,7 @@ MotionPrompt.pack('lp2', function () {
   CELLS[9] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
-    const cx = 255 + 190 * Math.sin(2 * Math.PI * u / CYC), cy = 92 + 40 * Math.sin(4 * Math.PI * u / CYC);
+    const cx = 255 + EP("154", "value1", 190) * Math.sin(2 * Math.PI * u / CYC), cy = 92 + EP("154", "value2", 40) * Math.sin(4 * Math.PI * u / CYC);
     view(k, () => {
       k.fillStyle = '#121828'; k.fillRect(0, 0, VW, VH);
       txt(k, '特色', VW / 2, 26, `800 11px ${EN}`, 'rgba(255,255,255,.45)', 'center', 'alphabetic', '3px');
@@ -477,7 +477,7 @@ MotionPrompt.pack('lp2', function () {
         k.globalAlpha = 1 - q; tee(k, x + CWD / 2, CY + IH / 2 + 4, 108, col, false);
         k.fillStyle = mark; k.beginPath(); k.arc(x + CWD / 2 + 18, CY + IH / 2 - 16, 7, 0, 7); k.fill();
         k.globalAlpha = q; tee(k, x + CWD / 2, CY + IH / 2 + 4, 108, col, true);
-        { const sx = x + CWD / 2, sy = CY + IH / 2 + 12; k.fillStyle = mark; k.beginPath(); for (let j = 0; j < 10; j++) { const r = j % 2 ? 8 : 19, a = -Math.PI / 2 + j * Math.PI / 5; j ? k.lineTo(sx + Math.cos(a) * r, sy + Math.sin(a) * r) : k.moveTo(sx + Math.cos(a) * r, sy + Math.sin(a) * r); } k.closePath(); k.fill(); }
+        { const sx = x + CWD / 2, sy = CY + IH / 2 + 12; k.fillStyle = mark; k.beginPath(); for (let j = 0; j < 10; j++) { const r = j % 2 ? 8 : 19, a = -Math.PI / 2 + j * Math.PI / EP("155", "value1", 5); j ? k.lineTo(sx + Math.cos(a) * r, sy + Math.sin(a) * r) : k.moveTo(sx + Math.cos(a) * r, sy + Math.sin(a) * r); } k.closePath(); k.fill(); }
         k.globalAlpha = 1; k.restore();
         for (let j = 0; j < 2; j++) { k.fillStyle = (j ? q : 1 - q) > 0.5 ? C.ink : C.faint; k.beginPath(); k.arc(x + CWD / 2 - 6 + j * 12, CY + IH - 10, 3, 0, 7); k.fill(); }
         txt(k, nm, x + 4, CY + IH + 22, `800 14px ${JP}`, C.ink);
@@ -508,7 +508,7 @@ MotionPrompt.pack('lp2', function () {
         k.save(); k.beginPath(); k.rect(x0 - 4, LY - 31, ws[i] + 8, 39); k.clip();
         let cxp = x0;
         [...s].forEach((ch, j) => {
-          const f = tc === null ? (on ? 1 : 0) : eIO(P(u, tc + 0.035 * j, tc + 0.035 * j + 0.36)), q = on ? f : 1 - f;
+          const f = tc === null ? (on ? 1 : 0) : eIO(P(u, tc + 0.035 * j, tc + 0.035 * j + EP("156", "duration", 0.36))), q = on ? f : 1 - f;
           k.font = F; k.letterSpacing = '1px'; const cw = k.measureText(ch).width; k.letterSpacing = '0px';
           txt(k, ch, cxp, LY - LH * q, F, C.ink, 'left', 'alphabetic', '1px');
           txt(k, ch, cxp, LY + LH - LH * q, F, C.acc, 'left', 'alphabetic', '1px');
@@ -535,14 +535,14 @@ MotionPrompt.pack('lp2', function () {
         const top = RT + i * RH, inside = t => { const [a, b] = cur(t); return b > top && b < top + RH && a > 20 && a < 490; };
         const q = trans(inside, u, 0.25);
         txt(k, '0' + (i + 1), 30, top + 25, `800 12px ${EN}`, C.sub);
-        txt(k, s, 64 + 8 * q, top + 26, `800 17px ${JP}`, mix(C.ink, C.acc, q));
+        txt(k, s, 64 + EP("157", "value1", 8) * q, top + 26, `800 17px ${JP}`, mix(C.ink, C.acc, q));
         txt(k, '→', 476, top + 25, `700 15px ${EN}`, mix('#B7BFCC', C.acc, q), 'right');
         k.fillStyle = C.rule; k.fillRect(24, top + RH, VW - 48, 1);
       });
       NAMES.forEach((s, i) => {
         const top = RT + i * RH, q = trans(t => { const [a, b] = cur(t); return b > top && b < top + RH && a > 20 && a < 490; }, u, 0.25);
         if (q <= 0) return;
-        const iw = 132, ih = 84, px = cx + 26, py = clamp(cy - 46, 4, VH - ih - 4), sc = 0.85 + 0.15 * q;
+        const iw = 132, ih = 84, px = cx + 26, py = clamp(cy - 46, 4, VH - ih - 4), sc = 0.85 + EP("157", "value2", 0.15) * q;
         k.save(); k.globalAlpha = q; k.translate(px + iw / 2, py + ih / 2); k.scale(sc, sc);
         k.shadowColor = 'rgba(28,35,51,.25)'; k.shadowBlur = 12; k.shadowOffsetY = 4; k.fillStyle = '#fff'; rr(k, -iw / 2, -ih / 2, iw, ih, 6); k.fill(); k.shadowColor = 'transparent';
         pic(k, -iw / 2, -ih / 2, iw, ih, [0, 2, 1, 2][i], 6);
@@ -571,7 +571,7 @@ MotionPrompt.pack('lp2', function () {
       const s = TEXT.slice(0, len(u));
       txt(k, s, F.x + 14, F.y + 30, `600 15px ${EN}`, C.ink);
       if (focused(u) && (mod(u, 0.9) < 0.5 || (u > 1 && u < 2.4))) { k.font = `600 15px ${EN}`; const xw = k.measureText(s).width; k.fillStyle = C.ink; k.fillRect(F.x + 14 + xw + 1, F.y + 14, 1.6, 20); }
-      const fs = lerp(15, 11.5, q), ly = lerp(F.y + F.h / 2, F.y, q), lx = F.x + lerp(14, 10, q), LAB = '电子邮件地址';
+      const fs = lerp(15, EP("158", "value1", 11.5), q), ly = lerp(F.y + F.h / 2, F.y, q), lx = F.x + lerp(14, 10, q), LAB = '电子邮件地址';
       k.font = `600 ${fs}px ${JP}`; const lw = k.measureText(LAB).width;
       if (q > 0) { k.fillStyle = '#fff'; k.fillRect(lx - 4, ly - 3, lw + 8, 6); }
       txt(k, LAB, lx, ly + 0.5, `600 ${fs}px ${JP}`, mix('#8B94A6', C.acc, fo), 'left', 'middle');
@@ -586,7 +586,7 @@ MotionPrompt.pack('lp2', function () {
     u = snapU(u);
     frame(k);
     const TEXT = 'hana@example.com', F = { x: 106, y: 56, w: 300, h: 44 };
-    const len = t => { t = mod(t, CYC); return t < 0.75 ? 0 : t < 3.6 ? Math.min(TEXT.length, Math.floor((t - 0.75) / 0.115)) : Math.max(0, TEXT.length - Math.floor((t - 3.6) / 0.03)); };
+    const len = t => { t = mod(t, CYC); return t < 0.75 ? 0 : t < 3.6 ? Math.min(TEXT.length, Math.floor((t - 0.75) / EP("159", "value1", 0.115))) : Math.max(0, TEXT.length - Math.floor((t - 3.6) / 0.03)); };
     const err = t => { const n = len(t); return mod(t, CYC) < 3.6 && n >= 2 && n < TEXT.length; };
     const ok = t => mod(t, CYC) < 3.6 && len(t) === TEXT.length;
     const focused = t => { t = mod(t, CYC); return t >= 0.45 && t < 4.2; };
@@ -626,7 +626,7 @@ MotionPrompt.pack('lp2', function () {
     frame(k);
     const CLK = 0.8, BY = 124, BHT = 36;
     const shr = eIO(P(u, CLK + 0.05, CLK + 0.35)), done = eOut(P(u, 2.25, 2.45)), grow = eIO(P(u, 2.45, 2.8)), fade = P(u, 3.9, 4.1), back = eOut(P(u, 4.1, 4.4));
-    const bw = fade >= 1 ? 220 : grow > 0 ? lerp(BHT, 150, grow) : lerp(220, BHT, shr);
+    const bw = fade >= 1 ? 220 : grow > 0 ? lerp(BHT, EP("160", "value2", 150), grow) : lerp(220, BHT, shr);
     const cur = t => path([[0, 430, 205], [0.55, 290, 136], [1.1, 290, 136], [1.6, 440, 205], [4.7, 430, 205]], t);
     const [cx, cy] = cur(u);
     view(k, () => {
@@ -638,7 +638,7 @@ MotionPrompt.pack('lp2', function () {
       k.save(); k.globalAlpha = ba; k.translate(0, fade >= 1 ? 6 * (1 - back) : 0); k.save(); k.shadowColor = 'rgba(28,35,51,.18)'; k.shadowBlur = 8; k.shadowOffsetY = 3; k.fillStyle = col; rr(k, VW / 2 - bw / 2, BY, bw, BHT, BHT / 2); k.fill(); k.restore();
       const idleA = fade >= 1 ? 1 : 1 - clamp(shr * 3);
       if (idleA > 0) { k.save(); k.globalAlpha = idleA * ba; txt(k, '发送', VW / 2, BY + BHT / 2 + 0.5, `800 14px ${JP}`, '#fff', 'center', 'middle'); k.restore(); }
-      if (u > CLK + 0.3 && u < 2.3) { k.save(); k.globalAlpha = clamp((u - CLK - 0.3) / 0.1) * (1 - clamp((u - 2.2) / 0.08)); k.lineCap = 'round'; k.lineWidth = 3; k.strokeStyle = 'rgba(255,255,255,.35)'; k.beginPath(); k.arc(VW / 2, BY + BHT / 2, 10, 0, 7); k.stroke(); const a = u / 0.7 * Math.PI * 2; k.strokeStyle = '#fff'; k.beginPath(); k.arc(VW / 2, BY + BHT / 2, 10, a, a + Math.PI * 0.7); k.stroke(); k.restore(); }
+      if (u > CLK + 0.3 && u < 2.3) { k.save(); k.globalAlpha = clamp((u - CLK - 0.3) / 0.1) * (1 - clamp((u - 2.2) / 0.08)); k.lineCap = 'round'; k.lineWidth = 3; k.strokeStyle = 'rgba(255,255,255,.35)'; k.beginPath(); k.arc(VW / 2, BY + BHT / 2, 10, 0, 7); k.stroke(); const a = u / 0.7 * Math.PI * EP("160", "value1", 2); k.strokeStyle = '#fff'; k.beginPath(); k.arc(VW / 2, BY + BHT / 2, 10, a, a + Math.PI * 0.7); k.stroke(); k.restore(); }
       if (u >= 2.25 && fade < 1) {
         k.save();
         const ox = lerp(0, -26, grow);
@@ -655,7 +655,7 @@ MotionPrompt.pack('lp2', function () {
   // 17 ビュートランジション（一覧の写真を押すと、その写真がそのまま大きくなって詳細ページの上部になる）
   CELLS[16] = (k, w, h, u) => {
     u = snapU(u);
-    const e = u < 2.0 ? eIO(P(u, 0.85, 1.45)) : 1 - eIO(P(u, 3.15, 3.75));
+    const e = u < 2.0 ? eIO(P(u, 0.85, EP("161", "value1", 1.45))) : 1 - eIO(P(u, 3.15, 3.75));
     frame(k, e > 0.5 ? 'example.com/works/02' : 'example.com/works');
     const G = [24, 184, 344], GY = 44, GW = 143, GH = 80, NM = ['雪山小屋', '海边咖啡馆', '晚上的观景台'], PV = [0, 1, 2];
     const T = { x: 16, y: 10, w: VW - 32, h: 94 };
@@ -685,7 +685,7 @@ MotionPrompt.pack('lp2', function () {
   CELLS[17] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
-    const e = u < 2.0 ? eOut(P(u, 0.85, 1.3)) : 1 - eIO(P(u, 3.05, 3.4));
+    const e = u < 2.0 ? eOut(P(u, EP("162", "value1", 0.85), 1.3)) : 1 - eIO(P(u, 3.05, 3.4));
     const TX = [24, 142, 260, 378], TY = 72, TW = 108, THt = 72, PV = [2, 0, 1, 0];
     const B = { x: 125, y: 12, w: 261, h: 128 };
     const cur = t => path([[0, 430, 205], [0.5, 318, 110], [0.95, 318, 110], [1.6, 445, 120], [2.5, 445, 120], [2.85, 487, 19], [3.15, 487, 19], [3.8, 430, 205], [4.7, 430, 205]], t);
@@ -699,7 +699,7 @@ MotionPrompt.pack('lp2', function () {
         k.fillStyle = `rgba(14,18,28,${0.82 * e})`; k.fillRect(0, 0, VW, VH);
         const x = lerp(TX[2], B.x, e), y = lerp(TY, B.y, e), ww = lerp(TW, B.w, e), hh = lerp(THt, B.h, e);
         pic(k, x, y, ww, hh, 1, 6);
-        k.save(); k.globalAlpha = clamp((e - 0.5) / 0.5);
+        k.save(); k.globalAlpha = clamp((e - 0.5) / EP("162", "value2", 0.5));
         txt(k, '3 / 4', VW / 2, 156, `700 12px ${EN}`, 'rgba(255,255,255,.85)', 'center', 'middle', '1px');
         k.strokeStyle = '#fff'; k.lineWidth = 2.4; k.lineCap = 'round'; k.lineJoin = 'round';
         k.beginPath(); k.moveTo(481, 13); k.lineTo(493, 25); k.moveTo(493, 13); k.lineTo(481, 25); k.stroke();
@@ -733,7 +733,7 @@ MotionPrompt.pack('lp2', function () {
       txt(k, '¥12,800', 322, 88, `800 19px ${EN}`, C.acc);
       bars(k, 322, 104, 160, 3);
       [D1, D2].forEach(([x, y], i) => {
-        for (let r = 0; r < 2; r++) { const f = mod(u / (CYC / 3) + r * 0.5, 1); k.strokeStyle = `rgba(255,255,255,${0.75 * (1 - f)})`; k.lineWidth = 2; k.beginPath(); k.arc(x, y, 8 + 12 * f, 0, 7); k.stroke(); }
+        for (let r = 0; r < 2; r++) { const f = mod(u / (CYC / 3) + r * 0.5, 1); k.strokeStyle = `rgba(255,255,255,${EP("163", "value1", 0.75) * (1 - f)})`; k.lineWidth = 2; k.beginPath(); k.arc(x, y, 8 + EP("163", "value2", 12) * f, 0, 7); k.stroke(); }
         k.save(); k.shadowColor = 'rgba(28,35,51,.3)'; k.shadowBlur = 6; k.shadowOffsetY = 2; k.fillStyle = '#fff'; k.beginPath(); k.arc(x, y, 8, 0, 7); k.fill(); k.restore();
         k.fillStyle = C.acc; k.beginPath(); k.arc(x, y, 4, 0, 7); k.fill();
       });
@@ -760,8 +760,8 @@ MotionPrompt.pack('lp2', function () {
     const tp = mod(Math.round(u * 1e6) / 1e6, LOOP);
     frame(k);
     const T0 = 0.4, START = 2 * 3600 + 15 * 60 + 4;    // 02:15:04 → 02:14:55
-    const n = clamp(Math.floor(tp - T0) + 1, 0, 9), fp = n === 0 ? 1 : clamp((tp - T0 - (n - 1)) / 0.32);
-    const dg = v => { const hh = Math.floor(v / 3600), mm = Math.floor(v / 60) % 60, ss = v % 60; return [hh, mm, ss].map(x => String(x).padStart(2, '0')).join(''); };
+    const n = clamp(Math.floor(tp - T0) + 1, 0, 9), fp = n === 0 ? 1 : clamp((tp - T0 - (n - 1)) / EP("164", "value1", 0.32));
+    const dg = v => { const hh = Math.floor(v / 3600), mm = Math.floor(v / EP("164", "value2", 60)) % 60, ss = v % 60; return [hh, mm, ss].map(x => String(x).padStart(2, '0')).join(''); };
     const now = dg(START - n), was = dg(START - Math.max(0, n - 1));
     const TW = 34, TH = 50, TY = 50, GW = 2 * TW + 4, SEP = 30, X0 = (VW - (3 * GW + 2 * SEP)) / 2;
     const tile = (x, d, clipHalf) => {
@@ -803,8 +803,8 @@ MotionPrompt.pack('lp2', function () {
       const g = k.createLinearGradient(0, 0, 0, 120); g.addColorStop(0, '#3B64E8'); g.addColorStop(1, '#8FA9F7'); k.fillStyle = g; k.fillRect(0, 0, VW, VH);
       k.fillStyle = 'rgba(255,255,255,.9)'; k.beginPath(); k.arc(430, 44, 22, 0, 7); k.fill();
       txt(k, '夏季活动', 34, 42, `800 22px ${JP}`, '#fff'); btn(k, 34, 56, 96, 24, '查看详情', '#fff', C.blue, 11);
-      k.fillStyle = 'rgba(255,255,255,.45)'; wave(100, 8, 260, a + 1, 4, 130, -2 * a); k.fill();
-      k.fillStyle = '#fff'; wave(110, 9, 300, -a, 3.5, 110, 2 * a + 0.5); k.fill();
+      k.fillStyle = 'rgba(255,255,255,.45)'; wave(100, 8, 260, a + 1, 4, 130, EP("165", "value1", -2) * a); k.fill();
+      k.fillStyle = '#fff'; wave(110, 9, 300, -a, 3.5, 110, EP("165", "value2", 2) * a + 0.5); k.fill();
       txt(k, '推荐方案', 34, 146, `800 15px ${JP}`, C.ink); bars(k, 170, 140, 290, 1, C.faint, 6);
       bars(k, 34, 156, 200, 1, C.faint, 5);
     });
@@ -834,7 +834,7 @@ MotionPrompt.pack('lp2', function () {
       if (d >= 0.08 && d < 0.58) {
         const f = (d - 0.08) / 0.5;
         k.strokeStyle = `rgba(242,61,92,${0.5 * (1 - f)})`; k.lineWidth = 2; k.beginPath(); k.arc(HX, HY, 15 + 18 * eOut(f), 0, 7); k.stroke();
-        for (let i = 0; i < 6; i++) { const an = -Math.PI / 2 + i * Math.PI / 3, r = 24 + 13 * eOut(f); k.fillStyle = [HEART, '#FFB020', C.acc][i % 3]; k.globalAlpha = 1 - f; k.beginPath(); k.arc(HX + Math.cos(an) * r, HY + Math.sin(an) * r, 2.4 * (1 - 0.5 * f), 0, 7); k.fill(); }
+        for (let i = 0; i < 6; i++) { const an = -Math.PI / 2 + i * Math.PI / EP("166", "value2", 3), r = 24 + 13 * eOut(f); k.fillStyle = [HEART, '#FFB020', C.acc][i % 3]; k.globalAlpha = 1 - f; k.beginPath(); k.arc(HX + Math.cos(an) * r, HY + Math.sin(an) * r, EP("166", "value1", 2.4) * (1 - 0.5 * f), 0, 7); k.fill(); }
         k.globalAlpha = 1;
       }
       k.save(); k.translate(HX, HY + 2); k.scale(sc, sc); heartPath(k, 14.5);
@@ -867,7 +867,7 @@ MotionPrompt.pack('lp2', function () {
       const mx = VW / 2;
       txt(k, '向下滚动', mx, 116, `800 11px ${EN}`, C.ink, 'center', 'middle', '3px');
       k.strokeStyle = C.ink; k.lineWidth = 2.2; rr(k, mx - 12, 126, 24, 38, 12); k.stroke();
-      const dy = eIOs(clamp(f / 0.7)) * 14, da = 1 - clamp((f - 0.45) / 0.3);
+      const dy = eIOs(clamp(f / 0.7)) * EP("167", "distance", 14), da = 1 - clamp((f - 0.45) / 0.3);
       k.fillStyle = `rgba(255,90,44,${da})`; rr(k, mx - 2.5, 133 + dy, 5, 9, 2.5); k.fill();
       // 両わきの矢印も下へ流れる
       [mx - 40, mx + 40].forEach(x => { for (let j = 0; j < 2; j++) { const ff = mod(f + j * 0.5, 1), yy = 128 + ff * 24, al = Math.sin(Math.PI * ff); k.strokeStyle = `rgba(28,35,51,${0.8 * al})`; k.lineWidth = 2.5; k.lineCap = 'round'; k.lineJoin = 'round'; k.beginPath(); k.moveTo(x - 8, yy); k.lineTo(x, yy + 8); k.lineTo(x + 8, yy); k.stroke(); } });
@@ -885,8 +885,8 @@ MotionPrompt.pack('lp2', function () {
       const g = k.createLinearGradient(0, 0, 0, 120); g.addColorStop(0, '#7C9EF4'); g.addColorStop(1, '#DCE5FF'); k.fillStyle = g; k.fillRect(0, 0, VW, VH);
       k.fillStyle = 'rgba(255,240,230,.95)'; k.beginPath(); k.arc(400, 66, 20, 0, 7); k.fill();
       // 遠い雲（170px ごとにくり返す柄が、1周期で1柄ぶん流れる）・近い雲（340px）
-      for (let x = -170; x < VW + 170; x += 170) { const xx = x + mod(f * 170, 170); cloud(k, xx + 40, 30, 0.7, 0.75); cloud(k, xx + 120, 58, 0.55, 0.6); }
-      for (let x = -340; x < VW + 340; x += 340) { const xx = x + mod(f * 340, 340); cloud(k, xx + 90, 44, 1.15, 0.95); cloud(k, xx + 260, 86, 0.9, 0.9); }
+      for (let x = -170; x < VW + 170; x += 170) { const xx = x + mod(f * EP("168", "value1", 170), 170); cloud(k, xx + 40, 30, 0.7, 0.75); cloud(k, xx + 120, 58, 0.55, 0.6); }
+      for (let x = -340; x < VW + 340; x += 340) { const xx = x + mod(f * EP("168", "value2", 340), 340); cloud(k, xx + 90, 44, 1.15, 0.95); cloud(k, xx + 260, 86, 0.9, 0.9); }
       mount(k, VW, 132, [[0, .78], [.18, .66], [.36, .76], [.6, .62], [.82, .74], [1, .68]], '#6E8CEB', 0);
       const sea = (y0, A, L, ph, col) => { k.fillStyle = col; k.beginPath(); k.moveTo(0, VH + 1); for (let x = 0; x <= VW + 4; x += 4) k.lineTo(x, y0 + A * Math.sin(2 * Math.PI * x / L + ph)); k.lineTo(VW, VH + 1); k.closePath(); k.fill(); };
       sea(118, 2.5, 90, -2 * Math.PI * f, '#4B6BDB'); sea(130, 3, 60, 2 * Math.PI * f * 2, '#3B5CCF'); sea(146, 2.5, 120, -2 * Math.PI * f, '#2E4DB8');

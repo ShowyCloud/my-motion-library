@@ -274,7 +274,7 @@ MotionPrompt.pack('photo', function () {
     const a = env(u);
     stagePortrait(k, pal(BASE, DARK, a));
     k.save(); k.globalAlpha = a; k.fillStyle = BASE.lit;
-    for (const dx of [-3.5, 3.5]) { k.save(); k.translate(dx, -2.5); bustPath(k, PX, PY, PR); k.fill(); k.restore(); }
+    for (const dx of [-EP("098", "offset", 3.5), EP("098", "offset", 3.5)]) { k.save(); k.translate(dx, -2.5); bustPath(k, PX, PY, PR); k.fill(); k.restore(); }
     k.restore();
     bust(k, PX, PY, PR, mixc(BASE.person, DARK.person, a));
     plan(k, [[Math.PI * 0.75, a], [-Math.PI * 0.75, a]]);
@@ -287,7 +287,7 @@ MotionPrompt.pack('photo', function () {
     const a = env(u), INK = '#2A2D36';
     const SILH = mapPal(BASE, () => INK);
     Object.assign(SILH, { sky: '#FFEDC4', sky2: '#FFCF73', far: '#4A4546', sun: BASE.sun, glow: BASE.glow });
-    stagePortrait(k, pal(BASE, SILH, a), { sun: [404, lerp(60, 128, a), 20, a] });
+    stagePortrait(k, pal(BASE, SILH, a), { sun: [404, lerp(60, EP("099", "value1", 128), a), 20, a] });
     bust(k, PX, PY, PR, mixc(BASE.person, '#22252D', a));
     hud(k, `${(-2 * a).toFixed(1).replace('-0.0', '±0.0')} EV`);
   });
@@ -295,13 +295,13 @@ MotionPrompt.pack('photo', function () {
   // @element 04
   // スプリットライティング: 光が真横（90°）へ回り、顔の右半分が影に沈む
   CELLS[3] = cell((k, u) => {
-    const a = env(u), az = lerp(0.35, Math.PI / 2, a);
+    const a = env(u), az = lerp(EP("100", "value1", 0.35), Math.PI / 2, a);
     stagePortrait(k, pal(BASE, DIM, a));
     const lit = mixc(BASE.person, BASE.lit, a), sh = mixc(BASE.person, BASE.shade, a), W = torsoW(PR);
     bust(k, PX, PY, PR, BASE.person, kk => {
       kk.fillStyle = lit; kk.beginPath(); kk.arc(PX, PY, PR, 0, TAU); kk.fill();
       headShade(kk, PX, PY, PR, az, 1, sh);
-      torso(kk, PX, PY, PR, PX - W, PX - Math.cos(az) * 0.4 * W - 0.4 * W, lit);
+      torso(kk, PX, PY, PR, PX - W, PX - Math.cos(az) * EP("100", "value2", 0.4) * W - 0.4 * W, lit);
       torso(kk, PX, PY, PR, PX + Math.cos(az) * W, PX + W, sh);
     });
     plan(k, [[az, a]]);
@@ -311,7 +311,7 @@ MotionPrompt.pack('photo', function () {
   // @element 05
   // レンブラントライティング: 斜め45°・上からの光。影側の頬に三角形の光が残る
   CELLS[4] = cell((k, u) => {
-    const a = env(u), R = PR, W = torsoW(R);
+    const a = Math.min(1, env(u) * EP("101", "strength", 1)), R = PR, W = torsoW(R);
     stagePortrait(k, pal(BASE, DIM, a));
     const lit = mixc(BASE.person, BASE.lit, a), sh = mixc(BASE.person, BASE.shade, a);
     bust(k, PX, PY, R, BASE.person, kk => {
@@ -333,7 +333,7 @@ MotionPrompt.pack('photo', function () {
   // @element 06
   // バタフライライティング: 顔の正面・高い位置からの光。顔は左右対称に明るく、あごの下にだけ小さな影
   CELLS[5] = cell((k, u) => {
-    const a = env(u), R = PR, W = torsoW(R);
+    const a = Math.min(1, env(u) * EP("102", "strength", 1)), R = PR, W = torsoW(R);
     stagePortrait(k, pal(BASE, DIM, a));
     const lit = mixc(BASE.person, BASE.lit, a), sh = mixc(BASE.person, BASE.shade, a);
     bust(k, PX, PY, R, BASE.person, kk => {
@@ -355,7 +355,7 @@ MotionPrompt.pack('photo', function () {
       person: '#5C5470', shade: '#3E3650', lit: '#FFB547', car: '#A08E8E', glass: '#F6DDB0', tire: '#3E3650', sun: '#F59A24', glow: '#FFD48A'
     };
     const p = pal(BASE, GOLD, a);
-    stagePortrait(k, p, { sun: [lerp(110, 96, a), lerp(-30, 136, a), 18, 1], cast: lerp(0, 150, a) });
+    stagePortrait(k, p, { sun: [lerp(110, EP("103", "value1", 96), a), lerp(-30, 136, a), 18, 1], cast: lerp(0, 150, a) });
     const lit = mixc(p.person, GOLD.lit, a), sh = mixc(p.person, GOLD.shade, a);
     bust(k, PX, PY, R, p.person, kk => {
       kk.fillStyle = lit; kk.beginPath(); kk.arc(PX, PY, R, 0, TAU); kk.fill();
@@ -372,7 +372,7 @@ MotionPrompt.pack('photo', function () {
     const a = env(u);
     const p = pal(BASE, NIGHT, a);
     stagePortrait(k, p, {
-      sun: [120, lerp(40, 190, P(a, 0, 0.7)), 18, 1 - P(a, 0.4, 0.8)],
+      sun: [120, lerp(40, 190, P(a, EP("104", "value1", 0), 0.7)), 18, 1 - P(a, EP("104", "value2", 0.4), 0.8)],
       after: D => { const k2 = D.k; k2.save(); k2.globalAlpha = 0.35 * a; D.circ(413, HZ - 53, 13, BASE.glow); k2.globalAlpha = 0.6 * a; D.circ(413, HZ - 53, 8, BASE.glow); k2.restore(); D.circ(413, HZ - 53, 4, p.bulb); }
     });
     bust(k, PX, PY, PR, p.person);
@@ -395,7 +395,7 @@ MotionPrompt.pack('photo', function () {
     k.save();
     for (const [x, y, s, w] of pts) {
       const r = (2.4 + 15 * a) * s;
-      k.globalAlpha = lerp(1, 0.55, a); k.fillStyle = w ? BASE.glow : BASE.lit; k.beginPath(); k.arc(x, y, r, 0, TAU); k.fill();
+      k.globalAlpha = lerp(1, EP("105", "value1", 0.55), a); k.fillStyle = w ? BASE.glow : BASE.lit; k.beginPath(); k.arc(x, y, r, 0, TAU); k.fill();
       k.globalAlpha = 0.7 * a; k.strokeStyle = BASE.lit; k.lineWidth = 1.2; k.stroke();
     }
     k.restore();
@@ -407,7 +407,7 @@ MotionPrompt.pack('photo', function () {
   // @element 10
   // ティルトシフト: 上下の帯がぼけて中央の帯だけピントが合い、街と小さな人と車が模型のように見える
   CELLS[9] = cell((k, u) => {
-    const a = env(u), carX = lerp(-60, 600, u / CYC);
+    const a = env(u), carX = lerp(-60, EP("106", "value1", 600), u / CYC);
     const minis = D => { [[196, 26], [322, 26], [340, 23], [452, 25]].forEach(([x, h]) => figure(D, x, 172, h, BASE.person)); };
     const [S, ks] = layer('tilt'); stageStreet(ks, BASE, { car: carX, person: false, after: minis });
     const [B1, k1] = layer('tilt-1'); k1.filter = `blur(${(3 * a).toFixed(2)}px)`; k1.drawImage(S, 0, 0); k1.filter = 'none';
@@ -424,7 +424,7 @@ MotionPrompt.pack('photo', function () {
   // @element 11
   // 長時間露光: シャッターを開け続けると、夜道の車は消え、ライトだけが光の線になる
   CELLS[10] = cell((k, u) => {
-    const a = env(u), x = lerp(-60, 600, u / CYC);
+    const a = env(u), x = lerp(-60, EP("107", "value1", 600), u / CYC);
     const p = pal(BASE, NIGHT, a);
     stageStreet(k, p, {
       car: false, person: false,
@@ -451,7 +451,7 @@ MotionPrompt.pack('photo', function () {
   // 流し撮り: 走る車を追ってカメラを振ると、車はくっきり、背景だけ横に流れる
   CELLS[11] = cell((k, u) => {
     const a = env(u);
-    const drive = lerp(-80, 620, u / CYC), x = lerp(drive, 270 + 10 * Math.sin(u / CYC * TAU), a);
+    const drive = lerp(-80, EP("108", "value2", 620), u / CYC), x = lerp(drive, 270 + EP("108", "value1", 10) * Math.sin(u / CYC * TAU), a);
     const S = 46 * a, n = S < 0.5 ? 1 : 12;
     for (let i = 0; i < n; i++) {   // 背景を横にずらして重ね、平均をとる（流れ）
       k.save(); k.globalAlpha = 1 / (i + 1); k.translate(n > 1 ? lerp(-S / 2, S / 2, i / (n - 1)) : 0, 0); stageStreet(k, BASE, { car: false, person: false }); k.restore();
@@ -473,7 +473,7 @@ MotionPrompt.pack('photo', function () {
     k.save();
     // 太陽の光の筋
     k.globalAlpha = 0.75 * a; k.strokeStyle = BASE.lit; k.lineWidth = 1.6; k.lineCap = 'round';
-    for (let i = 0; i < 8; i++) { const t = i / 8 * TAU + 0.2, L = i % 2 ? 26 : 44; k.beginPath(); k.moveTo(sx + Math.cos(t) * 17, sy + Math.sin(t) * 17); k.lineTo(sx + Math.cos(t) * L, sy + Math.sin(t) * L); k.stroke(); }
+    for (let i = 0; i < 8; i++) { const t = i / 8 * TAU + 0.2, L = i % 2 ? 26 : 44; k.beginPath(); k.moveTo(sx + Math.cos(t) * EP("109", "value1", 17), sy + Math.sin(t) * EP("109", "value2", 17)); k.lineTo(sx + Math.cos(t) * L, sy + Math.sin(t) * L); k.stroke(); }
     // 光の玉: 太陽から中心を通る線の上（t = 0.45〜2.0）
     const G = [[0.45, 7, 'c', 0.6], [0.8, 13, 'h', 0.55], [1.15, 5, 'c', 0.7], [1.45, 22, 'h', 0.4], [1.75, 9, 'c', 0.55], [2.0, 30, 'r', 0.55]];
     for (const [t, r, kind, al] of G) {
@@ -490,20 +490,20 @@ MotionPrompt.pack('photo', function () {
   // @element 14
   // 魚眼レンズ: 中心がふくらみ、建物の縦の線が外側へ丸く曲がる
   CELLS[13] = cell((k, u) => {
-    const a = env(u), kk = 1.25 * a, cx = CW / 2, cy = CH / 2, R2 = cx * cx + cy * cy;
+    const a = env(u), kk = EP("110", "value2", 1.25) * a, cx = CW / 2, cy = CH / 2, R2 = cx * cx + cy * cy;
     const M = kk < 0.002 ? null : (x, y) => { const dx = x - cx, dy = y - cy, g = (1 + kk) / (1 + kk * (dx * dx + dy * dy) / R2); return [cx + dx * g, cy + dy * g]; };
     stageStreet(k, BASE, { M });
-    hud(k, `${Math.round(lerp(24, 8, a))}mm`);
+    hud(k, `${Math.round(lerp(EP("110", "value1", 24), 8, a))}mm`);
   });
 
   // @element 15
   // 色収差: 赤・緑・青を少しずつ違う大きさで重ね、画面の端ほど縁に赤と青のずれが出る
   CELLS[14] = cell((k, u) => {
-    const a = env(u), s = 0.02 * a, cx = CW / 2, cy = CH / 2;
+    const a = env(u), s = EP("111", "value1", 0.02) * a, cx = CW / 2, cy = CH / 2;
     if (s < 0.0005) { stageStreet(k, BASE); return; }
     const [S, ks] = layer('ca'); stageStreet(ks, BASE);
     k.fillStyle = '#000000'; k.fillRect(0, 0, CW, CH);
-    for (const [col, sc] of [['#FF0000', 1 + 2 * s], ['#00FF00', 1 + s], ['#0000FF', 1]]) {
+    for (const [col, sc] of [['#FF0000', 1 + EP("111", "value2", 2) * s], ['#00FF00', 1 + s], ['#0000FF', 1]]) {
       const [L, kl] = layer('ca-' + col); kl.drawImage(S, 0, 0); kl.globalCompositeOperation = 'multiply'; kl.fillStyle = col; kl.fillRect(0, 0, CW, CH); kl.globalCompositeOperation = 'source-over';
       k.save(); k.globalCompositeOperation = 'lighter'; k.translate(cx, cy); k.scale(sc, sc); k.translate(-cx, -cy); k.drawImage(L, 0, 0); k.restore();
     }
@@ -515,8 +515,8 @@ MotionPrompt.pack('photo', function () {
     const a = env(u);
     stageStreet(k, BASE);
     // 楕円の放射グラデーション: 半径の45%までは素通し、外へ向かって 0 → 70% の濃さ
-    k.save(); k.translate(CW / 2, CH / 2); k.scale(1, CH / CW * 1.35);
-    const g = k.createRadialGradient(0, 0, CW * 0.45 * 0.62, 0, 0, CW * 0.62);
+    k.save(); k.translate(CW / 2, CH / 2); k.scale(1, CH / CW * EP("112", "value1", 1.35));
+    const g = k.createRadialGradient(0, 0, CW * 0.45 * EP("112", "value2", 0.62), 0, 0, CW * 0.62);
     g.addColorStop(0, 'rgba(32,35,43,0)'); g.addColorStop(1, `rgba(32,35,43,${(0.7 * a).toFixed(3)})`);
     k.fillStyle = g; k.fillRect(-CW, -CW, CW * 2, CW * 2); k.restore();
   });
@@ -531,7 +531,7 @@ MotionPrompt.pack('photo', function () {
       person: '#B9C0CE', shade: '#A6AEBF', lit: '#FFE6AE', car: '#E4E7EC', glass: '#FFFFFF', tire: '#C5CAD3', sun: '#FFD889', glow: '#FFF3D8'
     };
     stageLand(k, pal(BASE, HIGH, a));
-    histo(k, lerp(0.56, 0.85, a), lerp(0.2, 0.09, a));
+    histo(k, lerp(0.56, EP("113", "value1", 0.85), a), lerp(0.2, 0.09, a));
   });
 
   // @element 18
@@ -540,21 +540,21 @@ MotionPrompt.pack('photo', function () {
     const a = env(u);
     const LOW = Object.assign({}, DARK, { sun: DARK.sky, glow: DARK.sky, person: '#25272E', lit: '#FFB547' });
     stageLand(k, pal(BASE, LOW, a));
-    histo(k, lerp(0.56, 0.14, a), lerp(0.2, 0.08, a));
+    histo(k, lerp(0.56, EP("114", "value1", 0.14), a), lerp(0.2, 0.08, a));
   });
 
   // @element 19
   // モノクロ: 色を抜き、明るさだけで見せる（コントラストを少し強める）
   CELLS[18] = cell((k, u) => {
     const a = env(u);
-    const GRAY = mapPal(BASE, c => { const g = clamp((lum(c) - 140) * 1.25 + 140, 0, 255); return toHex([g, g, g]); });
+    const GRAY = mapPal(BASE, c => { const g = clamp((lum(c) - 140) * EP("115", "value1", 1.25) + 140, 0, 255); return toHex([g, g, g]); });
     stageLand(k, pal(BASE, GRAY, a));
   });
 
   // @element 20
   // デュオトーン: 暗い所を藍、明るい所をピンクの2色だけに置き換える
   CELLS[19] = cell((k, u) => {
-    const a = env(u);
+    const a = Math.min(1, env(u) * EP("116", "strength", 1));
     const DUO = mapPal(BASE, c => mixc('#1F2A5C', '#FF9FB2', Math.pow(clamp((lum(c) - 70) / (250 - 70)), 2.4)));
     stageLand(k, pal(BASE, DUO, a));
   });
@@ -562,7 +562,7 @@ MotionPrompt.pack('photo', function () {
   // @element 21
   // ティール＆オレンジ: 空と影を青緑、日の当たる肌と太陽を橙に寄せる
   CELLS[20] = cell((k, u) => {
-    const a = env(u);
+    const a = Math.min(1, env(u) * EP("117", "strength", 1));
     const TO = {
       sky: '#CFE6E3', sky2: '#B7DAD6', far: '#8CC1BE', mid: '#62A2A1', ground: '#3F8083', ground2: '#2F6A6E', mark: '#CFE6E3', cast: '#2F6A6E',
       bld: '#A8D1CE', edge: '#4E8E8F', win: '#62A2A1', winOff: '#62A2A1', tree: '#2F6A6E', trunk: '#1F5357', post: '#1F5357', bulb: '#1F5357',
@@ -574,7 +574,7 @@ MotionPrompt.pack('photo', function () {
   // @element 22
   // フィルムグレイン: 細かい粒子が全体に乗り、全体が少し暖かい色に寄る
   CELLS[21] = cell((k, u) => {
-    const a = env(u);
+    const a = Math.min(1, env(u) * EP("118", "strength", 1));
     const FILM = mapPal(BASE, c => mixc(c, '#F2DDBE', 0.16));
     const p = pal(BASE, FILM, a);
     const G = once('grain', () => { const r = rng(22), o = []; for (let i = 0; i < 2600; i++) o.push([r() * CW, r() * CH, 0.8 + r() * 0.9, r() < 0.55 ? 0 : 1, 0.16 + r() * 0.22]); return o; });
@@ -585,7 +585,7 @@ MotionPrompt.pack('photo', function () {
   // @element 23
   // ライトリーク: 右端から、フィルムに光がもれたような赤と橙のにじみが帯になって入る
   CELLS[22] = cell((k, u) => {
-    const a = env(u), w = Math.sin(u / CYC * TAU);
+    const a = Math.min(1, env(u) * EP("119", "strength", 1)), w = Math.sin(u / CYC * TAU);
     stageLand(k, BASE);
     k.save();
     // 縦長の楕円を右端の外に中心を置いて重ねる（外ほど淡い黄、端ほど赤）
@@ -597,7 +597,7 @@ MotionPrompt.pack('photo', function () {
   // @element 24
   // 二重露光: 背景が白く飛び、胸像の形の中にだけ丘と家と木と太陽が写り込む
   CELLS[23] = cell((k, u) => {
-    const a = env(u);
+    const a = Math.min(1, env(u) * EP("120", "strength", 1));
     const DX = Object.assign({}, BASE, { sky: '#D3DBE6', sky2: '#D3DBE6', far: '#9AA8BD', mid: '#76869F', ground: '#55647E', bld: '#E8ECF2', edge: '#55647E', win: '#9AA8BD', winOff: '#9AA8BD', tree: '#3F4C66', trunk: '#3F4C66' });
     const draw = kk => {
       kk.fillStyle = '#FFFFFF'; kk.fillRect(0, 0, CW, CH);
