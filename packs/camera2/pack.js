@@ -229,7 +229,7 @@ MotionPrompt.pack('camera2', function () {
   // @element 02
   // 02 バレルロール: レンズの軸（画面の中央）でカメラを1回転
   CELLS[1] = shot(camCell((k, w, h, p) => world(k, w, h, cam({ roll: p * Math.PI * EP("170", "value1", 2) }), { person: { z: 7 } }),
-    p => `↻ ${Math.round(p * EP("170", "value2", 360))}°`, 0.5, 3.6));
+    p => `↻ ${Math.round(p * 180 * EP("170", "value1", 2))}°`, 0.5, 3.6));
 
   // @element 03
   // 03 ハイパーラプス: 街路を前へ進みながらのタイムラプス（太陽・雲・人影が早送り）。#039 タイムラプスはカメラが動かない
@@ -280,7 +280,7 @@ MotionPrompt.pack('camera2', function () {
     const path = s => [EP("174", "value2", 1.8) * Math.sin(s * 2.2), 4 + s * 9];
     const [px, pz] = path(p), [cx, cz] = path(p - 0.4);
     world(k, w, h, cam({ x: cx, z: cz, y: 1.5, yaw: Math.atan2(px - cx, pz - cz) }), { person: { x: px, z: pz, walk: p * EP("174", "value1", 30) }, fg: [[-2.4, 7], [2.6, 9.5, 'rock'], [-1.5, 12]] });
-  }, p => `跟随 ${Math.hypot(1.8 * Math.sin(p * 2.2) - 1.8 * Math.sin((p - 0.4) * 2.2), 3.6).toFixed(1)}m`, 0.3, 4.2));
+  }, p => `跟随 ${Math.hypot(EP("174", "value2", 1.8) * Math.sin(p * 2.2) - EP("174", "value2", 1.8) * Math.sin((p - 0.4) * 2.2), 3.6).toFixed(1)}m`, 0.3, 4.2));
 
   // @element 07
   // 07 ロックオフ: 三脚で固定したカメラの前を人物が横切り、奥を車が通る。カメラは1pxも動かない（#040 フリーズフレームは映像が止まる）
@@ -375,7 +375,7 @@ MotionPrompt.pack('camera2', function () {
         kk.stroke(); kk.globalAlpha = 1;
       }
     });
-  }, p => { const a = lerp(1.8, EP("182", "value1", 16), p); return `f/${a < 10 ? a.toFixed(1) : Math.round(a)}`; }));
+  }, p => { const a = lerp(1.8, 16, p); return `f/${a < 10 ? a.toFixed(1) : Math.round(a)}`; }));
 
   // @element 15
   // 15 エスタブリッシングショット: 広角・高い位置から街全体を見せる引きの画。ゆっくり寄りながら場所の表示が出る

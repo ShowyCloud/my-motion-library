@@ -493,7 +493,7 @@ MotionPrompt.pack('photo', function () {
     const a = env(u), kk = EP("110", "value2", 1.25) * a, cx = CW / 2, cy = CH / 2, R2 = cx * cx + cy * cy;
     const M = kk < 0.002 ? null : (x, y) => { const dx = x - cx, dy = y - cy, g = (1 + kk) / (1 + kk * (dx * dx + dy * dy) / R2); return [cx + dx * g, cy + dy * g]; };
     stageStreet(k, BASE, { M });
-    hud(k, `${Math.round(lerp(EP("110", "value1", 24), 8, a))}mm`);
+    hud(k, `${Math.round(lerp(24, 8, a))}mm`);
   });
 
   // @element 15
