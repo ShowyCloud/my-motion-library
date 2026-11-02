@@ -4,7 +4,7 @@
 // Pack: photo (Photo looks, lighting & styles) · element 07 · Category: Lighting & time of day
 // What happens: The sun drops to just above the horizon; sky and ground turn orange, the left side of the person lights up and the shadows of the lamp and tree stretch far to the right.
 // Motion spec:
-//   - Scene 1: a head-and-shoulders figure in front of a horizon at y 150 (head centre x 270, y 78, radius 29 px, no face or hair). 
+//   - Scene 1: a head-and-shoulders figure in front of a horizon at y 150 (head centre x 270, y 78, radius 29 px, no face or hair).
 //   - Sun: radius 18 px, from (x 110, y −30) to (x 96, y 136), half hidden by the hills
 //   - Colour: sky #FAF9F7 → #FFE8BC at the top and #FFCF80 near the horizon, ground #F1F0EE → #F6DDB0; light on the figure #FFB547, shadow #3E3650
 //   - Head: light from the left at about 66°, shadow right of the edge; body lit on the left, shadow on the right

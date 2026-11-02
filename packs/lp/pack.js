@@ -136,15 +136,23 @@ MotionPrompt.pack('lp', function () {
   // Numeric controls are optional; original constants are used without the local editor.
   const EP = (id, key, value) => (typeof window !== "undefined" && window.MPParams) ? window.MPParams.get(id, key, value) : value;
 
+  function reusableParallaxSky(k, g) { k.fillStyle = g; k.fillRect(0, 0, VW, 260); }
+  function reusableParallaxSun(k, x, y, r) { k.fillStyle = C.acc; k.beginPath(); k.arc(x, y, r, 0, 7); k.fill(); }
+  function reusableHoverCard(k, x, y, CWD, CHT, i, q) {
+    k.save(); k.shadowColor = `rgba(28,35,51,${0.08 + EP("081", "value1", 0.14) * q})`; k.shadowBlur = 6 + 16 * q; k.shadowOffsetY = 2 + EP("081", "value2", 10) * q;
+    k.fillStyle = '#fff'; rr(k, x, y, CWD, CHT, 10); k.fill(); k.restore();
+    pic(k, x + 8, y + 8, CWD - 16, 66, i, 6);
+    txt(k, ['山间旅馆', '海滨旅馆', '星星旅馆'][i], x + 12, y + 96, `800 13px ${JP}`, C.ink); bars(k, x + 12, y + 106, 100, 1);
+  }
   // @element 01
   // 01 パララックススクロール（スクロールすると、空・山・見出しが違う速さで動く）
   CELLS[0] = (k, w, h, u) => {
     frame(k);
-    const s = steps([[0.3, 0], [1.9, 1], [2.9, 1], [4.3, 0]], u), y = s * EP("073", "distance", 120);
+    const s = steps([[EP("073", "scrollStart", 0.3), 0], [EP("073", "scrollEnd", 1.9), EP("073", "extra1", 1)], [EP("073", "returnStart", 2.9), EP("073", "extra2", 1)], [EP("073", "returnEnd", 4.3), 0]], u), y = s * EP("073", "distance", 120);
     view(k, () => {
       const g = k.createLinearGradient(0, 0, 0, 200); g.addColorStop(0, '#9DB6FB'); g.addColorStop(1, '#E6ECFF');
       k.save(); k.translate(0, -y * EP("073", "sky", 0.15));                         // 空と太陽: 0.15倍
-      k.fillStyle = g; k.fillRect(0, 0, VW, 260); k.fillStyle = C.acc; k.beginPath(); k.arc(392, 54, 25, 0, 7); k.fill(); k.restore();
+      reusableParallaxSky(k, g); reusableParallaxSun(k, 392, 54, 25); k.restore();
       k.save(); k.translate(0, -y * EP("073", "far", 0.4)); mount(k, VW, 190, M1, '#7D9AF4', 0); k.restore();   // 遠い山: 0.4倍
       k.save(); k.translate(0, -y * EP("073", "near", 0.7)); mount(k, VW, 205, M2, '#4B6BDB', 1); k.restore();   // 近い山: 0.7倍
       k.save(); k.translate(0, -y);                                // 見出し・ボタン・次のセクション: 1倍
@@ -159,19 +167,21 @@ MotionPrompt.pack('lp', function () {
     });
   };
 
+  function reusableReasonCard(k,x,y,i) { k.fillStyle = C.soft; rr(k, x, y, 136, 106, 8); k.fill(); pic(k, x + 8, y + 8, 120, 56, i, 5); bars(k, x + 10, y + 74, 112, 2, '#CBD2DE'); }
+  function reusableFeatureCard(k,x,y,i) { k.fillStyle = '#fff'; rr(k, x, y, 136, 120, 8); k.fill(); pic(k, x + 8, y + 8, 120, 58, i, 5); bars(k, x + 10, y + 78, 110, 3, C.faint, 6, 11); }
   // @element 02
   // 02 スクロールでフェードイン（画面に入った要素が、下から浮かび上がって現れる）
   CELLS[1] = (k, w, h, u) => {
     frame(k);
-    const SY = t => steps([[0.35, 0], [1.0, EP("074", "value1", 95)], [1.5, EP("074", "value1", 95)], [2.1, 200], [3.2, 200], [4.4, 0]], t), y = SY(u);
-    const LINE = VH * 0.85, DUR = 0.7, RISE = 28;
+    const SY = t => steps([[EP("074", "scrollKeyTime1", 0.35), 0], [EP("074", "scrollKeyTime2", 1.0), EP("074", "value1", 95)], [EP("074", "scrollKeyTime3", 1.5), EP("074", "value1", 95)], [EP("074", "scrollKeyTime4", 2.1), EP("074", "extra1", 200)], [EP("074", "scrollKeyTime5", 3.2), EP("074", "extra2", 200)], [EP("074", "scrollKeyTime6", 4.4), 0]], t), y = SY(u);
+    const LINE = VH * EP("074", "triggerLine", 0.85), DUR = EP("074", "fadeDuration", 0.7), RISE = EP("074", "riseDistance", 28);
     view(k, () => {
       k.save(); k.translate(0, -y);
       txt(k, '让您的生活更轻松。', 34, 52, `800 24px ${JP}`, C.ink); bars(k, 34, 68, 190, 3); btn(k, 34, 108, 96, 26, '查看详情');
       pic(k, 286, 18, 196, 110, 0, 8);
       const items = [
         [172, () => txt(k, '选择我们的 3 大理由', VW / 2, 172 + 20, `800 18px ${JP}`, C.ink, 'center')],
-        [206, () => { for (let i = 0; i < 3; i++) { const x = 34 + i * 152; k.fillStyle = C.soft; rr(k, x, 206, 136, 106, 8); k.fill(); pic(k, x + 8, 214, 120, 56, i, 5); bars(k, x + 10, 280, 112, 2, '#CBD2DE'); } }],
+        [206, () => { for (let i = 0; i < 3; i++) { const x = 34 + i * 152; reusableReasonCard(k,x,206,i); } }],
         [334, () => bars(k, 110, 334, 290, 3, C.faint, 7, 13)]
       ];
       for (const [top, draw] of items) {
@@ -188,7 +198,7 @@ MotionPrompt.pack('lp', function () {
   // 03 追従ヘッダー（スクロールすると、ヘッダーが画面の上で止まってついてくる）
   CELLS[2] = (k, w, h, u) => {
     frame(k);
-    const y = steps([[0.4, 0], [1.3, EP("075", "value1", 110)], [1.9, EP("075", "value1", 110)], [2.8, 250], [3.4, 250], [4.4, 0]], u);
+    const y = steps([[EP("075", "scrollKeyTime1", 0.4), 0], [EP("075", "scrollKeyTime2", 1.3), EP("075", "value1", 110)], [EP("075", "scrollKeyTime3", 1.9), EP("075", "value1", 110)], [EP("075", "scrollKeyTime4", 2.8), EP("075", "extra1", 250)], [EP("075", "scrollKeyTime5", 3.4), EP("075", "extra2", 250)], [EP("075", "scrollKeyTime6", 4.4), 0]], u);
     const STRIP = 22;
     view(k, () => {
       k.save(); k.translate(0, -y);
@@ -196,12 +206,12 @@ MotionPrompt.pack('lp', function () {
       txt(k, '新的一天，', 262, 104, `800 22px ${JP}`, C.ink); bars(k, 262, 120, 210, 3); btn(k, 262, 160, 100, 26, '查看详情');
       k.fillStyle = C.soft; k.fillRect(0, 212, VW, 240);
       txt(k, '特点', VW / 2, 246, `800 18px ${JP}`, C.ink, 'center');
-      for (let i = 0; i < 3; i++) { const x = 34 + i * 152; k.fillStyle = '#fff'; rr(k, x, 262, 136, 120, 8); k.fill(); pic(k, x + 8, 270, 120, 58, i, 5); bars(k, x + 10, 340, 110, 3, C.faint, 6, 11); }
+      for (let i = 0; i < 3; i++) { const x = 34 + i * 152; reusableFeatureCard(k,x,262,i); }
       k.fillStyle = C.ink; k.fillRect(0, 0, VW, STRIP);
       txt(k, '限时活动正在进行中', VW / 2, STRIP / 2 + 0.5, `600 11px ${JP}`, '#fff', 'center', 'middle');
       k.restore();
-      const hy = Math.max(STRIP - y, 0), sh = clamp((y - STRIP) / 24);
-      if (sh > 0) { const g = k.createLinearGradient(0, hy + 34, 0, hy + 46); g.addColorStop(0, `rgba(28,35,51,${0.16 * sh})`); g.addColorStop(1, 'rgba(28,35,51,0)'); k.fillStyle = g; k.fillRect(0, hy + 34, VW, 12); }
+      const hy = Math.max(STRIP - y, 0), sh = clamp((y - STRIP) / EP("075", "shadowRange", 24));
+      if (sh > 0) { const g = k.createLinearGradient(0, hy + 34, 0, hy + 46); g.addColorStop(0, `rgba(28,35,51,${EP("075", "shadowOpacity", 0.16) * sh})`); g.addColorStop(1, 'rgba(28,35,51,0)'); k.fillStyle = g; k.fillRect(0, hy + 34, VW, 12); }
       header(k, hy);
       sbar(k, y / 250, 0.42);
     });
@@ -211,11 +221,11 @@ MotionPrompt.pack('lp', function () {
   // 04 ピン留め（セクションが画面に止まったまま、中身だけがスクロールで進む）
   CELLS[3] = (k, w, h, u) => {
     frame(k);
-    const y = steps([[0.3, 0], [3.0, EP("076", "value1", 500)], [3.5, EP("076", "value1", 500)], [4.5, 0]], u);
-    const PIN0 = 110, PD = 300;
+    const y = steps([[EP("076", "scrollKeyTime1", 0.3), 0], [EP("076", "scrollKeyTime2", 3.0), EP("076", "value1", 500)], [EP("076", "scrollKeyTime3", 3.5), EP("076", "value1", 500)], [EP("076", "scrollKeyTime4", 4.5), 0]], u);
+    const PIN0 = EP("076", "pinStart", 110), PD = EP("076", "pinDistance", 300);
     const top = y < PIN0 ? PIN0 - y : y < PIN0 + PD ? 0 : PIN0 + PD - y, p = clamp((y - PIN0) / PD);
     // 中身は 1/3・2/3 の所で次のステップへ（前後 ±0.07 の範囲で easeInOut）
-    const f = eIO(P(p, 1 / 3 - 0.07, 1 / 3 + 0.07)) + eIO(P(p, 2 / 3 - 0.07, 2 / 3 + 0.07));
+    const f = eIO(P(p, 1 / 3 - EP("076", "stepWidth", 0.07), 1 / 3 + EP("076", "stepWidth", 0.07))) + eIO(P(p, 2 / 3 - EP("076", "stepWidth", 0.07), 2 / 3 + EP("076", "stepWidth", 0.07)));
     view(k, () => {
       txt(k, '分 3 步完成', 34, 56 - y, `800 22px ${JP}`, C.ink); bars(k, 34, 72 - y, 240, 2);
       k.save(); k.translate(0, top);
@@ -239,12 +249,13 @@ MotionPrompt.pack('lp', function () {
     });
   };
 
+  function reusablePortfolioCard(k,x,y,i) { pic(k,x,y,200,112,i%3,8); txt(k,'0'+(i+1),x+14,y+100,`800 22px ${EN}`,'#fff'); bars(k,x,y+122,120,1,'#CBD2DE'); }
   // @element 05
   // 05 横スクロール（縦にスクロールすると、カードの列が横へ流れる）
   CELLS[4] = (k, w, h, u) => {
     frame(k);
-    const y = steps([[0.3, 0], [3.0, EP("077", "value1", 420)], [3.5, EP("077", "value1", 420)], [4.5, 0]], u);
-    const PIN0 = 40, PD = 380, N = 4, PWD = 200, GAP = 20;
+    const y = steps([[EP("077", "scrollKeyTime1", 0.3), 0], [EP("077", "scrollKeyTime2", 3.0), EP("077", "value1", 420)], [EP("077", "scrollKeyTime3", 3.5), EP("077", "value1", 420)], [EP("077", "scrollKeyTime4", 4.5), 0]], u);
+    const PIN0 = EP("077", "pinStart", 40), PD = EP("077", "pinDistance", 380), N = 4, PWD = 200, GAP = EP("077", "cardGap", 20);
     const top = y < PIN0 ? PIN0 - y : 0, p = clamp((y - PIN0) / PD);
     const travel = 34 * 2 + N * PWD + (N - 1) * GAP - VW;
     view(k, () => {
@@ -253,50 +264,44 @@ MotionPrompt.pack('lp', function () {
       k.fillStyle = C.soft; k.fillRect(0, 0, VW, VH + 40);
       for (let i = 0; i < N; i++) {
         const x = 34 + i * (PWD + GAP) - p * travel;
-        pic(k, x, 18, PWD, 112, i % 3, 8);
-        txt(k, '0' + (i + 1), x + 14, 118, `800 22px ${EN}`, '#fff');
-        bars(k, x, 140, 120, 1, '#CBD2DE');
+        reusablePortfolioCard(k,x,18,i);
       }
       k.restore();
       sbar(k, y / 420, 0.36);
     });
   };
 
+  function reusableSnapSection(k,y0,i) { const dark=i===1; k.fillStyle=dark?C.ink:C.blueL; k.fillRect(0,y0,VW,VH); txt(k,'0'+(i+1),34,y0+70,`800 46px ${EN}`,C.acc); txt(k,dark?'尝试使用它':'让人们知道',34,y0+102,`800 18px ${JP}`,dark?'#fff':C.ink); bars(k,34,y0+118,170,2,dark?'rgba(255,255,255,.3)':'#C3CDEA'); pic(k,262,y0+24,220,120,dark?2:0,8); }
   // @element 06
   // 06 スクロールスナップ（少しスクロールすると、次のセクションの頭までピタッと送られる）
   CELLS[5] = (k, w, h, u) => {
     frame(k);
-    const T = CYC / 2, lu = mod(u, T), dir = u < T ? 1 : -1, from = u < T ? 0 : VH, DRIFT = 34;
-    const y = from + dir * (DRIFT * eOut(P(lu, 0.45, EP("078", "value1", 0.85))) + (VH - DRIFT) * eOut(P(lu, 0.9, 1.5)));
+    const T = CYC / 2, lu = mod(u, T), dir = u < T ? 1 : -1, from = u < T ? 0 : VH, DRIFT = EP("078", "dragDistance", 34);
+    const y = from + dir * (DRIFT * eOut(P(lu, 0.45, EP("078", "value1", 0.85))) + (VH - DRIFT) * eOut(P(lu, EP("078", "extra2", 0.9), EP("078", "extra1", 1.5))));
     view(k, () => {
       k.save(); k.translate(0, -y);
       for (let i = 0; i < 2; i++) {
-        const y0 = i * VH, dark = i === 1;
-        k.fillStyle = dark ? C.ink : C.blueL; k.fillRect(0, y0, VW, VH);
-        txt(k, '0' + (i + 1), 34, y0 + 70, `800 46px ${EN}`, C.acc);
-        txt(k, dark ? '尝试使用它' : '让人们知道', 34, y0 + 102, `800 18px ${JP}`, dark ? '#fff' : C.ink);
-        bars(k, 34, y0 + 118, 170, 2, dark ? 'rgba(255,255,255,.3)' : '#C3CDEA');
-        pic(k, 262, y0 + 24, 220, 120, dark ? 2 : 0, 8);
+        reusableSnapSection(k,i*VH,i);
       }
       k.restore();
       sbar(k, y / VH, 0.5);
     });
   };
 
+  function reusableScrollProgress(k,w,q) { k.fillStyle = C.faint; k.fillRect(0,0,w,6); k.fillStyle = C.acc; k.fillRect(0,0,w*q,6); }
   // @element 07
   // 07 スクロールプログレスバー（読み進めた分だけ、画面上の線が伸びる）
   CELLS[6] = (k, w, h, u) => {
     frame(k);
     const MAX = 430;
-    const y = steps([[0.3, 0], [0.75, EP("079", "value1", 110)], [1.15, EP("079", "value1", 110)], [1.6, 220], [2.0, 220], [2.45, 330], [2.85, 330], [3.3, MAX], [3.75, MAX], [4.55, 0]], u);
+    const y = steps([[EP("079", "firstStart", 0.3), 0], [EP("079", "firstEnd", 0.75), EP("079", "value1", 110)], [EP("079", "scrollKeyTime3", 1.15), EP("079", "value1", 110)], [EP("079", "scrollKeyTime4", 1.6), EP("079", "extra1", 220)], [EP("079", "scrollKeyTime5", 2.0), EP("079", "extra2", 220)], [EP("079", "scrollKeyTime6", 2.45), EP("079", "extra3", 330)], [EP("079", "scrollKeyTime7", 2.85), EP("079", "extra4", 330)], [EP("079", "scrollKeyTime8", 3.3), MAX], [EP("079", "scrollKeyTime9", 3.75), MAX], [EP("079", "scrollKeyTime10", 4.55), 0]], u);
     view(k, () => {
       k.save(); k.translate(0, -y);
       txt(k, '第一个网页设计', 70, 44, `800 20px ${JP}`, C.ink); bars(k, 70, 56, 120, 1, C.faint, 5);
       pic(k, 70, 74, 371, 112, 0, 8);
       for (let b = 0; b < 4; b++) { const y0 = 204 + b * 82; k.fillStyle = C.ink; rr(k, 70, y0, 140, 9, 4.5); k.fill(); bars(k, 70, y0 + 22, 371, 4, C.faint, 6, 12); }
       k.restore();
-      k.fillStyle = C.faint; k.fillRect(0, 0, VW, 6);
-      k.fillStyle = C.acc; k.fillRect(0, 0, VW * (y / MAX), 6);
+      reusableScrollProgress(k,VW,y/MAX);
       sbar(k, y / MAX, 0.3);
     });
   };
@@ -305,8 +310,8 @@ MotionPrompt.pack('lp', function () {
   // 08 マーカーアニメーション（大事な言葉が画面に入ると、蛍光ペンの線が左から引かれる）
   CELLS[7] = (k, w, h, u) => {
     frame(k);
-    const SY = t => steps([[0.35, 0], [1.0, EP("080", "value1", 90)], [1.6, EP("080", "value1", 90)], [2.2, 180], [3.3, 180], [4.4, 0]], t), y = SY(u);
-    const LINE = VH * 0.8, DUR = 0.8, MARK = '#FFE36B', F = `800 20px ${JP}`;
+    const SY = t => steps([[EP("080", "scrollKeyTime1", 0.35), 0], [EP("080", "scrollKeyTime2", 1.0), EP("080", "value1", 90)], [EP("080", "scrollKeyTime3", 1.6), EP("080", "value1", 90)], [EP("080", "scrollKeyTime4", 2.2), EP("080", "extra1", 180)], [EP("080", "scrollKeyTime5", 3.3), EP("080", "extra2", 180)], [EP("080", "scrollKeyTime6", 4.4), 0]], t), y = SY(u);
+    const LINE = VH * EP("080", "triggerLine", 0.8), DUR = EP("080", "drawDuration", 0.8), MARK = '#FFE36B', F = `800 20px ${JP}`;
     const rows = [[190, ['日常膳食', '只需 10 分钟', '我能做到。']], [290, ['即使这是你的第一次', '不会失败的食谱', '只是。']]];
     view(k, () => {
       k.save(); k.translate(0, -y);
@@ -328,17 +333,14 @@ MotionPrompt.pack('lp', function () {
   // 09 ホバーで浮き上がる（カーソルが乗ったカードが、影をつけて少し持ち上がる）
   CELLS[8] = (k, w, h, u) => {
     frame(k);
-    const CX = [26, 192, 358], CY = 18, CWD = 146, CHT = 128, LIFT = 10;
+    const CX = [26, 192, 358], CY = 18, CWD = 146, CHT = 128, LIFT = EP("081", "hoverLift", 10);
     const cur = t => path([[0, 70, 160], [0.45, 96, 78], [1.4, 110, 86], [1.62, 262, 80], [2.5, 276, 88], [2.72, 428, 80], [3.6, 440, 88], [4.0, 470, 160], [4.8, 70, 160]], t);
     view(k, () => {
       k.fillStyle = C.soft; k.fillRect(0, 0, VW, VH);
       for (let i = 0; i < 3; i++) {
         const inside = t => { const [x, y] = cur(t); return x > CX[i] && x < CX[i] + CWD && y > CY && y < CY + CHT; };
-        const q = trans(inside, u, 0.3), x = CX[i], y = CY - LIFT * q;
-        k.save(); k.shadowColor = `rgba(28,35,51,${0.08 + EP("081", "value1", 0.14) * q})`; k.shadowBlur = 6 + 16 * q; k.shadowOffsetY = 2 + EP("081", "value2", 10) * q;
-        k.fillStyle = '#fff'; rr(k, x, y, CWD, CHT, 10); k.fill(); k.restore();
-        pic(k, x + 8, y + 8, CWD - 16, 66, i, 6);
-        txt(k, ['山间旅馆', '海滨旅馆', '星星旅馆'][i], x + 12, y + 96, `800 13px ${JP}`, C.ink); bars(k, x + 12, y + 106, 100, 1);
+        const q = trans(inside, u, EP("081", "hoverDuration", 0.3)), x = CX[i], y = CY - LIFT * q;
+        reusableHoverCard(k, x, y, CWD, CHT, i, q);
       }
       const [cx, cy] = cur(u); cursor(k, cx, cy);
     });
@@ -353,7 +355,7 @@ MotionPrompt.pack('lp', function () {
     view(k, () => {
       for (let i = 0; i < 2; i++) {
         const inside = t => { const [x, y] = cur(t); return x > FX[i] && x < FX[i] + FW && y > FY && y < FY + FH; };
-        const q = trans(inside, u, 0.5);
+        const q = trans(inside, u, EP("082", "hoverDuration", 0.5));
         pic(k, FX[i], FY, FW, FH, i, 8, 1 + ZOOM * q);
         txt(k, ['夏季山间小屋', '海边咖啡馆'][i], FX[i], FY + FH + 20, `800 13px ${JP}`, C.ink); bars(k, FX[i], FY + FH + 28, 150, 1);
       }
@@ -361,6 +363,7 @@ MotionPrompt.pack('lp', function () {
     });
   };
 
+  function reusableFollowerDot(k,x,y) { k.fillStyle = C.acc; k.globalAlpha = 0.88; k.beginPath(); k.arc(x,y,17,0,7); k.fill(); k.globalAlpha = 1; }
   // @element 11
   // 11 マウスストーカー（カーソルのあとを、丸が少し遅れて追いかける）
   CELLS[10] = (k, w, h, u) => {
@@ -368,41 +371,41 @@ MotionPrompt.pack('lp', function () {
     const cur = t => [255 + EP("083", "value1", 175) * Math.sin(2 * Math.PI * t / CYC), 86 + EP("083", "value2", 46) * Math.sin(4 * Math.PI * t / CYC)];
     // 毎フレーム（60fps）残りの距離の 12% ずつ近づく
     let t = u - 2, [fx, fy] = cur(t);
-    for (let i = 0; i < 120; i++) { t += 1 / 60; const [tx, ty] = cur(t); fx += (tx - fx) * 0.12; fy += (ty - fy) * 0.12; }
+    for (let i = 0; i < 120; i++) { t += 1 / 60; const [tx, ty] = cur(t); fx += (tx - fx) * EP("083", "followRate", 0.12); fy += (ty - fy) * EP("083", "followRate", 0.12); }
     view(k, () => {
       txt(k, '创意工作室', VW / 2, 74, `800 34px ${EN}`, C.ink, 'center', 'alphabetic', '3px');
       bars(k, VW / 2 - 120, 96, 240, 2, C.faint, 6, 12, 0.7);
       btn(k, VW / 2 - 50, 128, 100, 24, '查看作品', C.ink);
-      k.fillStyle = C.acc; k.globalAlpha = 0.88; k.beginPath(); k.arc(fx, fy, 17, 0, 7); k.fill(); k.globalAlpha = 1;
+      reusableFollowerDot(k,fx,fy);
       const [cx, cy] = cur(u); cursor(k, cx, cy);
     });
   };
 
+  function reusableMagneticButton(k) { k.shadowColor = 'rgba(255,90,44,.35)'; k.shadowBlur = 16; k.shadowOffsetY = 6; k.fillStyle = C.acc; rr(k, -84, -26, 168, 52, 26); k.fill(); k.shadowColor = 'transparent'; txt(k, '联系我们', 0, 1, `800 16px ${JP}`, '#fff', 'center', 'middle'); }
+  function reusableRippleButtonBase(k,B) { k.save(); k.shadowColor = 'rgba(28,35,51,.18)'; k.shadowBlur = 8; k.shadowOffsetY = 3; k.fillStyle = C.acc; rr(k, B.x, B.y, B.w, B.h, 10); k.fill(); k.restore(); }
   // @element 12
   // 12 マグネティックボタン（カーソルが近づくと、ボタンが吸い寄せられ、離れるとぷるんと戻る）
   CELLS[11] = (k, w, h, u) => {
     frame(k);
-    const BX = VW / 2, BY = 84, R = EP("084", "value1", 110), PULL = 0.35;
+    const BX = VW / 2, BY = 84, R = EP("084", "value1", 110), PULL = EP("084", "pullStrength", 0.35);
     const cur = t => path([[0, -20, 130], [0.9, 170, 104], [1.5, 300, 62], [2.1, 318, 110], [2.7, 205, 66], [3.1, 250, 92], [3.6, 545, 120], [4.8, 545, 120]], t);
     const inside = t => { const [x, y] = cur(t); return Math.hypot(x - BX, y - BY) < R; };
     // 範囲に入った時刻から 60fps で目標（カーソルとの差 × 0.35）へ毎フレーム 18% ずつ近づく
     const pull = t => {
       let t0 = t; for (let i = 0; i < 600 && inside(t0 - 1 / 120); i++) t0 -= 1 / 120;
-      let ox = 0, oy = 0; for (let s = t0; s <= t; s += 1 / 60) { const [x, y] = cur(s); ox += ((x - BX) * PULL - ox) * EP("084", "value2", 0.18); oy += ((y - BY) * PULL - oy) * 0.18; }
+      let ox = 0, oy = 0; for (let s = t0; s <= t; s += 1 / 60) { const [x, y] = cur(s); ox += ((x - BX) * PULL - ox) * EP("084", "value2", 0.18); oy += ((y - BY) * PULL - oy) * EP("084", "value2", 0.18); }
       return [ox, oy];
     };
     let ox = 0, oy = 0;
     if (inside(u)) [ox, oy] = pull(u);
     else {
       let t1 = u; for (let i = 0; i < 600 && !inside(t1); i++) t1 -= 1 / 120;
-      if (inside(t1)) { const [lx, ly] = pull(t1), e = 1 - eEl(P(u, t1, t1 + 1.1)); ox = lx * e; oy = ly * e; }
+      if (inside(t1)) { const [lx, ly] = pull(t1), e = 1 - eEl(P(u, t1, t1 + EP("084", "returnDuration", 1.1))); ox = lx * e; oy = ly * e; }
     }
     view(k, () => {
       k.fillStyle = C.soft; k.fillRect(0, 0, VW, VH);
       k.save(); k.translate(BX + ox, BY + oy);
-      k.shadowColor = 'rgba(255,90,44,.35)'; k.shadowBlur = 16; k.shadowOffsetY = 6;
-      k.fillStyle = C.acc; rr(k, -84, -26, 168, 52, 26); k.fill(); k.shadowColor = 'transparent';
-      txt(k, '联系我们', 0, 1, `800 16px ${JP}`, '#fff', 'center', 'middle');
+      reusableMagneticButton(k);
       k.restore();
       const [cx, cy] = cur(u); cursor(k, cx, cy);
     });
@@ -412,15 +415,15 @@ MotionPrompt.pack('lp', function () {
   // 13 リップルエフェクト（押した場所から、ボタンの中に波紋が広がる）
   CELLS[12] = (k, w, h, u) => {
     frame(k);
-    const B = { x: 115, y: 78, w: 280, h: 56 }, TAPS = [[0.7, 165, 110], [2.9, 345, 100]], DUR = 0.6;
+    const B = { x: 115, y: 78, w: 280, h: 56 }, TAPS = [[0.7, 165, 110], [2.9, 345, 100]], DUR = EP("085", "rippleDuration", 0.6);
     const [cx, cy] = path([[0, 430, 160], [0.55, 165, 110], [1.6, 165, 110], [2.7, 345, 100], [3.6, 345, 100], [4.4, 430, 160], [4.8, 430, 160]], u);
     view(k, () => {
       k.fillStyle = C.soft; k.fillRect(0, 0, VW, VH);
       txt(k, '申请', VW / 2, 38, `800 18px ${JP}`, C.ink, 'center'); bars(k, VW / 2 - 110, 50, 220, 1, C.faint, 6, 11, 1);
-      k.save(); k.shadowColor = 'rgba(28,35,51,.18)'; k.shadowBlur = 8; k.shadowOffsetY = 3; k.fillStyle = C.acc; rr(k, B.x, B.y, B.w, B.h, 10); k.fill(); k.restore();
+      reusableRippleButtonBase(k,B);
       k.save(); rr(k, B.x, B.y, B.w, B.h, 10); k.clip();
       for (const [tc, px, py] of TAPS) {
-        const d = u - tc; if (d < 0 || d > 0.8) continue;
+        const d = u - tc; if (d < 0 || d > EP("085", "value1", 0.8)) continue;
         const Rm = Math.max(Math.hypot(px - B.x, py - B.y), Math.hypot(px - B.x - B.w, py - B.y), Math.hypot(px - B.x, py - B.y - B.h), Math.hypot(px - B.x - B.w, py - B.y - B.h));
         k.fillStyle = `rgba(255,255,255,${0.4 * (1 - P(d, 0.3, EP("085", "value1", 0.8)))})`; k.beginPath(); k.arc(px, py, Rm * eOut(P(d, 0, DUR)), 0, 7); k.fill();
       }
@@ -442,7 +445,7 @@ MotionPrompt.pack('lp', function () {
       const centers = [x + ws[0] / 2, x + ws[0] + GAP + ws[1] / 2, x + ws[0] + ws[1] + GAP * 2 + ws[2] / 2];
       const cur = t => path([[0, 120, 150], [0.45, centers[0], 80], [1.3, centers[0], 84], [1.55, centers[1], 80], [2.4, centers[1], 84], [2.65, centers[2], 80], [3.5, centers[2], 84], [3.95, 430, 150], [4.8, 120, 150]], t);
       LINKS.forEach((s, i) => {
-        const x0 = x, x1 = x + ws[i], inside = t => { const [a, b] = cur(t); return a > x0 - 6 && a < x1 + 6 && b > LY - 22 && b < LY + 14; };
+        const x0 = x, x1 = x + ws[i], inside = t => { const [a, b] = cur(t); return a > x0 - EP("086", "hoverMargin", 6) && a < x1 + EP("086", "hoverMargin", 6) && b > LY - 22 && b < LY + 14; };
         txt(k, s, x0, LY, F, C.ink);
         // 最後に乗った・離れた時刻から 0.3秒（乗る: 左端から伸びる / 離れる: 左端から縮んで右へ抜ける）
         const on = inside(u); let tc = null; for (let j = 0, t = u; j < 600; j++, t -= 1 / 120) if (inside(t - 1 / 120) !== on) { tc = t; break; }
@@ -456,38 +459,51 @@ MotionPrompt.pack('lp', function () {
     });
   };
 
+  function reusableCompareBefore(k,F) {
+    pic(k, F.x, F.y, F.w, F.h, 1, 10);
+    k.globalCompositeOperation = 'saturation'; k.fillStyle = '#888'; k.fillRect(F.x, F.y, F.w, F.h);
+    k.globalCompositeOperation = 'source-over'; k.fillStyle = 'rgba(28,35,51,.18)'; k.fillRect(F.x, F.y, F.w, F.h);
+  }
+  function reusableCompareHandle(k,hx,hy) {
+    k.save(); k.shadowColor = 'rgba(28,35,51,.3)'; k.shadowBlur = 8; k.shadowOffsetY = 2; k.fillStyle = '#fff'; k.beginPath(); k.arc(hx, hy, 17, 0, 7); k.fill(); k.restore();
+    k.fillStyle = C.ink; k.beginPath(); k.moveTo(hx - 4, hy - 6); k.lineTo(hx - 11, hy); k.lineTo(hx - 4, hy + 6); k.closePath(); k.moveTo(hx + 4, hy - 6); k.lineTo(hx + 11, hy); k.lineTo(hx + 4, hy + 6); k.closePath(); k.fill();
+  }
   // @element 15
   // 15 ビフォーアフタースライダー（真ん中の線をドラッグすると、加工前と加工後の写真の境目が動く）
   CELLS[14] = (k, w, h, u) => {
     frame(k);
     const F = { x: 76, y: 14, w: 359, h: 140 };
-    const pos = steps([[0.75, 0.5], [1.55, EP("087", "value1", 0.2)], [2.65, 0.82], [3.55, 0.5]], u), hx = F.x + F.w * pos, hy = F.y + F.h / 2;
+    const pos = steps([[EP("087", "dragStart", 0.75), 0.5], [EP("087", "leftEnd", 1.55), EP("087", "value1", 0.2)], [EP("087", "rightEnd", 2.65), EP("087", "extra1", 0.82)], [EP("087", "centerEnd", 3.55), 0.5]], u), hx = F.x + F.w * pos, hy = F.y + F.h / 2;
     const drag = u > 0.68 && u < 3.62;
     const [cx, cy] = u < 0.7 ? path([[0, 430, 160], [0.62, hx, hy + 4]], u) : drag ? [hx, hy + 4] : path([[3.6, hx, hy + 4], [4.3, 430, 160], [4.8, 430, 160]], u);
     view(k, () => {
       k.fillStyle = C.soft; k.fillRect(0, 0, VW, VH);
       pic(k, F.x, F.y, F.w, F.h, 1, 10);                      // 後（色あり）
       k.save(); k.beginPath(); k.rect(F.x, F.y, hx - F.x, F.h); k.clip();
-      pic(k, F.x, F.y, F.w, F.h, 1, 10);                      // 前（色を抜いて暗く）
-      k.globalCompositeOperation = 'saturation'; k.fillStyle = '#888'; k.fillRect(F.x, F.y, F.w, F.h);
-      k.globalCompositeOperation = 'source-over'; k.fillStyle = 'rgba(28,35,51,.18)'; k.fillRect(F.x, F.y, F.w, F.h);
+      reusableCompareBefore(k,F);
       k.restore();
       const tag = (s, x, al) => { k.font = `800 11px ${EN}`; const tw = k.measureText(s).width + 16; const bx = al ? x - tw : x; k.fillStyle = 'rgba(28,35,51,.55)'; rr(k, bx, F.y + 10, tw, 20, 10); k.fill(); txt(k, s, bx + tw / 2, F.y + 20.5, `800 11px ${EN}`, '#fff', 'center', 'middle', '1px'); };
       k.save(); rr(k, F.x, F.y, F.w, F.h, 10); k.clip(); tag('调整前', F.x + 10, false); tag('调整后', F.x + F.w - 10, true); k.restore();
       k.fillStyle = '#fff'; k.fillRect(hx - 1.5, F.y, 3, F.h);
-      k.save(); k.shadowColor = 'rgba(28,35,51,.3)'; k.shadowBlur = 8; k.shadowOffsetY = 2; k.fillStyle = '#fff'; k.beginPath(); k.arc(hx, hy, 17, 0, 7); k.fill(); k.restore();
-      k.fillStyle = C.ink; k.beginPath(); k.moveTo(hx - 4, hy - 6); k.lineTo(hx - 11, hy); k.lineTo(hx - 4, hy + 6); k.closePath(); k.moveTo(hx + 4, hy - 6); k.lineTo(hx + 11, hy); k.lineTo(hx + 4, hy + 6); k.closePath(); k.fill();
+      reusableCompareHandle(k,hx,hy);
       cursor(k, cx, cy, drag ? 1 : 0);
     });
   };
 
+  function reusableOfferPopup(k,width,height) {
+        k.fillStyle = '#fff'; rr(k, 0, 0, width, height, 12); k.fill();
+        txt(k, '等一下！', width / 2, 34, `800 17px ${JP}`, C.ink, 'center');
+        txt(k, '现在首次享受 10% 折扣', width / 2, 60, `800 15px ${JP}`, C.acc, 'center');
+        btn(k, width / 2 - 75, 80, 150, 30, '收到优惠券', C.acc, '#fff', 12);
+        k.strokeStyle = C.sub; k.lineWidth = 2; k.lineCap = 'round'; k.beginPath(); k.moveTo(width - 26, 14); k.lineTo(width - 14, 26); k.moveTo(width - 14, 14); k.lineTo(width - 26, 26); k.stroke();
+  }
   // @element 16
   // 16 離脱防止ポップアップ（カーソルがタブや閉じるボタンの方へ出ていくと、引き止める小窓が出る）
   CELLS[15] = (k, w, h, u) => {
     frame(k);
     const OX = WIN.x, OY = WIN.y + WIN.bar;               // カーソルは窓の外（タブ・アドレスバー）まで出るので、カードの座標で描く
-    const [cx, cy] = path([[0, 440, 150], [0.7, 300, 120], [1.25, 360, -18], [1.9, 372, -20], [2.6, 366, 38], [3.3, 366, 38], [4.4, 440, 150], [4.8, 440, 150]], u);
     const CLOSE = EP("088", "value1", 2.9);
+    const [cx, cy] = path([[0, 440, 150], [0.7, 300, 120], [1.25, 360, -18], [1.9, 372, -20], [Math.max(1.9, CLOSE - 0.3), 366, 38], [Math.min(4.4, CLOSE + 0.4), 366, 38], [4.4, 440, 150], [4.8, 440, 150]], u);
     let TRIG = 0.7; while (TRIG < 1.3 && path([[0.7, 300, 120], [1.25, 360, -18]], TRIG)[1] >= 0) TRIG += 1 / 240;   // 表示域の上端（y = 0）を越えた時刻（約1.07秒）
     const m = eOut(P(u, TRIG + 0.05, TRIG + 0.45)) * (1 - P(u, CLOSE + 0.03, CLOSE + 0.25));
     const D = { x: 125.5, y: 18, w: 260, h: 132 };
@@ -495,13 +511,9 @@ MotionPrompt.pack('lp', function () {
       header(k, 0);
       pic(k, 24, 46, 222, 110, 0, 8); txt(k, '对于初次使用的用户', 264, 82, `800 19px ${JP}`, C.ink); bars(k, 264, 96, 210, 3); btn(k, 264, 132, 100, 24, '申请');
       if (m > 0) {
-        k.fillStyle = `rgba(28,35,51,${0.5 * m})`; k.fillRect(0, 0, VW, VH);
+        k.fillStyle = `rgba(28,35,51,${EP("088", "overlayOpacity", 0.5) * m})`; k.fillRect(0, 0, VW, VH);
         k.save(); k.globalAlpha = m; k.translate(D.x + D.w / 2, D.y + D.h / 2); const s = 0.9 + 0.1 * m; k.scale(s, s); k.translate(-D.w / 2, -D.h / 2);
-        k.fillStyle = '#fff'; rr(k, 0, 0, D.w, D.h, 12); k.fill();
-        txt(k, '等一下！', D.w / 2, 34, `800 17px ${JP}`, C.ink, 'center');
-        txt(k, '现在首次享受 10% 折扣', D.w / 2, 60, `800 15px ${JP}`, C.acc, 'center');
-        btn(k, D.w / 2 - 75, 80, 150, 30, '收到优惠券', C.acc, '#fff', 12);
-        k.strokeStyle = C.sub; k.lineWidth = 2; k.lineCap = 'round'; k.beginPath(); k.moveTo(D.w - 26, 14); k.lineTo(D.w - 14, 26); k.moveTo(D.w - 14, 14); k.lineTo(D.w - 26, 26); k.stroke();
+        reusableOfferPopup(k,D.w,D.h);
         k.restore();
       }
     });
@@ -509,24 +521,22 @@ MotionPrompt.pack('lp', function () {
     k.save(); k.beginPath(); k.rect(0, 0, CW, CH); k.clip(); k.translate(OX, OY); click(k, cx, cy, u, [CLOSE]); k.restore();
   };
 
+  function reusablePreloaderContent(k,n) { logo(k, VW / 2 - 40, 56, '#fff'); txt(k, n + '%', VW / 2, 98, `800 28px ${EN}`, '#fff', 'center', 'middle'); k.fillStyle = 'rgba(255,255,255,.15)'; rr(k, VW / 2 - 90, 122, 180, 4, 2); k.fill(); k.fillStyle = C.acc; rr(k, VW / 2 - 90, 122, 180 * n / 100, 4, 2); k.fill(); }
   // @element 17
   // 17 ローディング画面（数字が100%まで進むと、幕が上がってページが現れる）
   CELLS[16] = (k, w, h, u) => {
     frame(k);
     const n = Math.round(100 * eOut(P(u, 0.25, EP("089", "value1", 2.1))));
-    const cy = u < 4.25 ? -VH * eIO(P(u, 2.3, 2.85)) : -VH * (1 - eIO(P(u, 4.25, 4.75)));
-    const show = eOut(P(u, 2.35, 2.95));
+    const cy = u < EP("089", "extra4", 4.25) ? -VH * eIO(P(u, EP("089", "extra2", 2.3), EP("089", "extra1", 2.85))) : -VH * (1 - eIO(P(u, EP("089", "extra4", 4.25), EP("089", "extra3", 4.75))));
+    const show = eOut(P(u, EP("089", "extra6", 2.35), EP("089", "extra5", 2.95)));
     view(k, () => {
       header(k, 0);
-      k.save(); k.globalAlpha = show; k.translate(0, 14 * (1 - show));
+      k.save(); k.globalAlpha = show; k.translate(0, EP("089", "contentRise", 14) * (1 - show));
       txt(k, '欢迎。', 34, 82, `800 26px ${JP}`, C.ink); bars(k, 34, 98, 200, 3); btn(k, 34, 136, 96, 24, '开始');
       pic(k, 270, 46, 214, 112, 0, 8); k.restore();
       if (cy > -VH) {
         k.save(); k.translate(0, cy); k.fillStyle = C.ink; k.fillRect(0, 0, VW, VH);
-        logo(k, VW / 2 - 40, 56, '#fff');
-        txt(k, (u >= 4.25 ? 0 : n) + '%', VW / 2, 98, `800 28px ${EN}`, '#fff', 'center', 'middle');
-        k.fillStyle = 'rgba(255,255,255,.15)'; rr(k, VW / 2 - 90, 122, 180, 4, 2); k.fill();
-        k.fillStyle = C.acc; rr(k, VW / 2 - 90, 122, 180 * (u >= 4.25 ? 0 : n / 100), 4, 2); k.fill();
+        reusablePreloaderContent(k,u >= EP("089", "extra4", 4.25) ? 0 : n);
         k.restore();
       }
     });
@@ -536,13 +546,13 @@ MotionPrompt.pack('lp', function () {
   // 18 遅延読み込み（画面に入った画像だけ、その時点で読み込まれて表示される）
   CELLS[17] = (k, w, h, u) => {
     frame(k);
-    const SY = t => steps([[0.35, 0], [1.1, EP("090", "value1", 110)], [1.7, EP("090", "value1", 110)], [2.5, 225], [3.5, 225], [4.5, 0]], t), y = SY(u);
-    const COLX = [15, 180, 345], IW = 151, IH = 92, ROWS = [12, 168, 276], WAIT = 0.45, FADE = 0.35;
+    const SY = t => steps([[EP("090", "scrollKeyTime1", 0.35), 0], [EP("090", "scrollKeyTime2", 1.1), EP("090", "value1", 110)], [EP("090", "scrollKeyTime3", 1.7), EP("090", "value1", 110)], [EP("090", "scrollKeyTime4", 2.5), EP("090", "extra1", 225)], [EP("090", "scrollKeyTime5", 3.5), EP("090", "extra2", 225)], [EP("090", "scrollKeyTime6", 4.5), 0]], t), y = SY(u);
+    const COLX = [15, 180, 345], IW = 151, IH = 92, ROWS = [12, 168, 276], WAIT = EP("090", "loadWait", 0.45), FADE = EP("090", "fadeDuration", 0.35);
     view(k, () => {
       k.save(); k.translate(0, -y);
       txt(k, '画廊', 15, 140, `800 18px ${JP}`, C.ink); bars(k, 120, 128, 200, 1);
       ROWS.forEach((top, r) => COLX.forEach((x, c) => {
-        const t0 = r === 0 ? -1e9 : enteredAt(SY, top, VH, u), age = t0 === null ? -1 : u - t0 - c * 0.12;
+        const t0 = r === 0 ? -1e9 : enteredAt(SY, top, VH, u), age = t0 === null ? -1 : u - t0 - c * EP("090", "columnDelay", 0.12);
         k.fillStyle = C.skel; rr(k, x, top, IW, IH, 6); k.fill();
         if (age < WAIT + FADE) {   // まだの画像: 灰色の枠と画像の印
           k.save(); k.translate(x + IW / 2, top + IH / 2); k.strokeStyle = '#B9C1CF'; k.lineWidth = 2; k.lineJoin = 'round';
@@ -557,23 +567,23 @@ MotionPrompt.pack('lp', function () {
     });
   };
 
+  function reusableInfiniteRow(k,top,v) { k.fillStyle = '#fff'; rr(k, 90, top, 331, 44, 8); k.fill(); pic(k, 98, top + 6, 48, 32, v, 5); bars(k, 158, top + 12, [180, 140, 200][v], 1, C.ink, 7); bars(k, 158, top + 26, [120, 150, 100][v], 1, C.faint, 6); }
   // @element 19
   // 19 無限スクロール（いちばん下まで来ると読み込み表示が出て、続きが足される）
   CELLS[18] = (k, w, h, u) => {
     frame(k);
     // 1周期で 3件（156px）ぶん進む。周期の終わりは始まりと同じ見た目（内容は3件ごとにくり返す）
-    const PITCH = 52, BATCH = 3, L0 = 6, TL = 2.6;
-    const y = steps([[0.25, 38], [0.85, EP("091", "value1", 116)], [1.15, EP("091", "value1", 116)], [1.75, 194], [4.8, 194]], u);
+    const PITCH = 52, BATCH = 3, L0 = 6, TL = EP("091", "loadTime", 2.6);
+    const y = steps([[EP("091", "scrollKeyTime1", 0.25), 38], [EP("091", "scrollKeyTime2", 0.85), EP("091", "value1", 116)], [EP("091", "scrollKeyTime3", 1.15), EP("091", "value1", 116)], [EP("091", "scrollKeyTime4", 1.75), EP("091", "extra1", 194)], [4.8, 194]], u);
     const n = u < TL ? L0 : L0 + BATCH, end = 10 + n * PITCH;
     view(k, () => {
       k.fillStyle = C.soft; k.fillRect(0, 0, VW, VH);
       k.save(); k.translate(0, -y);
       for (let i = 0; i < n; i++) {
-        const top = 10 + i * PITCH, v = i % 3, fresh = i >= L0 ? eOut(P(u, TL, TL + 0.35)) : 1;
+        const top = 10 + i * PITCH, v = i % 3, fresh = i >= L0 ? eOut(P(u, TL, TL + EP("091", "itemDuration", 0.35))) : 1;
         if (top - y > VH || top + 44 - y < 0) continue;
-        k.save(); k.globalAlpha = fresh; k.translate(0, 10 * (1 - fresh));
-        k.fillStyle = '#fff'; rr(k, 90, top, 331, 44, 8); k.fill(); pic(k, 98, top + 6, 48, 32, v, 5);
-        bars(k, 158, top + 12, [180, 140, 200][v], 1, C.ink, 7); bars(k, 158, top + 26, [120, 150, 100][v], 1, C.faint, 6);
+        k.save(); k.globalAlpha = fresh; k.translate(0, EP("091", "itemRise", 10) * (1 - fresh));
+        reusableInfiniteRow(k,top,v);
         k.restore();
       }
       spinner(k, VW / 2, end + 18, 10, u);
@@ -584,12 +594,12 @@ MotionPrompt.pack('lp', function () {
   // @element 20
   // 20 ページ遷移アニメーション（リンクを押すと、色の幕が横切って次のページに切り替わる）
   CELLS[19] = (k, w, h, u) => {
-    frame(k, u >= 1.3 && u < 3.5 ? 'example.com/works/02' : 'example.com/works');
+    const duration = EP("092", "dur", 0.4), switch1 = 0.9 + duration, switch2 = 3.1 + duration, reveal1 = switch1 + 0.1, reveal2 = switch2 + 0.1;
+    const pageB = u >= switch1 && u < switch2;
+    frame(k, pageB ? 'example.com/works/02' : 'example.com/works');
     const CLK = [0.8, 3.0];
-    const cover = t0 => eIO(P(u, t0, t0 + EP("092", "dur", 0.4))), uncover = t0 => eIO(P(u, t0, t0 + 0.45));
-    // 幕の左端: 入る −VW→0、出る 0→VW
-    const xs = u < 1.4 ? -VW * (1 - cover(0.9)) : u < 3.1 ? VW * uncover(1.4) : u < 3.6 ? -VW * (1 - cover(3.1)) : VW * uncover(3.6);
-    const pageB = u >= 1.3 && u < 3.5;
+    const cover = t0 => eIO(P(u, t0, t0 + duration)), uncover = t0 => eIO(P(u, t0, t0 + EP("092", "uncoverDuration", 0.45)));
+    const xs = u < reveal1 ? -VW * (1 - cover(0.9)) : u < 3.1 ? VW * uncover(reveal1) : u < reveal2 ? -VW * (1 - cover(3.1)) : VW * uncover(reveal2);
     const [cx, cy] = path([[0, 420, 150], [0.65, 255, 100], [2.6, 255, 100], [2.85, 46, 50], [3.3, 46, 50], [4.6, 420, 150], [4.8, 420, 150]], u);
     view(k, () => {
       header(k, 0);
@@ -606,12 +616,13 @@ MotionPrompt.pack('lp', function () {
     });
   };
 
+  function reusableSmoothPriceCard(k,x,y,s,i) { const hi=i===1; k.fillStyle = '#fff'; rr(k, x, y, 125, 96, 8); k.fill(); k.lineWidth = hi ? 2.5 : 1.5; k.strokeStyle = hi ? C.acc : C.faint; k.stroke(); txt(k, s, x + 62.5, y + 40, `800 20px ${EN}`, hi ? C.acc : C.ink, 'center'); bars(k, x + 22, y + 56, 81, 2); }
   // @element 21
   // 21 スムーススクロール（メニューを押すと、ページがなめらかに目的の場所まで動く）
   CELLS[20] = (k, w, h, u) => {
     frame(k);
     const TO = 296;   // 「料金」セクションの頭（330）− ヘッダーの高さ（34）
-    const y = TO * eIO(P(u, 0.95, EP("093", "value1", 2.0))) * (1 - eIO(P(u, 3.15, 4.2)));
+    const y = TO * eIO(P(u, EP("093", "scrollStart", 0.95), EP("093", "value1", 2.0))) * (1 - eIO(P(u, EP("093", "extra2", 3.15), EP("093", "extra1", 4.2))));
     const [cx, cy] = path([[0, 380, 132], [0.75, 360, 18], [1.0, 360, 18], [2.9, 478, 140], [3.25, 478, 140], [4.8, 380, 132]], u);
     view(k, () => {
       k.save(); k.translate(0, -y);
@@ -621,13 +632,11 @@ MotionPrompt.pack('lp', function () {
       for (let i = 0; i < 3; i++) { const x = 100 + i * 155; k.fillStyle = C.blueL; k.beginPath(); k.arc(x, 252, 24, 0, 7); k.fill(); bars(k, x - 46, 288, 92, 2); }
       txt(k, '费用', VW / 2, 370, `800 17px ${JP}`, C.ink, 'center');
       ['¥0', '¥980', '¥2,980'].forEach((s, i) => {
-        const x = 50 + i * 143, hi = i === 1; k.fillStyle = '#fff'; rr(k, x, 388, 125, 96, 8); k.fill();
-        k.lineWidth = hi ? 2.5 : 1.5; k.strokeStyle = hi ? C.acc : C.faint; k.stroke();
-        txt(k, s, x + 62.5, 428, `800 20px ${EN}`, hi ? C.acc : C.ink, 'center'); bars(k, x + 22, 444, 81, 2);
+        const x = 50 + i * 143; reusableSmoothPriceCard(k,x,388,s,i);
       });
       k.restore();
       header(k, 0, y > 250 ? 1 : -1);
-      const tb = clamp((y - 60) / 40);   // ページトップへ戻るボタン
+      const tb = clamp((y - EP("093", "buttonThreshold", 60)) / 40);   // ページトップへ戻るボタン
       if (tb > 0) { k.globalAlpha = tb; k.fillStyle = C.ink; k.beginPath(); k.arc(478, 140, 15, 0, 7); k.fill(); k.strokeStyle = '#fff'; k.lineWidth = 2.4; k.lineCap = 'round'; k.lineJoin = 'round'; k.beginPath(); k.moveTo(472, 143); k.lineTo(478, 136.5); k.lineTo(484, 143); k.stroke(); k.globalAlpha = 1; }
       sbar(k, y / TO * 0.7, 0.36);
       click(k, cx, cy, u, [0.9, 3.1]);
@@ -644,7 +653,7 @@ MotionPrompt.pack('lp', function () {
       k.fillStyle = C.ink; k.fillRect(0, 58, VW, 58);
       k.font = F; k.letterSpacing = '1px'; const ws = WORDS.map(s => k.measureText(s).width); k.letterSpacing = '0px';
       const unit = ws.reduce((a, b) => a + b + GAPW, 0);
-      let x = -mod(u / CYC, 1) * unit;                 // 1周期で1組ぶん左へ
+      let x = -mod(u / CYC * EP("094", "laps", 1), 1) * unit;                 // 1周期で1組ぶん左へ
       for (let rep = 0; x < VW; rep++) WORDS.forEach((s, i) => {
         txt(k, s, x, 88, F, '#fff', 'left', 'middle', '1px');
         k.fillStyle = C.acc; k.beginPath(); k.arc(x + ws[i] + GAPW / 2, 88, 6, 0, 7); k.fill();
@@ -656,17 +665,20 @@ MotionPrompt.pack('lp', function () {
 
   // @element 23
   // 23 グラデーションアニメーション（背景のグラデーションの色が、ゆっくり流れるように動き続ける）
+  function reusableGradientBackground(k, u) {
+    const a = 2 * Math.PI * u / CYC;                        // 4.8秒で1周
+    const BLOBS = [[C.acc, 150, 60, 230, EP("095", "amp", 70), EP("095", "firstY", 30), 0], ['#FFB08F', 380, 40, 210, EP("095", "secondX", 60), EP("095", "secondY", 40), 2.1], [C.blue, 330, 150, 240, EP("095", "thirdX", 80), EP("095", "thirdY", 30), 4.2], ['#9DB6FB', 90, 170, 200, EP("095", "fourthX", 50), EP("095", "fourthY", 35), 1.0]];
+    k.fillStyle = '#FFF1EB'; k.fillRect(0, 0, VW, VH);
+    for (const [col, x0, y0, r, ax, ay, ph] of BLOBS) {
+      const x = x0 + ax * Math.cos(a + ph), y = y0 + ay * Math.sin(a + ph);
+      const g = k.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, col); g.addColorStop(1, 'rgba(255,255,255,0)');
+      k.globalAlpha = 0.85; k.fillStyle = g; k.fillRect(0, 0, VW, VH); k.globalAlpha = 1;
+    }
+  }
   CELLS[22] = (k, w, h, u) => {
     frame(k);
-    const a = 2 * Math.PI * u / CYC;                        // 4.8秒で1周
-    const BLOBS = [[C.acc, 150, 60, 230, EP("095", "amp", 70), 30, 0], ['#FFB08F', 380, 40, 210, 60, 40, 2.1], [C.blue, 330, 150, 240, 80, 30, 4.2], ['#9DB6FB', 90, 170, 200, 50, 35, 1.0]];
     view(k, () => {
-      k.fillStyle = '#FFF1EB'; k.fillRect(0, 0, VW, VH);
-      for (const [col, x0, y0, r, ax, ay, ph] of BLOBS) {
-        const x = x0 + ax * Math.cos(a + ph), y = y0 + ay * Math.sin(a + ph);
-        const g = k.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, col); g.addColorStop(1, 'rgba(255,255,255,0)');
-        k.globalAlpha = 0.85; k.fillStyle = g; k.fillRect(0, 0, VW, VH); k.globalAlpha = 1;
-      }
+      reusableGradientBackground(k, u);
       txt(k, '你好，未来。', 40, 82, `800 34px ${EN}`, '#fff', 'left', 'alphabetic', '1px');
       bars(k, 40, 100, 200, 2, 'rgba(255,255,255,.8)', 6, 12, 0.6);
       btn(k, 40, 128, 104, 26, '开始', '#fff', C.ink);
@@ -675,10 +687,24 @@ MotionPrompt.pack('lp', function () {
 
   // @element 24
   // 24 ふわふわアニメーション（画面の飾りが、ゆっくり上下に浮き沈みし続ける）
+  function reusableFloatingPhone(k) {
+    k.fillStyle = C.ink; rr(k, 306, 18, 92, 132, 16); k.fill(); k.fillStyle = '#fff'; rr(k, 312, 24, 80, 120, 11); k.fill();
+    pic(k, 318, 32, 68, 52, 0, 6); bars(k, 318, 92, 68, 3, C.faint, 5, 10);
+  }
+  function reusableHeartBadge(k) {
+    k.shadowColor = 'rgba(28,35,51,.18)'; k.shadowBlur = 10; k.shadowOffsetY = 4;
+    k.fillStyle = C.acc; k.beginPath(); k.arc(268, 54, 20, 0, 7); k.fill(); k.shadowColor = 'transparent';
+    k.fillStyle = '#fff'; k.beginPath(); k.moveTo(268, 62); k.bezierCurveTo(254, 53, 260, 41, 268, 48); k.bezierCurveTo(276, 41, 282, 53, 268, 62); k.fill();
+  }
+  function reusableRatingChip(k) {
+    k.shadowColor = 'rgba(28,35,51,.16)'; k.shadowBlur = 10; k.shadowOffsetY = 4;
+    k.fillStyle = '#fff'; rr(k, 410, 92, 76, 30, 15); k.fill(); k.shadowColor = 'transparent';
+    txt(k, '★ 4.8', 448, 108, `800 13px ${EN}`, C.acc, 'center', 'middle');
+  }
   CELLS[23] = (k, w, h, u) => {
     frame(k);
     const bob = (T, A, ph) => -A * Math.sin(2 * Math.PI * u / T + ph);   // 上下（easeInOut に近いサイン波）
-    const y1 = bob(2.4, EP("096", "amp", 8), 0), y2 = bob(1.6, 6, 1.2), y3 = bob(2.4, 6, 2.4);
+    const y1 = bob(2.4, EP("096", "amp", 8), 0), y2 = bob(1.6, EP("096", "heartAmplitude", 6), 1.2), y3 = bob(2.4, EP("096", "chipAmplitude", 6), 2.4);
     view(k, () => {
       k.fillStyle = C.soft; k.fillRect(0, 0, VW, VH);
       txt(k, '在应用程序中，', 34, 62, `800 24px ${JP}`, C.ink); txt(k, '变得更加敏捷。', 34, 94, `800 24px ${JP}`, C.ink);
@@ -688,18 +714,49 @@ MotionPrompt.pack('lp', function () {
       k.fillStyle = `rgba(28,35,51,${0.16 * sh})`; k.beginPath(); k.ellipse(352, 160, 54 * sh, 6 * sh, 0, 0, 7); k.fill();
       // スマホ
       k.save(); k.translate(0, y1);
-      k.fillStyle = C.ink; rr(k, 306, 18, 92, 132, 16); k.fill(); k.fillStyle = '#fff'; rr(k, 312, 24, 80, 120, 11); k.fill();
-      pic(k, 318, 32, 68, 52, 0, 6); bars(k, 318, 92, 68, 3, C.faint, 5, 10);
+      reusableFloatingPhone(k);
       k.restore();
       // 飾り（ハートの丸と星のチップ）
-      k.save(); k.translate(0, y2); k.shadowColor = 'rgba(28,35,51,.18)'; k.shadowBlur = 10; k.shadowOffsetY = 4;
-      k.fillStyle = C.acc; k.beginPath(); k.arc(268, 54, 20, 0, 7); k.fill(); k.shadowColor = 'transparent';
-      k.fillStyle = '#fff'; k.beginPath(); k.moveTo(268, 62); k.bezierCurveTo(254, 53, 260, 41, 268, 48); k.bezierCurveTo(276, 41, 282, 53, 268, 62); k.fill(); k.restore();
-      k.save(); k.translate(0, y3); k.shadowColor = 'rgba(28,35,51,.16)'; k.shadowBlur = 10; k.shadowOffsetY = 4;
-      k.fillStyle = '#fff'; rr(k, 410, 92, 76, 30, 15); k.fill(); k.shadowColor = 'transparent';
-      txt(k, '★ 4.8', 448, 108, `800 13px ${EN}`, C.acc, 'center', 'middle'); k.restore();
+      k.save(); k.translate(0, y2); reusableHeartBadge(k); k.restore();
+      k.save(); k.translate(0, y3); reusableRatingChip(k); k.restore();
     });
   };
   // @end
-  return { width: CW, height: CH, cycle: CYC, cells: CELLS, fonts: [] };
+  const reusableMaterials = {
+    snapSectionLight: (k) => reusableSnapSection(k,0,0),
+    snapSectionDark: (k) => reusableSnapSection(k,0,1),
+    highlightMinutes: (k) => { const f=`800 20px ${JP}`; k.font=f; k.fillStyle='#FFE36B'; k.fillRect(20,35,k.measureText('只需 10 分钟').width,11); txt(k,'只需 10 分钟',20,43,f,C.ink); },
+    highlightRecipe: (k) => { const f=`800 20px ${JP}`; k.font=f; k.fillStyle='#FFE36B'; k.fillRect(20,35,k.measureText('不会失败的食谱').width,11); txt(k,'不会失败的食谱',20,43,f,C.ink); },
+    preloaderHalf: (k) => reusablePreloaderContent(k,50),
+    preloaderFull: (k) => reusablePreloaderContent(k,100),
+    preloaderBackground: (k) => { k.fillStyle=C.ink; k.fillRect(0,0,VW,VH); },
+    followerDot: (k) => { k.save(); k.translate(128,128); k.scale(4,4); reusableFollowerDot(k,0,0); k.restore(); },
+    magneticButton: (k) => { k.save(); k.translate(128,50); reusableMagneticButton(k); k.restore(); },
+    rippleButton: (k) => { const B={x:20,y:20,w:280,h:56}; reusableRippleButtonBase(k,B); txt(k,'发送',160,49,`800 17px ${JP}`,'#fff','center','middle'); },
+    smoothPrice0: (k) => reusableSmoothPriceCard(k,20,20,'¥0',0),
+    smoothPrice1: (k) => reusableSmoothPriceCard(k,20,20,'¥980',1),
+    smoothPrice2: (k) => reusableSmoothPriceCard(k,20,20,'¥2,980',2),
+    compareBefore: (k) => { k.save(); rr(k,20,20,359,140,10); k.clip(); reusableCompareBefore(k,{x:20,y:20,w:359,h:140}); k.restore(); },
+    compareHandle: (k) => { k.save(); k.translate(128,128); k.scale(3,3); reusableCompareHandle(k,0,0); k.restore(); },
+    offerPopup: (k) => { k.save(); k.translate(20,20); reusableOfferPopup(k,260,132); k.restore(); },
+    parallaxSky: (k) => { const g=k.createLinearGradient(0,0,0,200); g.addColorStop(0,'#9DB6FB'); g.addColorStop(1,'#E6ECFF'); reusableParallaxSky(k,g); },
+    parallaxSun: (k) => reusableParallaxSun(k,128,128,85),
+    parallaxFar: (k) => mount(k,VW,190,M1,'#7D9AF4',0),
+    parallaxNear: (k) => mount(k,VW,205,M2,'#4B6BDB',1),
+    hoverMountain: (k) => reusableHoverCard(k,20,20,146,128,0,0),
+    hoverSea: (k) => reusableHoverCard(k,20,20,146,128,1,0),
+    hoverStars: (k) => reusableHoverCard(k,20,20,146,128,2,0),
+    gradientBackground: (k) => reusableGradientBackground(k,0.8),
+    floatingPhone: (k) => { k.save(); k.translate(128,128); k.scale(1.5,1.5); k.translate(-352,-84); reusableFloatingPhone(k); k.restore(); },
+    heartBadge: (k) => { k.save(); k.translate(128,122); k.scale(3,3); k.translate(-268,-54); reusableHeartBadge(k); k.restore(); },
+    ratingChip: (k) => { k.save(); k.translate(128,122); k.scale(2.25,2.25); k.translate(-448,-107); reusableRatingChip(k); k.restore(); },
+  };
+  for(let i=1;i<=3;i++) reusableMaterials['pinStep'+i]=(k)=>txt(k,'0'+i,128,80,`800 46px ${EN}`,'#fff','center');
+  for(let i=0;i<3;i++) reusableMaterials['infiniteRow'+i]=(k)=>{k.save();k.translate(-70,20);reusableInfiniteRow(k,0,i);k.restore();};
+  for(let i=0;i<4;i++) reusableMaterials['marqueeWord'+i]=(k)=>txt(k,['网页设计','品牌设计','动态设计','界面体验'][i],20,50,`800 30px ${EN}`,'#fff','left','middle','1px');
+  for(let i=0;i<4;i++) reusableMaterials['portfolioCard'+i]=(k)=>reusablePortfolioCard(k,20,20,i);
+  for(let i=1;i<=4;i++) reusableMaterials['scrollProgress'+i]=(k)=>{k.save();k.translate(0,10);reusableScrollProgress(k,VW,i/4);k.restore();};
+  for(let i=0;i<3;i++) for(let active=0;active<2;active++) reusableMaterials['underlineLink'+i+'-'+active]=(k)=>{const label=['服务','成就','公司简介'][i],f=`800 20px ${JP}`;txt(k,label,20,43,f,C.ink);if(active){k.font=f;const width=k.measureText(label).width;k.fillStyle=C.acc;k.fillRect(20,51,width,3);}};
+  for(let i=0;i<3;i++) { reusableMaterials['reasonCard'+i]=(k)=>reusableReasonCard(k,20,20,i); reusableMaterials['featureCard'+i]=(k)=>reusableFeatureCard(k,20,20,i); }
+  return { materials: reusableMaterials, width: CW, height: CH, cycle: CYC, cells: CELLS, fonts: [] };
 });

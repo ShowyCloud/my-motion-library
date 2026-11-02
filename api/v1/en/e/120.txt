@@ -4,7 +4,7 @@
 // Pack: photo (Photo looks, lighting & styles) · element 24 · Category: Tones & finishing looks
 // What happens: The background turns white and the landscape of hills, house, trees and sun appears, scaled down, only inside the shape of the bust.
 // Motion spec:
-//   - Scene 3: a bust on the left (head centre x 140, y 82, radius 28 px) and hills, a house, trees and the sun (x 432, y 54, radius 15 px) on the right. 
+//   - Scene 3: a bust on the left (head centre x 140, y 82, radius 28 px) and hills, a house, trees and the sun (x 432, y 54, radius 15 px) on the right.
 //   - Background: white #FFFFFF outside the bust
 //   - Inside the bust: the same landscape at 0.7×, placed so the sun sits at the top right of the head and the ridge of the hills runs across the neck
 //   - Inside colours: sky #D3DBE6, hills #9AA8BD and #76869F, ground #55647E, trees #3F4C66

@@ -4,7 +4,7 @@
 // Pack: photo (Photo looks, lighting & styles) · element 03 · Category: Lighting & time of day
 // What happens: As the exposure is set for the bright evening sky, the person, buildings, lamp and tree turn into flat black shapes with no detail and only the sky stays bright.
 // Motion spec:
-//   - Scene 1: a head-and-shoulders figure in front of a horizon at y 150 (head centre x 270, y 78, radius 29 px, no face or hair). 
+//   - Scene 1: a head-and-shoulders figure in front of a horizon at y 150 (head centre x 270, y 78, radius 29 px, no face or hair).
 //   - Sky: #FAF9F7 → #FFEDC4 at the top and a #FFCF73 band near the horizon (y 92–150)
 //   - Everything but the sky becomes #2A2D36, the far hills #4A4546; the figure #22252D
 //   - Sun: radius 20 px at x 404, sinking from y 60 to y 128, half hidden by the hills

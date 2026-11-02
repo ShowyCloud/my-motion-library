@@ -80,12 +80,14 @@ MotionPrompt.pack('lp2', function () {
   ];
   const M1 = [[0, .62], [.22, .4], [.42, .56], [.66, .3], [.86, .5], [1, .42]], M2 = [[0, .8], [.28, .6], [.5, .76], [.76, .58], [1, .74]];
   function mount(k, w, h, pts, col, flip) { k.fillStyle = col; k.beginPath(); k.moveTo(flip ? w : 0, h + 1); pts.forEach(([a, b]) => k.lineTo((flip ? 1 - a : a) * w, b * h)); k.lineTo(flip ? 0 : w, h + 1); k.closePath(); k.fill(); }
+  function reusablePicSky(k, w, h, p) { const g = k.createLinearGradient(0, 0, 0, h); g.addColorStop(0, p.sky[0]); g.addColorStop(1, p.sky[1]); k.fillStyle = g; k.fillRect(-1, -1, w + 2, h + 2); }
+  function reusablePicSun(k, x, y, r, p) { k.fillStyle = p.sun; k.beginPath(); k.arc(x, y, r, 0, 7); k.fill(); }
   function pic(k, x, y, w, h, v = 0, r = 6, z = 1) {
     const p = PICS[v % PICS.length];
     k.save(); rr(k, x, y, w, h, r); k.clip();
     k.translate(x + w / 2, y + h / 2); k.scale(z, z); k.translate(-w / 2, -h / 2);
-    const g = k.createLinearGradient(0, 0, 0, h); g.addColorStop(0, p.sky[0]); g.addColorStop(1, p.sky[1]); k.fillStyle = g; k.fillRect(-1, -1, w + 2, h + 2);
-    k.fillStyle = p.sun; k.beginPath(); k.arc(w * p.sx, h * p.sy, Math.min(w, h) * 0.13, 0, 7); k.fill();
+    reusablePicSky(k, w, h, p);
+    reusablePicSun(k, w * p.sx, h * p.sy, Math.min(w, h) * 0.13, p);
     mount(k, w, h, M1, p.m1, v % 2); mount(k, w, h, M2, p.m2, (v + 1) % 2);
     k.restore();
   }
@@ -153,12 +155,13 @@ MotionPrompt.pack('lp2', function () {
   // Numeric controls are optional; original constants are used without the local editor.
   const EP = (id, key, value) => (typeof window !== "undefined" && window.MPParams) ? window.MPParams.get(id, key, value) : value;
 
+  function reusableTimelineNode(k,x,y,q) { k.fillStyle = '#fff'; k.beginPath(); k.arc(x, y, 7.5, 0, 7); k.fill(); k.lineWidth = 2.5; k.strokeStyle = q > 0 ? C.acc : C.faint; k.stroke(); if (q > 0) { k.fillStyle = C.acc; k.beginPath(); k.arc(x, y, 4 * q, 0, 7); k.fill(); } }
   // @element 01
   // 01 タイムラインアニメーション（スクロールに合わせて年表の線が上から伸び、線が届いた年が順に現れる）
   CELLS[0] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
-    const y = steps([[0.3, 0], [2.3, EP("145", "distance", 190)], [3.0, EP("145", "distance", 190)], [4.3, 0]], u);
+    const y = steps([[EP("145", "scrollKeyTime1", 0.3), 0], [EP("145", "scrollKeyTime2", 2.3), EP("145", "distance", 190)], [EP("145", "scrollKeyTime3", 3.0), EP("145", "distance", 190)], [EP("145", "scrollKeyTime4", 4.3), 0]], u);
     const ROWS = [[72, '2018', '成立'], [126, '2020', '第一家店开业'], [180, '2022', '10,000 名会员'], [234, '2024', '应用发布'], [288, '2026', '海外']];
     const LX = 168, L = y + 126;                         // 線の先（画面の下から 42px の所までページと一緒に伸びる）
     view(k, () => {
@@ -169,11 +172,9 @@ MotionPrompt.pack('lp2', function () {
       k.fillStyle = C.faint; rr(k, LX - 1.5, 52, 3, 248, 1.5); k.fill();
       k.fillStyle = C.acc; rr(k, LX - 1.5, 52, 3, clamp(L - 52, 0, 248), 1.5); k.fill();
       for (const [iy, yr, lab] of ROWS) {
-        const q = eOut(clamp((L - iy) / 22));
-        k.fillStyle = '#fff'; k.beginPath(); k.arc(LX, iy, 7.5, 0, 7); k.fill();
-        k.lineWidth = 2.5; k.strokeStyle = q > 0 ? C.acc : C.faint; k.stroke();
-        if (q > 0) { k.fillStyle = C.acc; k.beginPath(); k.arc(LX, iy, 4 * q, 0, 7); k.fill(); }
-        k.save(); k.globalAlpha = q; k.translate(16 * (1 - q), 0);
+        const q = eOut(clamp((L - iy) / EP("145", "revealDistance", 22)));
+        reusableTimelineNode(k,LX,iy,q);
+        k.save(); k.globalAlpha = q; k.translate(EP("145", "entryOffset", 16) * (1 - q), 0);
         txt(k, yr, LX + 22, iy + 6, `800 18px ${EN}`, C.acc);
         txt(k, lab, LX + 82, iy + 5, `700 15px ${JP}`, C.ink);
         bars(k, LX + 82, iy + 15, 190, 1, C.faint, 5);
@@ -189,7 +190,7 @@ MotionPrompt.pack('lp2', function () {
   CELLS[1] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
-    const p = steps([[0.3, 0], [2.6, EP("146", "value1", 1)], [3.2, EP("146", "value1", 1)], [4.4, 0]], u), y = p * 40;
+    const p = steps([[EP("146", "scrollKeyTime1", 0.3), 0], [EP("146", "scrollKeyTime2", 2.6), EP("146", "value1", 1)], [EP("146", "scrollKeyTime3", 3.2), EP("146", "value1", 1)], [EP("146", "scrollKeyTime4", 4.4), 0]], u), y = p * EP("146", "scrollDistance", 40);
     const LINES = ['日常微小用心累积', '一点一滴改变生活', '让每一天更有意义'], F = `800 27px ${JP}`;
     const total = LINES.join('').length;
     view(k, () => {
@@ -199,7 +200,7 @@ MotionPrompt.pack('lp2', function () {
       LINES.forEach((s, li) => {
         let x = 40; k.font = F;
         for (const ch of s) {
-          const f = clamp(p * (total + 2) - n);
+          const f = clamp(p * (total + EP("146", "revealLead", 2)) - n);
           txt(k, ch, x, 72 + li * 38, F, mix('#D6DBE4', C.ink, f));
           k.font = F; x += k.measureText(ch).width; n++;
         }
@@ -210,26 +211,30 @@ MotionPrompt.pack('lp2', function () {
     });
   };
 
-  // @element 03
-  // 03 スタッキングカード（スクロールすると、次のカードが下から来て前のカードに少しずらして重なる）
-  CELLS[2] = (k, w, h, u) => {
-    u = snapU(u);
-    frame(k);
-    const s = steps([[0.3, 0], [1.1, EP("147", "value1", 1)], [1.6, EP("147", "value1", 1)], [2.4, 2], [3.2, 2], [4.4, 0]], u);
-    const CARDS = [[C.blueL, C.ink, C.acc, '01', '计划', 0], [C.ink, '#fff', C.acc, '02', '制作', 2], [C.acc, '#fff', '#fff', '03', '交付', 1]];
-    const X = 70, CWD = 371, CHT = 124, STEP = 170;
-    view(k, () => {
-      k.fillStyle = C.soft; k.fillRect(0, 0, VW, VH);
-      CARDS.forEach(([bg, fg, nc, no, ttl, pv], i) => {
-        const top = Math.max(14 + i * 12, 16 + i * STEP - s * STEP);
-        const cov = clamp(s - i), sc = 1 - 0.045 * cov - 0.045 * clamp(s - i - 1);
-        k.save(); k.translate(VW / 2, top); k.scale(sc, sc); k.translate(-VW / 2, 0);
+  const STACK_CARDS = [[C.blueL, C.ink, C.acc, '01', '计划', 0], [C.ink, '#fff', C.acc, '02', '制作', 2], [C.acc, '#fff', '#fff', '03', '交付', 1]];
+  function reusableStackCard(k, X, CWD, CHT, i, cov) {
+    const [bg, fg, nc, no, ttl, pv] = STACK_CARDS[i];
         k.save(); k.shadowColor = 'rgba(28,35,51,.22)'; k.shadowBlur = 14; k.shadowOffsetY = -2; k.fillStyle = bg; rr(k, X, 0, CWD, CHT, 12); k.fill(); k.restore();
         txt(k, no, X + 24, 44, `800 26px ${EN}`, nc);
         txt(k, ttl, X + 24, 78, `800 20px ${JP}`, fg);
         bars(k, X + 24, 92, 140, 2, i === 0 ? '#C3CDEA' : 'rgba(255,255,255,.35)');
         pic(k, X + CWD - 160, 14, 144, CHT - 28, pv, 8);
         if (cov > 0) { k.fillStyle = `rgba(28,35,51,${0.16 * cov})`; rr(k, X, 0, CWD, CHT, 12); k.fill(); }
+  }
+  // @element 03
+  // 03 スタッキングカード（スクロールすると、次のカードが下から来て前のカードに少しずらして重なる）
+  CELLS[2] = (k, w, h, u) => {
+    u = snapU(u);
+    frame(k);
+    const s = steps([[EP("147", "scrollKeyTime1", 0.3), 0], [EP("147", "scrollKeyTime2", 1.1), EP("147", "value1", 1)], [EP("147", "scrollKeyTime3", 1.6), EP("147", "value1", 1)], [EP("147", "scrollKeyTime4", 2.4), EP("147", "extra1", 2)], [EP("147", "scrollKeyTime5", 3.2), EP("147", "extra2", 2)], [EP("147", "scrollKeyTime6", 4.4), 0]], u);
+    const X = 70, CWD = 371, CHT = 124, STEP = EP("147", "cardSpacing", 170);
+    view(k, () => {
+      k.fillStyle = C.soft; k.fillRect(0, 0, VW, VH);
+      STACK_CARDS.forEach((card, i) => {
+        const top = Math.max(14 + i * 12, 16 + i * STEP - s * STEP);
+        const cov = clamp(s - i), sc = 1 - EP("147", "stackScale", 0.045) * cov - EP("147", "stackScale", 0.045) * clamp(s - i - 1);
+        k.save(); k.translate(VW / 2, top); k.scale(sc, sc); k.translate(-VW / 2, 0);
+        reusableStackCard(k, X, CWD, CHT, i, cov);
         k.restore();
       });
       sbar(k, s / 2, 0.4);
@@ -238,12 +243,21 @@ MotionPrompt.pack('lp2', function () {
 
   // @element 04
   // 04 背景色の切り替え（スクロールでセクションが変わるたび、ページ全体の背景色がなめらかに変わる）
+  function reusableMorningSun(k,x,y,divisor) {
+    k.fillStyle=C.acc; k.beginPath(); k.arc(x,y,34,0,7); k.fill();
+    k.strokeStyle=C.acc; k.lineWidth=4; k.lineCap='round';
+    for (let j=0;j<8;j++) { const a=j*Math.PI/divisor; k.beginPath(); k.moveTo(x+Math.cos(a)*44,y+Math.sin(a)*44); k.lineTo(x+Math.cos(a)*54,y+Math.sin(a)*54); k.stroke(); }
+  }
+  function reusableSectionMoon(k,x,y,bg,transparent) {
+    k.fillStyle='#FFE5DB'; k.beginPath(); k.arc(x,y,36,0,7); k.fill();
+    k.save(); if (transparent) k.globalCompositeOperation='destination-out'; else k.fillStyle=bg; k.beginPath(); k.arc(x+16,y-12,32,0,7); k.fill(); k.restore();
+  }
   CELLS[3] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
-    const y = steps([[0.3, 0], [1.2, VH], [1.8, VH], [2.7, 2 * VH], [3.3, 2 * VH], [4.4, 0]], u), s = y / VH;
+    const y = steps([[EP("148", "scrollKeyTime1", 0.3), 0], [EP("148", "scrollKeyTime2", 1.2), VH], [EP("148", "scrollKeyTime3", 1.8), VH], [EP("148", "scrollKeyTime4", 2.7), 2 * VH], [EP("148", "scrollKeyTime5", 3.3), 2 * VH], [EP("148", "scrollKeyTime6", 4.4), 0]], u), s = y / VH;
     const BG = ['#FFEBD9', '#1E2A4A', '#DDE6FF'], DK = [0, 1, 0];
-    const i0 = Math.min(1, Math.floor(s)), t = eIOs(clamp((s - i0 - 0.05) / EP("148", "value1", 0.9)));
+    const i0 = Math.min(1, Math.floor(s)), t = eIOs(clamp((s - i0 - EP("148", "colorStart", 0.05)) / EP("148", "value1", 0.9)));
     const bg = mix(BG[i0], BG[i0 + 1], t), dk = lerp(DK[i0], DK[i0 + 1], t);
     const fg = mix(C.ink, '#FFFFFF', dk), bc = mix('#E3C9B4', '#45507A', dk);
     view(k, () => {
@@ -257,11 +271,8 @@ MotionPrompt.pack('lp2', function () {
         k.fillStyle = bc; for (let j = 0; j < 2; j++) { rr(k, 40, y0 + 108 + j * 12, j ? 110 : 180, 6, 3); k.fill(); }
       });
       // 朝: 太陽 / 夜: 月と星 / 休日: 山の写真
-      k.fillStyle = C.acc; k.beginPath(); k.arc(380, 84, 34, 0, 7); k.fill();
-      k.strokeStyle = C.acc; k.lineWidth = 4; k.lineCap = 'round';
-      for (let j = 0; j < 8; j++) { const a = j * Math.PI / EP("148", "value2", 4); k.beginPath(); k.moveTo(380 + Math.cos(a) * 44, 84 + Math.sin(a) * 44); k.lineTo(380 + Math.cos(a) * 54, 84 + Math.sin(a) * 54); k.stroke(); }
-      k.fillStyle = '#FFE5DB'; k.beginPath(); k.arc(380, VH + 84, 36, 0, 7); k.fill();
-      k.fillStyle = bg; k.beginPath(); k.arc(396, VH + 72, 32, 0, 7); k.fill();
+      reusableMorningSun(k,380,84,EP("148", "value2", 4));
+      reusableSectionMoon(k,380,VH+84,bg,false);
       k.fillStyle = '#FFE5DB';[[300, 50], [450, 40], [330, 130], [470, 120]].forEach(([a, b]) => { k.beginPath(); k.arc(a, VH + b, 2.5, 0, 7); k.fill(); });
       pic(k, 300, 2 * VH + 28, 180, 112, 0, 10);
       k.restore();
@@ -274,10 +285,10 @@ MotionPrompt.pack('lp2', function () {
   CELLS[4] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
-    const SY = t => steps([[0.3, 0], [1.1, EP("149", "value1", 170)], [1.5, EP("149", "value1", 170)], [1.9, 100], [2.4, 100], [2.9, 230], [3.3, 230], [4.3, 0]], t), y = SY(u);
+    const SY = t => steps([[EP("149", "scrollKeyTime1", 0.3), 0], [EP("149", "scrollKeyTime2", 1.1), EP("149", "value1", 170)], [EP("149", "scrollKeyTime3", 1.5), EP("149", "value1", 170)], [EP("149", "scrollKeyTime4", 1.9), EP("149", "extra1", 100)], [EP("149", "scrollKeyTime5", 2.4), EP("149", "extra2", 100)], [EP("149", "scrollKeyTime6", 2.9), EP("149", "extra3", 230)], [EP("149", "scrollKeyTime7", 3.3), EP("149", "extra4", 230)], [EP("149", "scrollKeyTime8", 4.3), 0]], t), y = SY(u);
     // 最後に動いた向きが「下」なら隠す（ページの一番上にいるときは出す）
-    const hidden = t => { const yt = SY(t); if (yt < 34) return false; for (let i = 0, tt = t; i < 600; i++, tt -= 1 / 120) { const d = SY(tt) - SY(tt - 1 / 120); if (Math.abs(d) > 1e-4) return d > 0; } return false; };
-    const q = trans(hidden, u, 0.3, eIOs);
+    const hidden = t => { const yt = SY(t); if (yt < EP("149", "hideThreshold", 34)) return false; for (let i = 0, tt = t; i < 600; i++, tt -= 1 / 120) { const d = SY(tt) - SY(tt - 1 / 120); if (Math.abs(d) > 1e-4) return d > 0; } return false; };
+    const q = trans(hidden, u, EP("149", "headerDuration", 0.3), eIOs);
     view(k, () => {
       k.save(); k.translate(0, -y);
       pic(k, 24, 48, 214, 110, 1, 8);
@@ -293,14 +304,23 @@ MotionPrompt.pack('lp2', function () {
     });
   };
 
+  function reusableScrollToc(k,TX,NAMES,a,getQ) {
+      k.fillStyle = C.soft; k.fillRect(0, 0, TX - 10, VH);
+      txt(k, '目录', 20, 30, `800 12px ${JP}`, C.sub);
+      NAMES.forEach((s, i) => {
+        const q = getQ(i), iy = 54 + i * 30;
+        if (q > 0) { k.fillStyle = `rgba(255,229,219,${q})`; rr(k, 12, iy - 13, TX - 34, 26, 6); k.fill(); k.fillStyle = C.acc; k.globalAlpha = q; rr(k, 12, iy - 13, 4, 26, 2); k.fill(); k.globalAlpha = 1; }
+        txt(k, s, 26, iy + 1, `${a === i ? 800 : 600} 13px ${JP}`, mix('#7D879B', C.acc, q), 'left', 'middle');
+      });
+  }
   // @element 06
   // 06 スクロールスパイ（左の目次のうち、いま読んでいる見出しの項目が光る）
   CELLS[5] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
-    const y = steps([[0.3, 0], [0.9, EP("150", "value1", 100)], [1.35, EP("150", "value1", 100)], [1.95, 200], [2.4, 200], [3.0, 300], [3.5, 300], [4.4, 0]], u);
+    const SY = t => steps([[EP("150", "scrollKeyTime1", 0.3), 0], [EP("150", "scrollKeyTime2", 0.9), EP("150", "value1", 100)], [EP("150", "scrollKeyTime3", 1.35), EP("150", "value1", 100)], [EP("150", "scrollKeyTime4", 1.95), EP("150", "extra1", 200)], [EP("150", "scrollKeyTime5", 2.4), EP("150", "extra2", 200)], [EP("150", "scrollKeyTime6", 3.0), EP("150", "extra3", 300)], [EP("150", "scrollKeyTime7", 3.25), EP("150", "extra5", 300)], [EP("150", "scrollKeyTime8", 3.5), EP("150", "extra4", 300)], [EP("150", "scrollKeyTime9", 4.4), 0]], t); const y = SY(u);
     const NAMES = ['简介', '如何使用', '费用', '常见问题'], TX = 160;
-    const act = t => { const yy = steps([[0.3, 0], [0.9, EP("150", "value1", 100)], [1.35, EP("150", "value1", 100)], [1.95, 200], [2.4, 200], [3.0, 300], [3.5, 300], [4.4, 0]], t); let a = 0; for (let i = 0; i < 4; i++) if (i * 100 <= yy + 40) a = i; return a; };
+    const act = t => { const yy = SY(t); let a = 0; for (let i = 0; i < 4; i++) if (i * 100 <= yy + EP("150", "highlightLead", 40)) a = i; return a; };
     view(k, () => {
       k.save(); k.beginPath(); k.rect(TX - 10, 0, VW, VH); k.clip(); k.translate(0, -y);
       NAMES.forEach((s, i) => {
@@ -309,25 +329,23 @@ MotionPrompt.pack('lp2', function () {
         bars(k, TX + 14, y0 + 38, 300, 3, C.faint, 6, 12, 0.6);
       });
       k.restore();
-      k.fillStyle = C.soft; k.fillRect(0, 0, TX - 10, VH);
-      txt(k, '目录', 20, 30, `800 12px ${JP}`, C.sub);
       const a = act(u);
-      NAMES.forEach((s, i) => {
-        const q = trans(t => act(t) === i, u, 0.25), iy = 54 + i * 30;
-        if (q > 0) { k.fillStyle = `rgba(255,229,219,${q})`; rr(k, 12, iy - 13, TX - 34, 26, 6); k.fill(); k.fillStyle = C.acc; k.globalAlpha = q; rr(k, 12, iy - 13, 4, 26, 2); k.fill(); k.globalAlpha = 1; }
-        txt(k, s, 26, iy + 1, `${a === i ? 800 : 600} 13px ${JP}`, mix('#7D879B', C.acc, q), 'left', 'middle');
-      });
+      reusableScrollToc(k,TX,NAMES,a,i=>trans(t=>act(t)===i,u,EP("150", "highlightDuration", 0.25)));
       sbar(k, y / 300, 0.36);
     });
   };
 
+  function reusableBackToTop(k, x, y, hov) {
+    k.save(); k.shadowColor = 'rgba(28,35,51,.3)'; k.shadowBlur = 10; k.shadowOffsetY = 3; k.fillStyle = mix(C.acc, '#D9431C', hov); k.beginPath(); k.arc(x, y, 19, 0, 7); k.fill(); k.restore();
+    k.strokeStyle = '#fff'; k.lineWidth = 2.6; k.lineCap = 'round'; k.lineJoin = 'round'; k.beginPath(); k.moveTo(x - 7, y + 4); k.lineTo(x, y - 3.5); k.lineTo(x + 7, y + 4); k.stroke();
+  }
   // @element 07
   // 07 トップへ戻るボタン（下までスクロールすると右下に丸いボタンが出て、押すと一気に先頭へ戻る）
   CELLS[6] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
-    const CLK = 2.6, MAX = 300;
-    const y = u < CLK + 0.02 ? steps([[0.2, 0], [1.7, MAX]], u) : MAX * (1 - eIO(P(u, CLK + 0.06, CLK + 0.66)));
+    const CLK = 2.6, MAX = EP("151", "scrollMax", 300);
+    const y = u < CLK + 0.02 ? steps([[EP("151", "scrollKeyTime1", 0.2), 0], [EP("151", "scrollKeyTime2", 1.7), MAX]], u) : MAX * (1 - eIO(P(u, CLK + 0.06, CLK + 0.06 + EP("151", "returnDuration", 0.6))));
     const cur = t => path([[0, 340, 205], [1.6, 340, 205], [2.35, 472, 138], [2.95, 472, 138], [3.6, 340, 205], [4.7, 340, 205]], t);
     const [cx, cy] = cur(u);
     view(k, () => {
@@ -342,8 +360,7 @@ MotionPrompt.pack('lp2', function () {
       if (tb > 0) {
         const hov = trans(t => { const [a, b] = cur(t); return Math.hypot(a - 472, b - 138) < 20; }, u, 0.2);
         k.save(); k.globalAlpha = tb; k.translate(0, 10 * (1 - tb));
-        k.save(); k.shadowColor = 'rgba(28,35,51,.3)'; k.shadowBlur = 10; k.shadowOffsetY = 3; k.fillStyle = mix(C.acc, '#D9431C', hov); k.beginPath(); k.arc(472, 138, 19, 0, 7); k.fill(); k.restore();
-        k.strokeStyle = '#fff'; k.lineWidth = 2.6; k.lineCap = 'round'; k.lineJoin = 'round'; k.beginPath(); k.moveTo(465, 142); k.lineTo(472, 134.5); k.lineTo(479, 142); k.stroke();
+        reusableBackToTop(k,472,138,hov);
         k.restore();
       }
       sbar(k, y / MAX, 0.34);
@@ -356,16 +373,16 @@ MotionPrompt.pack('lp2', function () {
   CELLS[7] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
-    const p = steps([[0.3, 0], [2.3, 1], [3.0, 1], [4.4, 0]], u);
-    const x = lerp(EP("152", "value1", 178), 0, p), y = lerp(EP("152", "value2", 58), 0, p), ww = lerp(155, VW, p), hh = lerp(90, VH, p);
+    const p = steps([[EP("152", "scrollKeyTime1", 0.3), 0], [EP("152", "scrollKeyTime2", 2.3), EP("152", "extra3", 1)], [EP("152", "scrollKeyTime3", 3.0), EP("152", "extra4", 1)], [EP("152", "scrollKeyTime4", 4.4), 0]], u);
+    const x = lerp(EP("152", "value1", 178), 0, p), y = lerp(EP("152", "value2", 58), 0, p), ww = lerp(EP("152", "extra1", 155), VW, p), hh = lerp(EP("152", "extra2", 90), VH, p);
     view(k, () => {
-      const a = 1 - clamp(p * 2.2);
+      const a = 1 - clamp(p * EP("152", "titleFadeRate", 2.2));
       k.save(); k.globalAlpha = a;
       txt(k, '进入风景', VW / 2, 38, `800 19px ${JP}`, C.ink, 'center');
       bars(k, 34, 66, 120, 4, C.faint, 6, 14); bars(k, 357, 66, 120, 4, C.faint, 6, 14);
       k.restore();
       pic(k, x, y, ww, hh, 0, lerp(8, 0, p));
-      const b = clamp((p - 0.7) / 0.3);
+      const b = clamp((p - EP("152", "captionStart", 0.7)) / (1 - EP("152", "captionStart", 0.7)));
       if (b > 0) { k.save(); k.globalAlpha = b; txt(k, '欢迎来到壮观的景色', VW / 2, VH / 2 + 2, `800 26px ${JP}`, '#fff', 'center', 'middle', '2px'); k.restore(); }
       sbar(k, p * 0.6, 0.4);
     });
@@ -377,13 +394,21 @@ MotionPrompt.pack('lp2', function () {
   const TC = document.createElement('canvas'); TC.width = 220; TC.height = 132; const TCK = TC.getContext('2d');
   const TD = document.createElement('canvas'); TD.width = 300; TD.height = 190; const TDK = TD.getContext('2d');
   const TDW = 300, TDH = 190;
+  function reusableMemberCard(g, BW, BH) {
+    const gr = g.createLinearGradient(0, 0, BW, BH); gr.addColorStop(0, '#2B4FD6'); gr.addColorStop(1, '#7D9AF4'); g.fillStyle = gr; g.fillRect(0, 0, BW, BH);
+    g.fillStyle = 'rgba(255,255,255,.12)'; g.beginPath(); g.arc(BW - 30, 20, 70, 0, 7); g.fill();
+    logo(g, 18, 26, '#fff');
+    g.fillStyle = '#FFD9C9'; rr(g, 18, 52, 34, 26, 5); g.fill();
+    txt(g, '会员卡', 18, 104, `700 11px ${EN}`, 'rgba(255,255,255,.8)', 'left', 'alphabetic', '2px');
+    txt(g, '0123  4567  8910', 18, 122, `700 13px ${EN}`, '#fff', 'left', 'alphabetic', '1px');
+  }
   CELLS[8] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
-    const BX = VW / 2, BY = 82, BW = 220, BH = 132, MAXA = 0.32, D = EP("153", "value2", 520);
+    const BX = VW / 2, BY = 82, BW = 220, BH = 132, MAXA = EP("153", "maxTilt", 0.32), D = EP("153", "value2", 520);
     const cur = t => path([[0, 80, 190], [0.6, 190, 40], [1.2, 335, 50], [1.8, 330, 125], [2.4, 180, 122], [3.0, 258, 80], [3.6, 470, 190], [4.7, 80, 190]], t);
     const inside = t => { const [x, y] = cur(t); return Math.abs(x - BX) < BW / 2 && Math.abs(y - BY) < BH / 2; };
-    const q = trans(inside, u, 0.4, eOut), [cx, cy] = cur(u);
+    const q = trans(inside, u, EP("153", "hoverDuration", 0.4), eOut), [cx, cy] = cur(u);
     const nx = clamp((cx - BX) / (BW / 2), -1, 1), ny = clamp((cy - BY) / (BH / 2), -1, 1);
     const ry = nx * MAXA * q, rx = ny * MAXA * q;
     // 呼び出し側の拡大率 S（詳細表示などで2倍・3倍に描かれるとき）。下書きの canvas を S 倍の細かさにする
@@ -394,12 +419,7 @@ MotionPrompt.pack('lp2', function () {
     // カードの面
     const g = TCK; g.clearRect(0, 0, TC.width, TC.height);
     g.save(); g.scale(S, S); rr(g, 0, 0, BW, BH, 14); g.clip();
-    const gr = g.createLinearGradient(0, 0, BW, BH); gr.addColorStop(0, '#2B4FD6'); gr.addColorStop(1, '#7D9AF4'); g.fillStyle = gr; g.fillRect(0, 0, BW, BH);
-    g.fillStyle = 'rgba(255,255,255,.12)'; g.beginPath(); g.arc(BW - 30, 20, 70, 0, 7); g.fill();
-    logo(g, 18, 26, '#fff');
-    g.fillStyle = '#FFD9C9'; rr(g, 18, 52, 34, 26, 5); g.fill();
-    txt(g, '会员卡', 18, 104, `700 11px ${EN}`, 'rgba(255,255,255,.8)', 'left', 'alphabetic', '2px');
-    txt(g, '0123  4567  8910', 18, 122, `700 13px ${EN}`, '#fff', 'left', 'alphabetic', '1px');
+    reusableMemberCard(g, BW, BH);
     const gx = (nx * 0.5 + 0.5) * BW, gy = (ny * 0.5 + 0.5) * BH, gl = g.createRadialGradient(gx, gy, 0, gx, gy, 130);
     gl.addColorStop(0, `rgba(255,255,255,${EP("153", "value1", 0.42) * q})`); gl.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gl; g.fillRect(0, 0, BW, BH);
     g.restore();
@@ -423,6 +443,19 @@ MotionPrompt.pack('lp2', function () {
     });
   };
 
+  function reusableSpotCard(k, x, y, cw, ch, i, cx, cy) {
+    const LAB = ['简单', '安心', '快'];
+        k.fillStyle = '#1C2335'; rr(k, x, y, cw, ch, 10); k.fill();
+        k.save(); rr(k, x, y, cw, ch, 10); k.clip();
+        const g = k.createRadialGradient(cx, cy, 0, cx, cy, EP("154", "glowRadius", 115)); g.addColorStop(0, 'rgba(255,255,255,.34)'); g.addColorStop(1, 'rgba(255,255,255,0)'); k.fillStyle = g; k.fillRect(x, y, cw, ch);
+        k.restore();
+        k.lineWidth = 1.5; k.strokeStyle = 'rgba(255,255,255,.08)'; rr(k, x + 0.75, y + 0.75, cw - 1.5, ch - 1.5, 10); k.stroke();
+        const sg = k.createRadialGradient(cx, cy, 0, cx, cy, EP("154", "borderRadius", 120)); sg.addColorStop(0, 'rgba(255,122,82,1)'); sg.addColorStop(1, 'rgba(255,122,82,0)');
+        k.lineWidth = 2; k.strokeStyle = sg; rr(k, x + 1, y + 1, cw - 2, ch - 2, 10); k.stroke();
+        k.strokeStyle = 'rgba(255,255,255,.75)'; k.lineWidth = 2; k.beginPath(); k.arc(x + 30, y + 32, 12, 0, 7); k.stroke();
+        txt(k, LAB[i], x + 18, y + 72, `800 16px ${JP}`, 'rgba(255,255,255,.9)');
+        bars(k, x + 18, y + 86, 110, 2, 'rgba(255,255,255,.16)', 5, 10);
+  }
   // @element 10
   // 10 スポットライトホバー（暗いカードの上で、カーソルの周りだけが丸く明るく光る）
   CELLS[9] = (k, w, h, u) => {
@@ -432,19 +465,9 @@ MotionPrompt.pack('lp2', function () {
     view(k, () => {
       k.fillStyle = '#121828'; k.fillRect(0, 0, VW, VH);
       txt(k, '特色', VW / 2, 26, `800 11px ${EN}`, 'rgba(255,255,255,.45)', 'center', 'alphabetic', '3px');
-      const LAB = ['简单', '安心', '快'];
       for (let i = 0; i < 3; i++) {
         const x = 22 + i * 160, y = 40, cw = 147, ch = 116;
-        k.fillStyle = '#1C2335'; rr(k, x, y, cw, ch, 10); k.fill();
-        k.save(); rr(k, x, y, cw, ch, 10); k.clip();
-        const g = k.createRadialGradient(cx, cy, 0, cx, cy, 115); g.addColorStop(0, 'rgba(255,255,255,.34)'); g.addColorStop(1, 'rgba(255,255,255,0)'); k.fillStyle = g; k.fillRect(x, y, cw, ch);
-        k.restore();
-        k.lineWidth = 1.5; k.strokeStyle = 'rgba(255,255,255,.08)'; rr(k, x + 0.75, y + 0.75, cw - 1.5, ch - 1.5, 10); k.stroke();
-        const sg = k.createRadialGradient(cx, cy, 0, cx, cy, 120); sg.addColorStop(0, 'rgba(255,122,82,1)'); sg.addColorStop(1, 'rgba(255,122,82,0)');
-        k.lineWidth = 2; k.strokeStyle = sg; rr(k, x + 1, y + 1, cw - 2, ch - 2, 10); k.stroke();
-        k.strokeStyle = 'rgba(255,255,255,.75)'; k.lineWidth = 2; k.beginPath(); k.arc(x + 30, y + 32, 12, 0, 7); k.stroke();
-        txt(k, LAB[i], x + 18, y + 72, `800 16px ${JP}`, 'rgba(255,255,255,.9)');
-        bars(k, x + 18, y + 86, 110, 2, 'rgba(255,255,255,.16)', 5, 10);
+        reusableSpotCard(k, x, y, cw, ch, i, cx, cy);
       }
       cursor(k, cx, cy);
     });
@@ -461,6 +484,8 @@ MotionPrompt.pack('lp2', function () {
     k.strokeStyle = 'rgba(28,35,51,.18)'; k.lineWidth = 0.025; k.beginPath(); k.moveTo(-0.36, -0.5); k.quadraticCurveTo(0, back ? -0.44 : -0.3, 0.36, -0.5); k.stroke();
     k.restore();
   }
+  function teeFrontMark(k,x,y,mark) { k.fillStyle = mark; k.beginPath(); k.arc(x + 18, y - 16, 7, 0, 7); k.fill(); }
+  function teeBackMark(k,sx,sy,mark) { k.fillStyle = mark; k.beginPath(); for (let j = 0; j < 10; j++) { const r = j % 2 ? 8 : 19, a = -Math.PI / 2 + j * Math.PI / EP("155", "value1", 5); j ? k.lineTo(sx + Math.cos(a) * r, sy + Math.sin(a) * r) : k.moveTo(sx + Math.cos(a) * r, sy + Math.sin(a) * r); } k.closePath(); k.fill(); }
   CELLS[10] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
@@ -471,13 +496,13 @@ MotionPrompt.pack('lp2', function () {
       for (let i = 0; i < 2; i++) {
         const [nm, pr, col, bg, mark] = PRODS[i], x = CX[i];
         const inside = t => { const [a, b] = cur(t); return a > x && a < x + CWD && b > CY && b < CY + IH + 40; };
-        const q = trans(inside, u, 0.3, eIOs);
+        const q = trans(inside, u, EP("155", "hoverDuration", 0.3), eIOs);
         k.save(); rr(k, x, CY, CWD, IH, 8); k.clip(); k.fillStyle = bg; k.fillRect(x, CY, CWD, IH);
         // 正面（胸に小さな丸い印）→ 後ろ姿（背中に大きな星の柄）
         k.globalAlpha = 1 - q; tee(k, x + CWD / 2, CY + IH / 2 + 4, 108, col, false);
-        k.fillStyle = mark; k.beginPath(); k.arc(x + CWD / 2 + 18, CY + IH / 2 - 16, 7, 0, 7); k.fill();
+        teeFrontMark(k,x + CWD / 2,CY + IH / 2,mark);
         k.globalAlpha = q; tee(k, x + CWD / 2, CY + IH / 2 + 4, 108, col, true);
-        { const sx = x + CWD / 2, sy = CY + IH / 2 + 12; k.fillStyle = mark; k.beginPath(); for (let j = 0; j < 10; j++) { const r = j % 2 ? 8 : 19, a = -Math.PI / 2 + j * Math.PI / EP("155", "value1", 5); j ? k.lineTo(sx + Math.cos(a) * r, sy + Math.sin(a) * r) : k.moveTo(sx + Math.cos(a) * r, sy + Math.sin(a) * r); } k.closePath(); k.fill(); }
+        teeBackMark(k,x + CWD / 2,CY + IH / 2 + 12,mark);
         k.globalAlpha = 1; k.restore();
         for (let j = 0; j < 2; j++) { k.fillStyle = (j ? q : 1 - q) > 0.5 ? C.ink : C.faint; k.beginPath(); k.arc(x + CWD / 2 - 6 + j * 12, CY + IH - 10, 3, 0, 7); k.fill(); }
         txt(k, nm, x + 4, CY + IH + 22, `800 14px ${JP}`, C.ink);
@@ -508,7 +533,7 @@ MotionPrompt.pack('lp2', function () {
         k.save(); k.beginPath(); k.rect(x0 - 4, LY - 31, ws[i] + 8, 39); k.clip();
         let cxp = x0;
         [...s].forEach((ch, j) => {
-          const f = tc === null ? (on ? 1 : 0) : eIO(P(u, tc + 0.035 * j, tc + 0.035 * j + EP("156", "duration", 0.36))), q = on ? f : 1 - f;
+          const f = tc === null ? (on ? 1 : 0) : eIO(P(u, tc + EP("156", "characterDelay", 0.035) * j, tc + EP("156", "characterDelay", 0.035) * j + EP("156", "duration", 0.36))), q = on ? f : 1 - f;
           k.font = F; k.letterSpacing = '1px'; const cw = k.measureText(ch).width; k.letterSpacing = '0px';
           txt(k, ch, cxp, LY - LH * q, F, C.ink, 'left', 'alphabetic', '1px');
           txt(k, ch, cxp, LY + LH - LH * q, F, C.acc, 'left', 'alphabetic', '1px');
@@ -533,16 +558,16 @@ MotionPrompt.pack('lp2', function () {
     view(k, () => {
       NAMES.forEach((s, i) => {
         const top = RT + i * RH, inside = t => { const [a, b] = cur(t); return b > top && b < top + RH && a > 20 && a < 490; };
-        const q = trans(inside, u, 0.25);
+        const q = trans(inside, u, EP("157", "hoverDuration", 0.25));
         txt(k, '0' + (i + 1), 30, top + 25, `800 12px ${EN}`, C.sub);
         txt(k, s, 64 + EP("157", "value1", 8) * q, top + 26, `800 17px ${JP}`, mix(C.ink, C.acc, q));
         txt(k, '→', 476, top + 25, `700 15px ${EN}`, mix('#B7BFCC', C.acc, q), 'right');
         k.fillStyle = C.rule; k.fillRect(24, top + RH, VW - 48, 1);
       });
       NAMES.forEach((s, i) => {
-        const top = RT + i * RH, q = trans(t => { const [a, b] = cur(t); return b > top && b < top + RH && a > 20 && a < 490; }, u, 0.25);
+        const top = RT + i * RH, q = trans(t => { const [a, b] = cur(t); return b > top && b < top + RH && a > 20 && a < 490; }, u, EP("157", "hoverDuration", 0.25));
         if (q <= 0) return;
-        const iw = 132, ih = 84, px = cx + 26, py = clamp(cy - 46, 4, VH - ih - 4), sc = 0.85 + EP("157", "value2", 0.15) * q;
+        const iw = 132, ih = 84, px = cx + EP("157", "imageOffset", 26), py = clamp(cy - 46, 4, VH - ih - 4), sc = 0.85 + EP("157", "value2", 0.15) * q;
         k.save(); k.globalAlpha = q; k.translate(px + iw / 2, py + ih / 2); k.scale(sc, sc);
         k.shadowColor = 'rgba(28,35,51,.25)'; k.shadowBlur = 12; k.shadowOffsetY = 4; k.fillStyle = '#fff'; rr(k, -iw / 2, -ih / 2, iw, ih, 6); k.fill(); k.shadowColor = 'transparent';
         pic(k, -iw / 2, -ih / 2, iw, ih, [0, 2, 1, 2][i], 6);
@@ -552,56 +577,38 @@ MotionPrompt.pack('lp2', function () {
     });
   };
 
+  function reusableFloatingField(k,F,s,q,fo,showCursor) {
+      k.lineWidth = lerp(1.5, 2.2, fo); k.strokeStyle = mix('#C9D0DC', C.acc, fo); rr(k, F.x, F.y, F.w, F.h, 8); k.stroke();
+      txt(k, s, F.x + 14, F.y + 30, `600 15px ${EN}`, C.ink);
+      if (showCursor) { k.font = `600 15px ${EN}`; const xw = k.measureText(s).width; k.fillStyle = C.ink; k.fillRect(F.x + 14 + xw + 1, F.y + 14, 1.6, 20); }
+      const fs = lerp(15, EP("158", "value1", 11.5), q), ly = lerp(F.y + F.h / 2, F.y, q), lx = F.x + lerp(14, 10, q), LAB = '电子邮件地址';
+      k.font = `600 ${fs}px ${JP}`; const lw = k.measureText(LAB).width;
+      if (q > 0) { k.fillStyle = '#fff'; k.fillRect(lx - 4, ly - 3, lw + 8, 6); }
+      txt(k, LAB, lx, ly + 0.5, `600 ${fs}px ${JP}`, mix('#8B94A6', C.acc, fo), 'left', 'middle');
+  }
   // @element 14
   // 14 フローティングラベル（入力欄の中のラベルが、入力を始めると小さくなって欄の上へ移る）
   CELLS[13] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
     const TEXT = 'hello@example.com', F = { x: 106, y: 58, w: 300, h: 46 };
-    const len = t => { t = mod(t, CYC); return t < 1.0 ? 0 : t < 3.2 ? Math.min(TEXT.length, Math.floor((t - 1.0) / 0.075)) : Math.max(0, TEXT.length - Math.floor((t - 3.2) / 0.03)); };
+    const len = t => { t = mod(t, CYC); return t < 1.0 ? 0 : t < 3.2 ? Math.min(TEXT.length, Math.floor((t - 1.0) / EP("158", "typingInterval", 0.075))) : Math.max(0, TEXT.length - Math.floor((t - 3.2) / 0.03)); };
     const focused = t => { t = mod(t, CYC); return t >= 0.65 && t < 3.95; };
-    const q = trans(t => focused(t) || len(t) > 0, u, 0.24, eOut), fo = trans(focused, u, 0.15);
+    const q = trans(t => focused(t) || len(t) > 0, u, EP("158", "labelDuration", 0.24), eOut), fo = trans(focused, u, 0.15);
     const cur = t => path([[0, 445, 205], [0.45, 262, 82], [0.85, 262, 82], [1.4, 452, 142], [3.5, 452, 142], [3.85, 470, 26], [4.05, 470, 26], [4.6, 445, 205], [4.7, 445, 205]], t);
     const [cx, cy] = cur(u);
     view(k, () => {
       k.fillStyle = C.soft; k.fillRect(0, 0, VW, VH);
       k.save(); k.shadowColor = 'rgba(28,35,51,.1)'; k.shadowBlur = 12; k.shadowOffsetY = 3; k.fillStyle = '#fff'; rr(k, 80, 12, 352, 148, 12); k.fill(); k.restore();
       txt(k, '会员注册', F.x, 40, `800 15px ${JP}`, C.ink);
-      k.lineWidth = lerp(1.5, 2.2, fo); k.strokeStyle = mix('#C9D0DC', C.acc, fo); rr(k, F.x, F.y, F.w, F.h, 8); k.stroke();
       const s = TEXT.slice(0, len(u));
-      txt(k, s, F.x + 14, F.y + 30, `600 15px ${EN}`, C.ink);
-      if (focused(u) && (mod(u, 0.9) < 0.5 || (u > 1 && u < 2.4))) { k.font = `600 15px ${EN}`; const xw = k.measureText(s).width; k.fillStyle = C.ink; k.fillRect(F.x + 14 + xw + 1, F.y + 14, 1.6, 20); }
-      const fs = lerp(15, EP("158", "value1", 11.5), q), ly = lerp(F.y + F.h / 2, F.y, q), lx = F.x + lerp(14, 10, q), LAB = '电子邮件地址';
-      k.font = `600 ${fs}px ${JP}`; const lw = k.measureText(LAB).width;
-      if (q > 0) { k.fillStyle = '#fff'; k.fillRect(lx - 4, ly - 3, lw + 8, 6); }
-      txt(k, LAB, lx, ly + 0.5, `600 ${fs}px ${JP}`, mix('#8B94A6', C.acc, fo), 'left', 'middle');
+      reusableFloatingField(k,F,s,q,fo,focused(u) && (mod(u, 0.9) < 0.5 || (u > 1 && u < 2.4)));
       btn(k, F.x, 118, F.w, 30, '下一步', C.ink, '#fff', 12);
       click(k, cx, cy, u, [0.65, 3.95]);
     });
   };
 
-  // @element 15
-  // 15 インラインバリデーション（打っている途中は赤で「形式が正しくありません」、正しく打ち終わると緑のチェックとOK）
-  CELLS[14] = (k, w, h, u) => {
-    u = snapU(u);
-    frame(k);
-    const TEXT = 'hana@example.com', F = { x: 106, y: 56, w: 300, h: 44 };
-    const len = t => { t = mod(t, CYC); return t < 0.75 ? 0 : t < 3.6 ? Math.min(TEXT.length, Math.floor((t - 0.75) / EP("159", "value1", 0.115))) : Math.max(0, TEXT.length - Math.floor((t - 3.6) / 0.03)); };
-    const err = t => { const n = len(t); return mod(t, CYC) < 3.6 && n >= 2 && n < TEXT.length; };
-    const ok = t => mod(t, CYC) < 3.6 && len(t) === TEXT.length;
-    const focused = t => { t = mod(t, CYC); return t >= 0.45 && t < 4.2; };
-    const qe = trans(err, u, 0.15), qo = trans(ok, u, 0.25), fo = trans(focused, u, 0.15);
-    const cur = t => path([[0, 445, 205], [0.3, 262, 80], [0.6, 262, 80], [1.1, 455, 146], [3.8, 455, 146], [4.1, 470, 26], [4.3, 470, 26], [4.65, 445, 205], [4.7, 445, 205]], t);
-    const [cx, cy] = cur(u);
-    view(k, () => {
-      txt(k, '联系我们', F.x, 26, `800 15px ${JP}`, C.ink);
-      txt(k, '电子邮件地址', F.x, 47, `700 12px ${JP}`, C.ink);
-      k.fillStyle = mix('#FFFFFF', '#FFF1F1', qe); rr(k, F.x, F.y, F.w, F.h, 8); k.fill();
-      const bc = mix(mix(mix('#C9D0DC', C.ink, fo), RED, qe), GREEN, qo);
-      k.lineWidth = lerp(1.5, 2.2, Math.max(fo, qe, qo)); k.strokeStyle = bc; rr(k, F.x, F.y, F.w, F.h, 8); k.stroke();
-      const s = TEXT.slice(0, len(u));
-      txt(k, s, F.x + 14, F.y + 28, `600 15px ${EN}`, C.ink);
-      if (focused(u) && !ok(u) && (mod(u, 0.9) < 0.5 || (u > 0.75 && u < 2.6))) { k.font = `600 15px ${EN}`; const xw = k.measureText(s).width; k.fillStyle = C.ink; k.fillRect(F.x + 14 + xw + 1, F.y + 12, 1.6, 20); }
+  function reusableValidationStates(k,F,qe,qo) {
       if (qe > 0) {
         k.save(); k.globalAlpha = qe;
         k.fillStyle = RED; k.beginPath(); k.arc(F.x + 7, F.y + F.h + 20, 7, 0, 7); k.fill(); txt(k, '!', F.x + 7, F.y + F.h + 20.5, `800 11px ${EN}`, '#fff', 'center', 'middle');
@@ -615,6 +622,30 @@ MotionPrompt.pack('lp2', function () {
         txt(k, '格式正确', F.x + 20, F.y + F.h + 20.5, `800 13px ${EN}`, GREEN, 'left', 'middle');
         k.restore();
       }
+  }
+  // @element 15
+  // 15 インラインバリデーション（打っている途中は赤で「形式が正しくありません」、正しく打ち終わると緑のチェックとOK）
+  CELLS[14] = (k, w, h, u) => {
+    u = snapU(u);
+    frame(k);
+    const TEXT = 'hana@example.com', F = { x: 106, y: 56, w: 300, h: 44 };
+    const len = t => { t = mod(t, CYC); return t < 0.75 ? 0 : t < 3.6 ? Math.min(TEXT.length, Math.floor((t - 0.75) / EP("159", "value1", 0.115))) : Math.max(0, TEXT.length - Math.floor((t - 3.6) / 0.03)); };
+    const err = t => { const n = len(t); return mod(t, CYC) < 3.6 && n >= 2 && n < TEXT.length; };
+    const ok = t => mod(t, CYC) < 3.6 && len(t) === TEXT.length;
+    const focused = t => { t = mod(t, CYC); return t >= 0.45 && t < 4.2; };
+    const qe = trans(err, u, EP("159", "errorDuration", 0.15)), qo = trans(ok, u, EP("159", "successDuration", 0.25)), fo = trans(focused, u, 0.15);
+    const cur = t => path([[0, 445, 205], [0.3, 262, 80], [0.6, 262, 80], [1.1, 455, 146], [3.8, 455, 146], [4.1, 470, 26], [4.3, 470, 26], [4.65, 445, 205], [4.7, 445, 205]], t);
+    const [cx, cy] = cur(u);
+    view(k, () => {
+      txt(k, '联系我们', F.x, 26, `800 15px ${JP}`, C.ink);
+      txt(k, '电子邮件地址', F.x, 47, `700 12px ${JP}`, C.ink);
+      k.fillStyle = mix('#FFFFFF', '#FFF1F1', qe); rr(k, F.x, F.y, F.w, F.h, 8); k.fill();
+      const bc = mix(mix(mix('#C9D0DC', C.ink, fo), RED, qe), GREEN, qo);
+      k.lineWidth = lerp(1.5, 2.2, Math.max(fo, qe, qo)); k.strokeStyle = bc; rr(k, F.x, F.y, F.w, F.h, 8); k.stroke();
+      const s = TEXT.slice(0, len(u));
+      txt(k, s, F.x + 14, F.y + 28, `600 15px ${EN}`, C.ink);
+      if (focused(u) && !ok(u) && (mod(u, 0.9) < 0.5 || (u > 0.75 && u < 2.6))) { k.font = `600 15px ${EN}`; const xw = k.measureText(s).width; k.fillStyle = C.ink; k.fillRect(F.x + 14 + xw + 1, F.y + 12, 1.6, 20); }
+      reusableValidationStates(k,F,qe,qo);
       click(k, cx, cy, u, [0.45, 4.2]);
     });
   };
@@ -624,10 +655,10 @@ MotionPrompt.pack('lp2', function () {
   CELLS[15] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
-    const CLK = 0.8, BY = 124, BHT = 36;
-    const shr = eIO(P(u, CLK + 0.05, CLK + 0.35)), done = eOut(P(u, 2.25, 2.45)), grow = eIO(P(u, 2.45, 2.8)), fade = P(u, 3.9, 4.1), back = eOut(P(u, 4.1, 4.4));
-    const bw = fade >= 1 ? 220 : grow > 0 ? lerp(BHT, EP("160", "value2", 150), grow) : lerp(220, BHT, shr);
-    const cur = t => path([[0, 430, 205], [0.55, 290, 136], [1.1, 290, 136], [1.6, 440, 205], [4.7, 430, 205]], t);
+    const CLK = EP("160", "clickTime", 0.8), BY = 124, BHT = 36;
+    const shr = eIO(P(u, CLK + 0.05, CLK + 0.05 + EP("160", "shrinkDuration", 0.3))), done = eOut(P(u, EP("160", "doneStart", 2.25), EP("160", "growStart", 2.45))), grow = eIO(P(u, EP("160", "growStart", 2.45), EP("160", "growEnd", 2.8))), fade = P(u, EP("160", "fadeStart", 3.9), EP("160", "fadeEnd", 4.1)), back = eOut(P(u, EP("160", "fadeEnd", 4.1), EP("160", "backEnd", 4.4)));
+    const bw = fade >= 1 ? EP("160", "extra1", 220) : grow > 0 ? lerp(BHT, EP("160", "value2", 150), grow) : lerp(EP("160", "extra1", 220), BHT, shr);
+    const cur = t => path([[0, 430, 205], [CLK - .25, 290, 136], [CLK + .3, 290, 136], [CLK + .8, 440, 205], [4.7, 430, 205]], t);
     const [cx, cy] = cur(u);
     view(k, () => {
       k.fillStyle = C.blueL; k.fillRect(0, 0, VW, VH);
@@ -638,11 +669,11 @@ MotionPrompt.pack('lp2', function () {
       k.save(); k.globalAlpha = ba; k.translate(0, fade >= 1 ? 6 * (1 - back) : 0); k.save(); k.shadowColor = 'rgba(28,35,51,.18)'; k.shadowBlur = 8; k.shadowOffsetY = 3; k.fillStyle = col; rr(k, VW / 2 - bw / 2, BY, bw, BHT, BHT / 2); k.fill(); k.restore();
       const idleA = fade >= 1 ? 1 : 1 - clamp(shr * 3);
       if (idleA > 0) { k.save(); k.globalAlpha = idleA * ba; txt(k, '发送', VW / 2, BY + BHT / 2 + 0.5, `800 14px ${JP}`, '#fff', 'center', 'middle'); k.restore(); }
-      if (u > CLK + 0.3 && u < 2.3) { k.save(); k.globalAlpha = clamp((u - CLK - 0.3) / 0.1) * (1 - clamp((u - 2.2) / 0.08)); k.lineCap = 'round'; k.lineWidth = 3; k.strokeStyle = 'rgba(255,255,255,.35)'; k.beginPath(); k.arc(VW / 2, BY + BHT / 2, 10, 0, 7); k.stroke(); const a = u / 0.7 * Math.PI * EP("160", "value1", 2); k.strokeStyle = '#fff'; k.beginPath(); k.arc(VW / 2, BY + BHT / 2, 10, a, a + Math.PI * 0.7); k.stroke(); k.restore(); }
-      if (u >= 2.25 && fade < 1) {
+      if (u > CLK + 0.3 && u < EP("160", "doneStart", 2.25) + .05) { k.save(); k.globalAlpha = clamp((u - CLK - 0.3) / 0.1) * (1 - clamp((u - (EP("160", "doneStart", 2.25) - .05)) / 0.08)); k.lineCap = 'round'; k.lineWidth = 3; k.strokeStyle = 'rgba(255,255,255,.35)'; k.beginPath(); k.arc(VW / 2, BY + BHT / 2, 10, 0, 7); k.stroke(); const a = u / EP("160", "spinPeriod", 0.7) * Math.PI * EP("160", "value1", 2); k.strokeStyle = '#fff'; k.beginPath(); k.arc(VW / 2, BY + BHT / 2, 10, a, a + Math.PI * 0.7); k.stroke(); k.restore(); }
+      if (u >= EP("160", "doneStart", 2.25) && fade < 1) {
         k.save();
         const ox = lerp(0, -26, grow);
-        check(k, VW / 2 + ox, BY + BHT / 2, 16, '#fff', 3, P(u, 2.25, 2.5));
+        check(k, VW / 2 + ox, BY + BHT / 2, 16, '#fff', 3, P(u, EP("160", "doneStart", 2.25), EP("160", "doneStart", 2.25) + .25));
         if (grow > 0.5) { k.globalAlpha = ba * P(grow, 0.5, 1); txt(k, '已完成', VW / 2 + 12, BY + BHT / 2 + 0.5, `800 14px ${JP}`, '#fff', 'center', 'middle'); }
         k.restore();
       }
@@ -655,7 +686,7 @@ MotionPrompt.pack('lp2', function () {
   // 17 ビュートランジション（一覧の写真を押すと、その写真がそのまま大きくなって詳細ページの上部になる）
   CELLS[16] = (k, w, h, u) => {
     u = snapU(u);
-    const e = u < 2.0 ? eIO(P(u, 0.85, EP("161", "value1", 1.45))) : 1 - eIO(P(u, 3.15, 3.75));
+    const e = u < 2.0 ? eIO(P(u, 0.85, EP("161", "value1", 1.45))) : 1 - eIO(P(u, 3.15, 3.15 + EP("161", "returnDuration", 0.6)));
     frame(k, e > 0.5 ? 'example.com/works/02' : 'example.com/works');
     const G = [24, 184, 344], GY = 44, GW = 143, GH = 80, NM = ['雪山小屋', '海边咖啡馆', '晚上的观景台'], PV = [0, 1, 2];
     const T = { x: 16, y: 10, w: VW - 32, h: 94 };
@@ -685,7 +716,7 @@ MotionPrompt.pack('lp2', function () {
   CELLS[17] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
-    const e = u < 2.0 ? eOut(P(u, EP("162", "value1", 0.85), 1.3)) : 1 - eIO(P(u, 3.05, 3.4));
+    const e = u < 2.0 ? eOut(P(u, EP("162", "value1", 0.85), 1.3)) : 1 - eIO(P(u, 3.05, 3.05 + EP("162", "closeDuration", 0.35)));
     const TX = [24, 142, 260, 378], TY = 72, TW = 108, THt = 72, PV = [2, 0, 1, 0];
     const B = { x: 125, y: 12, w: 261, h: 128 };
     const cur = t => path([[0, 430, 205], [0.5, 318, 110], [0.95, 318, 110], [1.6, 445, 120], [2.5, 445, 120], [2.85, 487, 19], [3.15, 487, 19], [3.8, 430, 205], [4.7, 430, 205]], t);
@@ -696,7 +727,7 @@ MotionPrompt.pack('lp2', function () {
       for (let i = 0; i < 4; i++) pic(k, TX[i], TY, TW, THt, PV[i], 6);
       bars(k, 24, 154, 300, 1, C.faint, 6);
       if (e > 0) {
-        k.fillStyle = `rgba(14,18,28,${0.82 * e})`; k.fillRect(0, 0, VW, VH);
+        k.fillStyle = `rgba(14,18,28,${EP("162", "overlayOpacity", 0.82) * e})`; k.fillRect(0, 0, VW, VH);
         const x = lerp(TX[2], B.x, e), y = lerp(TY, B.y, e), ww = lerp(TW, B.w, e), hh = lerp(THt, B.h, e);
         pic(k, x, y, ww, hh, 1, 6);
         k.save(); k.globalAlpha = clamp((e - 0.5) / EP("162", "value2", 0.5));
@@ -711,33 +742,14 @@ MotionPrompt.pack('lp2', function () {
     });
   };
 
-  // @element 19
-  // 19 ホットスポット（製品写真の上で点が脈打ち、押すと説明の吹き出しが出る）
-  CELLS[18] = (k, w, h, u) => {
-    u = snapU(u);
-    frame(k);
-    const D1 = [186, 52], D2 = [150, 122];
-    const o1 = t => { t = mod(t, CYC); return t >= 0.9 && t < 2.4; }, o2 = t => { t = mod(t, CYC); return t >= 2.4 && t < 3.8; };
-    const q1 = trans(o1, u, 0.25), q2 = trans(o2, u, 0.25);
-    const cur = t => path([[0, 280, 205], [0.6, D1[0], D1[1]], [1.15, D1[0], D1[1]], [2.05, D2[0], D2[1]], [3.95, D2[0], D2[1]], [4.45, 280, 205], [4.7, 280, 205]], t);
-    const [cx, cy] = cur(u);
-    view(k, () => {
-      k.fillStyle = '#EEF1F6'; k.fillRect(0, 0, 300, VH);
-      // リュック（平面の絵）
-      k.strokeStyle = C.ink; k.lineWidth = 6; k.lineCap = 'round'; k.beginPath(); k.arc(150, 30, 16, Math.PI, 0); k.stroke();
-      k.fillStyle = '#3B64E8'; rr(k, 92, 26, 116, 134, 28); k.fill();
-      k.fillStyle = '#2E50C2'; rr(k, 108, 92, 84, 56, 14); k.fill();
-      k.strokeStyle = '#FFD9C9'; k.lineWidth = 2.5; k.beginPath(); k.moveTo(116, 104); k.lineTo(184, 104); k.stroke();
-      k.fillStyle = C.acc; rr(k, 140, 54, 20, 8, 4); k.fill();
-      txt(k, '旅行背包', 322, 58, `800 16px ${JP}`, C.ink);
-      txt(k, '¥12,800', 322, 88, `800 19px ${EN}`, C.acc);
-      bars(k, 322, 104, 160, 3);
-      [D1, D2].forEach(([x, y], i) => {
-        for (let r = 0; r < 2; r++) { const f = mod(u / (CYC / 3) + r * 0.5, 1); k.strokeStyle = `rgba(255,255,255,${EP("163", "value1", 0.75) * (1 - f)})`; k.lineWidth = 2; k.beginPath(); k.arc(x, y, 8 + EP("163", "value2", 12) * f, 0, 7); k.stroke(); }
-        k.save(); k.shadowColor = 'rgba(28,35,51,.3)'; k.shadowBlur = 6; k.shadowOffsetY = 2; k.fillStyle = '#fff'; k.beginPath(); k.arc(x, y, 8, 0, 7); k.fill(); k.restore();
-        k.fillStyle = C.acc; k.beginPath(); k.arc(x, y, 4, 0, 7); k.fill();
-      });
-      const tip = (x, y, q, title, left) => {
+  function reusableBagHandle(k) { k.strokeStyle = C.ink; k.lineWidth = 6; k.lineCap = 'round'; k.beginPath(); k.arc(150, 30, 16, Math.PI, 0); k.stroke(); }
+  function reusableBagShell(k) { k.fillStyle = '#3B64E8'; rr(k, 92, 26, 116, 134, 28); k.fill(); }
+  function reusableBagPocket(k) { k.fillStyle = '#2E50C2'; rr(k, 108, 92, 84, 56, 14); k.fill(); }
+  function reusableBagZipper(k) { k.strokeStyle = '#FFD9C9'; k.lineWidth = 2.5; k.beginPath(); k.moveTo(116, 104); k.lineTo(184, 104); k.stroke(); }
+  function reusableBagTag(k) { k.fillStyle = C.acc; rr(k, 140, 54, 20, 8, 4); k.fill(); }
+  function reusableBackpack(k) { reusableBagHandle(k); reusableBagShell(k); reusableBagPocket(k); reusableBagZipper(k); reusableBagTag(k); }
+
+  function reusableHotspotTip(k, x, y, q, title, left) {
         if (q <= 0) return;
         k.save(); k.globalAlpha = q; k.translate(x, y + 6 * (1 - q));
         const L = left ? 0 : 1;   // 吹き出しを点の左（left）か右に出す
@@ -746,30 +758,56 @@ MotionPrompt.pack('lp2', function () {
         k.beginPath(); if (L) { k.moveTo(0, -6); k.lineTo(-8, 0); k.lineTo(0, 6); } else { k.moveTo(0, -6); k.lineTo(8, 0); k.lineTo(0, 6); } k.fill(); k.restore();
         txt(k, title, bx + 12, -6, `800 13px ${JP}`, C.ink); bars(k, bx + 12, 6, 100, 1, C.faint, 5);
         k.restore();
-      };
-      tip(D1[0] - 16, D1[1], q1, '可以挡雨的布', true);
-      tip(D2[0] + 16, D2[1], q2, '电脑专用口袋', false);
+  }
+  function reusableHotspotCore(k,x,y) {
+        k.save(); k.shadowColor = 'rgba(28,35,51,.3)'; k.shadowBlur = 6; k.shadowOffsetY = 2; k.fillStyle = '#fff'; k.beginPath(); k.arc(x, y, 8, 0, 7); k.fill(); k.restore();
+        k.fillStyle = C.acc; k.beginPath(); k.arc(x, y, 4, 0, 7); k.fill();
+  }
+  // @element 19
+  // 19 ホットスポット（製品写真の上で点が脈打ち、押すと説明の吹き出しが出る）
+  CELLS[18] = (k, w, h, u) => {
+    u = snapU(u);
+    frame(k);
+    const D1 = [186, 52], D2 = [150, 122];
+    const o1 = t => { t = mod(t, CYC); return t >= 0.9 && t < 2.4; }, o2 = t => { t = mod(t, CYC); return t >= 2.4 && t < 3.8; };
+    const q1 = trans(o1, u, EP("163", "tipDuration", 0.25)), q2 = trans(o2, u, EP("163", "tipDuration", 0.25));
+    const cur = t => path([[0, 280, 205], [0.6, D1[0], D1[1]], [1.15, D1[0], D1[1]], [2.05, D2[0], D2[1]], [3.95, D2[0], D2[1]], [4.45, 280, 205], [4.7, 280, 205]], t);
+    const [cx, cy] = cur(u);
+    view(k, () => {
+      k.fillStyle = '#EEF1F6'; k.fillRect(0, 0, 300, VH);
+      reusableBackpack(k);
+      txt(k, '旅行背包', 322, 58, `800 16px ${JP}`, C.ink);
+      txt(k, '¥12,800', 322, 88, `800 19px ${EN}`, C.acc);
+      bars(k, 322, 104, 160, 3);
+      [D1, D2].forEach(([x, y], i) => {
+        for (let r = 0; r < 2; r++) { const f = mod(u / EP("163", "ripplePeriod", 1.5666666666666667) + r * 0.5, 1); k.strokeStyle = `rgba(255,255,255,${EP("163", "value1", 0.75) * (1 - f)})`; k.lineWidth = 2; k.beginPath(); k.arc(x, y, 8 + EP("163", "value2", 12) * f, 0, 7); k.stroke(); }
+        reusableHotspotCore(k,x,y);
+      });
+
+      reusableHotspotTip(k, D1[0] - 16, D1[1], q1, '可以挡雨的布', true);
+      reusableHotspotTip(k, D2[0] + 16, D2[1], q2, '电脑专用口袋', false);
       click(k, cx, cy, u, [0.9, 2.4, 3.8]);
     });
   };
 
+  function reusableCountdownTile(k, x, ty, tw, th, d, clipHalf) {
+      k.save(); k.beginPath(); if (clipHalf === 0) k.rect(x, ty, tw, th / 2); else if (clipHalf === 1) k.rect(x, ty + th / 2, tw, th / 2); else k.rect(x, ty, tw, th); k.clip();
+      k.fillStyle = C.ink; rr(k, x, ty, tw, th, 6); k.fill();
+      txt(k, String(d), x + tw / 2, ty + th / 2 + 1.5, `800 32px ${EN}`, '#fff', 'center', 'middle');
+      k.restore();
+  }
   // @element 20
   // 20 カウントダウンタイマー（「キャンペーン終了まで」の 時:分:秒 が1秒ごとに入れ替わって減っていく）
   // このカードだけ1回の動きが9.4秒（パックの周期と同じ）。tp（0〜9.4秒）で描く。1秒ごとに9回減り、途中で分が1回繰り下がる
   CELLS[19] = (k, w, h, u) => {
     const tp = mod(Math.round(u * 1e6) / 1e6, LOOP);
     frame(k);
-    const T0 = 0.4, START = 2 * 3600 + 15 * 60 + 4;    // 02:15:04 → 02:14:55
+    const T0 = EP("164", "firstTick", 0.4), START = 2 * 3600 + 15 * 60 + 4;    // 02:15:04 → 02:14:55
     const n = clamp(Math.floor(tp - T0) + 1, 0, 9), fp = n === 0 ? 1 : clamp((tp - T0 - (n - 1)) / EP("164", "value1", 0.32));
     const dg = v => { const hh = Math.floor(v / 3600), mm = Math.floor(v / EP("164", "value2", 60)) % 60, ss = v % 60; return [hh, mm, ss].map(x => String(x).padStart(2, '0')).join(''); };
     const now = dg(START - n), was = dg(START - Math.max(0, n - 1));
     const TW = 34, TH = 50, TY = 50, GW = 2 * TW + 4, SEP = 30, X0 = (VW - (3 * GW + 2 * SEP)) / 2;
-    const tile = (x, d, clipHalf) => {
-      k.save(); k.beginPath(); if (clipHalf === 0) k.rect(x, TY, TW, TH / 2); else if (clipHalf === 1) k.rect(x, TY + TH / 2, TW, TH / 2); else k.rect(x, TY, TW, TH); k.clip();
-      k.fillStyle = C.ink; rr(k, x, TY, TW, TH, 6); k.fill();
-      txt(k, String(d), x + TW / 2, TY + TH / 2 + 1.5, `800 32px ${EN}`, '#fff', 'center', 'middle');
-      k.restore();
-    };
+    const tile = (x, d, clipHalf) => reusableCountdownTile(k, x, TY, TW, TH, d, clipHalf);
     // 入れ替わり: 古い数字が上へ抜け、新しい数字が下から入る
     const flip = (x, a, b, f) => {
       k.fillStyle = C.ink; rr(k, x, TY, TW, TH, 6); k.fill();
@@ -794,17 +832,18 @@ MotionPrompt.pack('lp2', function () {
 
   // @element 21
   // 21 シェイプディバイダー（セクションの境目の波の形が、ゆっくりゆれ続ける）
+  function reusableSectionWave(k,base,A1,L1,p1,A2,L2,p2) { k.beginPath(); k.moveTo(0,VH+1); for (let x=0;x<=VW+4;x+=4) k.lineTo(x,base+A1*Math.sin(2*Math.PI*x/L1+p1)+A2*Math.sin(2*Math.PI*x/L2+p2)); k.lineTo(VW,VH+1); k.closePath(); }
+  function reusableSectionSky(k) { const g=k.createLinearGradient(0,0,0,120); g.addColorStop(0,'#3B64E8'); g.addColorStop(1,'#8FA9F7'); k.fillStyle=g; k.fillRect(0,0,VW,VH); }
   CELLS[20] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
     const a = 2 * Math.PI * u / CYC;
-    const wave = (base, A1, L1, p1, A2, L2, p2) => { k.beginPath(); k.moveTo(0, VH + 1); for (let x = 0; x <= VW + 4; x += 4) k.lineTo(x, base + A1 * Math.sin(2 * Math.PI * x / L1 + p1) + A2 * Math.sin(2 * Math.PI * x / L2 + p2)); k.lineTo(VW, VH + 1); k.closePath(); };
     view(k, () => {
-      const g = k.createLinearGradient(0, 0, 0, 120); g.addColorStop(0, '#3B64E8'); g.addColorStop(1, '#8FA9F7'); k.fillStyle = g; k.fillRect(0, 0, VW, VH);
+      reusableSectionSky(k);
       k.fillStyle = 'rgba(255,255,255,.9)'; k.beginPath(); k.arc(430, 44, 22, 0, 7); k.fill();
       txt(k, '夏季活动', 34, 42, `800 22px ${JP}`, '#fff'); btn(k, 34, 56, 96, 24, '查看详情', '#fff', C.blue, 11);
-      k.fillStyle = 'rgba(255,255,255,.45)'; wave(100, 8, 260, a + 1, 4, 130, EP("165", "value1", -2) * a); k.fill();
-      k.fillStyle = '#fff'; wave(110, 9, 300, -a, 3.5, 110, EP("165", "value2", 2) * a + 0.5); k.fill();
+      k.fillStyle = 'rgba(255,255,255,.45)'; reusableSectionWave(k,100, EP("165", "backWaveHeight", 8), 260, a + 1, 4, 130, EP("165", "value1", -2) * a); k.fill();
+      k.fillStyle = '#fff'; reusableSectionWave(k,110, EP("165", "frontWaveHeight", 9), 300, -a, 3.5, 110, EP("165", "value2", 2) * a + 0.5); k.fill();
       txt(k, '推荐方案', 34, 146, `800 15px ${JP}`, C.ink); bars(k, 170, 140, 290, 1, C.faint, 6);
       bars(k, 34, 156, 200, 1, C.faint, 5);
     });
@@ -818,7 +857,7 @@ MotionPrompt.pack('lp2', function () {
     const ON = 0.9, OFF = 3.3, HX = 266, HY = 118;
     const liked = u >= ON && u < OFF, d = u - ON, d2 = u - OFF;
     let sc = 1;
-    if (d >= 0 && d < 1.2) sc = d < 0.12 ? lerp(0.78, 1.45, eOut(d / 0.12)) : 1 + 0.45 * Math.exp(-7 * (d - 0.12)) * Math.cos((d - 0.12) * 15);
+    if (d >= 0 && d < 1.2) sc = d < 0.12 ? lerp(0.78, EP("166", "popScale", 1.45), eOut(d / 0.12)) : 1 + (EP("166", "popScale", 1.45) - 1) * Math.exp(-EP("166", "popDamping", 7) * (d - 0.12)) * Math.cos((d - 0.12) * 15);
     else if (d < 0 && d > -0.1) sc = 1 - 0.22 * (1 + d / 0.1);
     if (d2 >= -0.1 && d2 < 0.3) sc = 1 - 0.16 * Math.sin(Math.PI * clamp((d2 + 0.1) / 0.4));
     const cur = t => path([[0, 430, 205], [0.5, 276, 130], [1.25, 276, 130], [1.8, 430, 160], [2.75, 430, 160], [3.1, 276, 130], [3.55, 276, 130], [4.1, 430, 205], [4.7, 430, 205]], t);
@@ -852,12 +891,16 @@ MotionPrompt.pack('lp2', function () {
     });
   };
 
+  function reusableScrollMouse(k, mx, top, dy, da) {
+    k.strokeStyle = C.ink; k.lineWidth = 2.2; rr(k, mx - 12, top, 24, 38, 12); k.stroke();
+    k.fillStyle = `rgba(255,90,44,${da})`; rr(k, mx - 2.5, top + 7 + dy, 5, 9, 2.5); k.fill();
+  }
   // @element 23
   // 23 スクロールダウンの合図（ファーストビューの下で「SCROLL」とマウスの形の中の点が、下へ促す動きをくり返す）
   CELLS[22] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
-    const T = CYC / 3, f = mod(u, T) / T;
+    const T = EP("167", "cycleDuration", 1.5666666666666667), f = mod(u, T) / T;
     view(k, () => {
       k.fillStyle = '#FFF4EA'; k.fillRect(0, 0, VW, VH);
       txt(k, '欢迎，', 40, 40, `800 22px ${JP}`, C.ink); txt(k, '前往山上的客栈。', 40, 70, `800 22px ${JP}`, C.ink);
@@ -866,43 +909,132 @@ MotionPrompt.pack('lp2', function () {
       // 合図
       const mx = VW / 2;
       txt(k, '向下滚动', mx, 116, `800 11px ${EN}`, C.ink, 'center', 'middle', '3px');
-      k.strokeStyle = C.ink; k.lineWidth = 2.2; rr(k, mx - 12, 126, 24, 38, 12); k.stroke();
       const dy = eIOs(clamp(f / 0.7)) * EP("167", "distance", 14), da = 1 - clamp((f - 0.45) / 0.3);
-      k.fillStyle = `rgba(255,90,44,${da})`; rr(k, mx - 2.5, 133 + dy, 5, 9, 2.5); k.fill();
+      reusableScrollMouse(k, mx, 126, dy, da);
       // 両わきの矢印も下へ流れる
-      [mx - 40, mx + 40].forEach(x => { for (let j = 0; j < 2; j++) { const ff = mod(f + j * 0.5, 1), yy = 128 + ff * 24, al = Math.sin(Math.PI * ff); k.strokeStyle = `rgba(28,35,51,${0.8 * al})`; k.lineWidth = 2.5; k.lineCap = 'round'; k.lineJoin = 'round'; k.beginPath(); k.moveTo(x - 8, yy); k.lineTo(x, yy + 8); k.lineTo(x + 8, yy); k.stroke(); } });
+      [mx - 40, mx + 40].forEach(x => { for (let j = 0; j < 2; j++) { const ff = mod(f + j * 0.5, 1), yy = 128 + ff * EP("167", "arrowTravel", 24), al = Math.sin(Math.PI * ff); k.strokeStyle = `rgba(28,35,51,${0.8 * al})`; k.lineWidth = 2.5; k.lineCap = 'round'; k.lineJoin = 'round'; k.beginPath(); k.moveTo(x - 8, yy); k.lineTo(x, yy + 8); k.lineTo(x + 8, yy); k.stroke(); } });
     });
   };
 
+  function reusablePlayerPause(k,x,y) { k.fillStyle='#fff'; k.fillRect(x,y,3.5,12); k.fillRect(x+7,y,3.5,12); }
+  function reusablePlayerMute(k,x,y) { k.beginPath();k.moveTo(x,y);k.lineTo(x+4,y);k.lineTo(x+9,y-4);k.lineTo(x+9,y+10);k.lineTo(x+4,y+6);k.lineTo(x,y+6);k.closePath();k.fill();k.strokeStyle='#fff';k.lineWidth=1.6;k.lineCap='round';k.beginPath();k.moveTo(x+14,y);k.lineTo(x+20,y+6);k.moveTo(x+20,y);k.lineTo(x+14,y+6);k.stroke(); }
+  function reusablePlayerBadge(k,x,y) { k.fillStyle='rgba(14,18,28,.5)';rr(k,x,y,76,24,12);k.fill();reusablePlayerPause(k,x+15,y+6);reusablePlayerMute(k,x+42,y+9); }
   // @element 24
   // 24 背景動画（ファーストビューの背景で雲と波が流れ続け、その上に見出しとボタンが乗っている）
   function cloud(k, x, y, s, a) { k.fillStyle = `rgba(255,255,255,${a})`; k.beginPath(); k.ellipse(x, y, 30 * s, 10 * s, 0, 0, 7); k.ellipse(x - 12 * s, y - 6 * s, 14 * s, 11 * s, 0, 0, 7); k.ellipse(x + 8 * s, y - 10 * s, 17 * s, 14 * s, 0, 0, 7); k.fill(); }
+  const VIDEO_MOUNTAINS = [[0, .78], [.18, .66], [.36, .76], [.6, .62], [.82, .74], [1, .68]];
+  function reusableVideoSky(k) { const g = k.createLinearGradient(0, 0, 0, 120); g.addColorStop(0, '#7C9EF4'); g.addColorStop(1, '#DCE5FF'); k.fillStyle = g; k.fillRect(0, 0, VW, VH); }
+  function reusableVideoSun(k,x,y,r) { k.fillStyle = 'rgba(255,240,230,.95)'; k.beginPath(); k.arc(x,y,r,0,7); k.fill(); }
+  function reusableVideoSea(k,y0,A,L,ph,col) { k.fillStyle = col; k.beginPath(); k.moveTo(0, VH + 1); for (let x = 0; x <= VW + 4; x += 4) k.lineTo(x, y0 + A * Math.sin(2 * Math.PI * x / L + ph)); k.lineTo(VW, VH + 1); k.closePath(); k.fill(); }
   CELLS[23] = (k, w, h, u) => {
     u = snapU(u);
     frame(k);
     const f = u / CYC;
     view(k, () => {
-      const g = k.createLinearGradient(0, 0, 0, 120); g.addColorStop(0, '#7C9EF4'); g.addColorStop(1, '#DCE5FF'); k.fillStyle = g; k.fillRect(0, 0, VW, VH);
-      k.fillStyle = 'rgba(255,240,230,.95)'; k.beginPath(); k.arc(400, 66, 20, 0, 7); k.fill();
+      reusableVideoSky(k);
+      reusableVideoSun(k,400,66,20);
       // 遠い雲（170px ごとにくり返す柄が、1周期で1柄ぶん流れる）・近い雲（340px）
       for (let x = -170; x < VW + 170; x += 170) { const xx = x + mod(f * EP("168", "value1", 170), 170); cloud(k, xx + 40, 30, 0.7, 0.75); cloud(k, xx + 120, 58, 0.55, 0.6); }
       for (let x = -340; x < VW + 340; x += 340) { const xx = x + mod(f * EP("168", "value2", 340), 340); cloud(k, xx + 90, 44, 1.15, 0.95); cloud(k, xx + 260, 86, 0.9, 0.9); }
-      mount(k, VW, 132, [[0, .78], [.18, .66], [.36, .76], [.6, .62], [.82, .74], [1, .68]], '#6E8CEB', 0);
-      const sea = (y0, A, L, ph, col) => { k.fillStyle = col; k.beginPath(); k.moveTo(0, VH + 1); for (let x = 0; x <= VW + 4; x += 4) k.lineTo(x, y0 + A * Math.sin(2 * Math.PI * x / L + ph)); k.lineTo(VW, VH + 1); k.closePath(); k.fill(); };
-      sea(118, 2.5, 90, -2 * Math.PI * f, '#4B6BDB'); sea(130, 3, 60, 2 * Math.PI * f * 2, '#3B5CCF'); sea(146, 2.5, 120, -2 * Math.PI * f, '#2E4DB8');
+      mount(k, VW, 132, VIDEO_MOUNTAINS, '#6E8CEB', 0);
+      reusableVideoSea(k,118, 2.5 * EP("168", "seaAmplitude", 1), 90, -2 * Math.PI * f * EP("168", "seaSpeed", 1), '#4B6BDB'); reusableVideoSea(k,130, 3 * EP("168", "seaAmplitude", 1), 60, 2 * Math.PI * f * EP("168", "seaSpeed", 1) * 2, '#3B5CCF'); reusableVideoSea(k,146, 2.5 * EP("168", "seaAmplitude", 1), 120, -2 * Math.PI * f * EP("168", "seaSpeed", 1), '#2E4DB8');
       k.fillStyle = 'rgba(28,35,51,.12)'; k.fillRect(0, 0, VW, VH);
       { const sg = k.createLinearGradient(0, 0, 300, 0); sg.addColorStop(0, 'rgba(20,28,64,.45)'); sg.addColorStop(1, 'rgba(20,28,64,0)'); k.fillStyle = sg; k.fillRect(0, 0, 300, VH); }
       k.save(); k.shadowColor = 'rgba(16,24,60,.55)'; k.shadowBlur = 10; k.shadowOffsetY = 2; txt(k, '我们去旅行吧。', 34, 60, `800 28px ${JP}`, '#fff', 'left', 'alphabetic', '1px'); k.restore();
       bars(k, 34, 74, 160, 1, 'rgba(255,255,255,.85)');
       btn(k, 34, 92, 96, 26, '预约');
       // 再生中の印（一時停止・音なし）
-      k.fillStyle = 'rgba(14,18,28,.5)'; rr(k, 420, 134, 76, 24, 12); k.fill();
-      k.fillStyle = '#fff'; k.fillRect(435, 140, 3.5, 12); k.fillRect(442, 140, 3.5, 12);
-      k.beginPath(); k.moveTo(462, 143); k.lineTo(466, 143); k.lineTo(471, 139); k.lineTo(471, 153); k.lineTo(466, 149); k.lineTo(462, 149); k.closePath(); k.fill();
-      k.strokeStyle = '#fff'; k.lineWidth = 1.6; k.lineCap = 'round'; k.beginPath(); k.moveTo(476, 143); k.lineTo(482, 149); k.moveTo(482, 143); k.lineTo(476, 149); k.stroke();
+      reusablePlayerBadge(k,420,134);
     });
   };
 
+  // Reusable components are drawn by the same helpers as the examples.
+  const reusableMaterials = {
+    hotspotCore: (k) => {k.save();k.translate(128,128);k.scale(5,5);reusableHotspotCore(k,0,0);k.restore();},
+    likeOutline: (k) => {k.save();k.translate(128,128);k.scale(4,4);heartPath(k,14.5);k.lineWidth=2.4;k.strokeStyle=C.ink;k.lineJoin='round';k.stroke();k.restore();},
+    playerBadge: (k) => {k.save();k.translate(20,20);k.scale(2,2);reusablePlayerBadge(k,0,0);k.restore();},
+    playerPause: (k) => {k.save();k.translate(100,90);k.scale(6,6);reusablePlayerPause(k,0,0);k.restore();},
+    playerMute: (k) => {k.save();k.translate(65,110);k.scale(5,5);k.fillStyle='#fff';reusablePlayerMute(k,0,0);k.restore();},
+    lightboxClose: (k) => {k.save();k.translate(128,128);k.scale(5,5);k.strokeStyle='#fff';k.lineWidth=2.4;k.lineCap='round';k.beginPath();k.moveTo(-6,-6);k.lineTo(6,6);k.moveTo(6,-6);k.lineTo(-6,6);k.stroke();k.restore();},
+    lightboxPrev: (k) => {k.save();k.translate(128,128);k.scale(5,5);k.strokeStyle='#fff';k.lineWidth=2.4;k.lineCap='round';k.lineJoin='round';k.beginPath();k.moveTo(4,-10);k.lineTo(-4,0);k.lineTo(4,10);k.stroke();k.restore();},
+    lightboxNext: (k) => {k.save();k.translate(128,128);k.scale(5,5);k.strokeStyle='#fff';k.lineWidth=2.4;k.lineCap='round';k.lineJoin='round';k.beginPath();k.moveTo(-4,-10);k.lineTo(4,0);k.lineTo(-4,10);k.stroke();k.restore();},
+    teeWhitePlainFront: (k) => { k.save();k.translate(128,120);k.scale(1.55,1.55);tee(k,0,4,108,'#fff',false);k.restore(); },
+    teeWhitePlainBack: (k) => { k.save();k.translate(128,120);k.scale(1.55,1.55);tee(k,0,4,108,'#fff',true);k.restore(); },
+    teeOrangePlainFront: (k) => { k.save();k.translate(128,120);k.scale(1.55,1.55);tee(k,0,4,108,C.acc,false);k.restore(); },
+    teeOrangePlainBack: (k) => { k.save();k.translate(128,120);k.scale(1.55,1.55);tee(k,0,4,108,C.acc,true);k.restore(); },
+    teeDotBlue: (k) => { k.save();k.translate(128,128);k.scale(8,8);teeFrontMark(k,-18,16,C.blue);k.restore(); },
+    teeDotWhite: (k) => { k.save();k.translate(128,128);k.scale(8,8);teeFrontMark(k,-18,16,'#fff');k.restore(); },
+    teeStarBlue: (k) => { k.save();k.translate(128,128);k.scale(4,4);teeBackMark(k,0,0,C.blue);k.restore(); },
+    teeStarWhite: (k) => { k.save();k.translate(128,128);k.scale(4,4);teeBackMark(k,0,0,'#fff');k.restore(); },
+    websiteHeader: (k) => { k.save(); k.translate(0,10); header(k,0); k.restore(); },
+    revealLine0: (k) => txt(k,'日常微小用心累积',20,42,`800 27px ${JP}`,C.ink),
+    revealLine1: (k) => txt(k,'一点一滴改变生活',20,42,`800 27px ${JP}`,C.ink),
+    revealLine2: (k) => txt(k,'让每一天更有意义',20,42,`800 27px ${JP}`,C.ink),
+    timelineNodeOff: (k) => { k.save(); k.translate(128,128); k.scale(6,6); reusableTimelineNode(k,0,0,0); k.restore(); },
+    timelineNodeOn: (k) => { k.save(); k.translate(128,128); k.scale(6,6); reusableTimelineNode(k,0,0,1); k.restore(); },
+    sendIdle: (k) => { k.save(); k.shadowColor='rgba(28,35,51,.18)'; k.shadowBlur=8; k.shadowOffsetY=3; k.fillStyle=C.acc; rr(k,18,25,220,36,18); k.fill(); k.restore(); txt(k,'发送',128,43.5,`800 14px ${JP}`,'#fff','center','middle'); },
+    sendLoading: (k) => { k.save(); k.translate(128,44); k.scale(1.2,1.2); k.shadowColor='rgba(28,35,51,.18)'; k.shadowBlur=8; k.shadowOffsetY=3; k.fillStyle=C.acc; rr(k,-18,-18,36,36,18); k.fill(); k.shadowColor='transparent'; k.lineCap='round'; k.lineWidth=3; k.strokeStyle='rgba(255,255,255,.35)'; k.beginPath(); k.arc(0,0,10,0,7); k.stroke(); k.strokeStyle='#fff'; k.beginPath(); k.arc(0,0,10,0,Math.PI*.7); k.stroke(); k.restore(); },
+    sendDone: (k) => { k.save(); k.shadowColor='rgba(28,35,51,.18)'; k.shadowBlur=8; k.shadowOffsetY=3; k.fillStyle=GREEN; rr(k,53,25,150,36,18); k.fill(); k.restore(); check(k,102,43,16,'#fff',3,1); txt(k,'已完成',140,43.5,`800 14px ${JP}`,'#fff','center','middle'); },
+    floatingFieldEmpty: (k) => reusableFloatingField(k,{x:20,y:30,w:300,h:46},'',0,0,false),
+    floatingFieldFilled: (k) => reusableFloatingField(k,{x:20,y:30,w:300,h:46},'hello@example.com',1,1,false),
+    validationError: (k) => { const F={x:20,y:20,w:300,h:44}; k.fillStyle='#FFF1F1'; rr(k,F.x,F.y,F.w,F.h,8); k.fill(); k.lineWidth=2.2; k.strokeStyle=RED; rr(k,F.x,F.y,F.w,F.h,8); k.stroke(); txt(k,'hana@example',F.x+14,F.y+28,`600 15px ${EN}`,C.ink); reusableValidationStates(k,F,1,0); },
+    validationSuccess: (k) => { const F={x:20,y:20,w:300,h:44}; k.fillStyle='#fff'; rr(k,F.x,F.y,F.w,F.h,8); k.fill(); k.lineWidth=2.2; k.strokeStyle=GREEN; rr(k,F.x,F.y,F.w,F.h,8); k.stroke(); txt(k,'hana@example.com',F.x+14,F.y+28,`600 15px ${EN}`,C.ink); reusableValidationStates(k,F,0,1); },
+    backToTop: (k) => { k.save(); k.translate(128,128); k.scale(3,3); reusableBackToTop(k,0,0,0); k.restore(); },
+    hotspotFabric: (k) => reusableHotspotTip(k,156,48,1,'可以挡雨的布',true),
+    hotspotPocket: (k) => reusableHotspotTip(k,24,48,1,'电脑专用口袋',false),
+    stackPlan: (k) => { k.save(); k.translate(-50,22); reusableStackCard(k,70,371,124,0,0); k.restore(); },
+    stackMake: (k) => { k.save(); k.translate(-50,22); reusableStackCard(k,70,371,124,1,0); k.restore(); },
+    stackDeliver: (k) => { k.save(); k.translate(-50,22); reusableStackCard(k,70,371,124,2,0); k.restore(); },
+    spotSimple: (k) => reusableSpotCard(k,20,20,147,116,0,93.5,78),
+    spotSafe: (k) => reusableSpotCard(k,20,20,147,116,1,93.5,78),
+    spotFast: (k) => reusableSpotCard(k,20,20,147,116,2,93.5,78),
+    scrollMouse: (k) => { k.save(); k.translate(128,45); k.scale(4,4); reusableScrollMouse(k,0,0,7,1); k.restore(); },
+    morningSun: (k) => { k.save(); k.translate(128,128); k.scale(1.6,1.6); reusableMorningSun(k,0,0,4); k.restore(); },
+    sectionMoon: (k) => { k.save(); k.translate(128,128); k.scale(2.2,2.2); reusableSectionMoon(k,0,0,'#1E2A4A',true); k.restore(); },
+    sectionSky: (k) => reusableSectionSky(k),
+    sectionWaveBack: (k) => { k.fillStyle='rgba(255,255,255,.45)'; reusableSectionWave(k,100,8,260,2*Math.PI*.8/CYC+1,4,130,-4*Math.PI*.8/CYC); k.fill(); },
+    sectionWaveFront: (k) => { k.fillStyle='#fff'; reusableSectionWave(k,110,9,300,-2*Math.PI*.8/CYC,3.5,110,4*Math.PI*.8/CYC+.5); k.fill(); },
+    videoSky: (k) => reusableVideoSky(k),
+    videoSun: (k) => reusableVideoSun(k,128,128,90),
+    videoMountain: (k) => mount(k,VW,132,VIDEO_MOUNTAINS,'#6E8CEB',0),
+    videoSeaFar: (k) => reusableVideoSea(k,118,2.5,90,-2*Math.PI*.8/CYC,'#4B6BDB'),
+    videoSeaMiddle: (k) => reusableVideoSea(k,130,3,60,4*Math.PI*.8/CYC,'#3B5CCF'),
+    videoSeaNear: (k) => reusableVideoSea(k,146,2.5,120,-2*Math.PI*.8/CYC,'#2E4DB8'),
+    pictureSkyBlue: (k) => reusablePicSky(k,512,288,PICS[0]),
+    pictureSkySunset: (k) => reusablePicSky(k,512,288,PICS[1]),
+    pictureSkyNight: (k) => reusablePicSky(k,512,288,PICS[2]),
+    pictureSunBlue: (k) => reusablePicSun(k,128,128,90,PICS[0]),
+    pictureSunSunset: (k) => reusablePicSun(k,128,128,90,PICS[1]),
+    pictureSunNight: (k) => reusablePicSun(k,128,128,90,PICS[2]),
+    pictureFarBlue: (k) => mount(k,512,288,M1,PICS[0].m1,0),
+    pictureNearBlue: (k) => mount(k,512,288,M2,PICS[0].m2,1),
+    pictureFarSunset: (k) => mount(k,512,288,M1,PICS[1].m1,1),
+    pictureNearSunset: (k) => mount(k,512,288,M2,PICS[1].m2,0),
+    pictureFarNight: (k) => mount(k,512,288,M1,PICS[2].m1,0),
+    pictureNearNight: (k) => mount(k,512,288,M2,PICS[2].m2,1),
+    memberCard: (k) => { k.save(); k.scale(2,2); rr(k,0,0,220,132,14); k.clip(); reusableMemberCard(k,220,132); k.restore(); },
+    backpack: (k) => { k.save(); k.translate(128,125); k.scale(1.5,1.5); k.translate(-150,-90); reusableBackpack(k); k.restore(); },
+    photoBlue: (k) => pic(k,0,0,512,288,0,0),
+    photoSunset: (k) => pic(k,0,0,512,288,1,0),
+    photoNight: (k) => pic(k,0,0,512,288,2,0),
+    teeWhiteFront: (k) => { k.save(); k.translate(128,120); k.scale(1.55,1.55); tee(k,0,4,108,'#FFFFFF',false); teeFrontMark(k,0,0,C.blue); k.restore(); },
+    teeWhiteBack: (k) => { k.save(); k.translate(128,120); k.scale(1.55,1.55); tee(k,0,4,108,'#FFFFFF',true); teeBackMark(k,0,12,C.blue); k.restore(); },
+    teeOrangeFront: (k) => { k.save(); k.translate(128,120); k.scale(1.55,1.55); tee(k,0,4,108,C.acc,false); teeFrontMark(k,0,0,'#fff'); k.restore(); },
+    teeOrangeBack: (k) => { k.save(); k.translate(128,120); k.scale(1.55,1.55); tee(k,0,4,108,C.acc,true); teeBackMark(k,0,12,'#fff'); k.restore(); },
+    teeFront: (k) => tee(k,128,128,155,'#3B64E8',false),
+    teeBack: (k) => tee(k,128,128,155,'#3B64E8',true),
+    cloud: (k) => cloud(k,128,133,2.6,.95),
+    cursor: (k) => { k.save(); k.translate(58,42); k.scale(7,7); cursor(k,0,0); k.restore(); },
+    heart: (k) => { k.save(); k.translate(128,130); k.fillStyle=HEART; heartPath(k,78); k.fill(); k.restore(); },
+    check: (k) => check(k,128,128,80,GREEN,14),
+    button: (k) => btn(k,20,74,216,108,'查看详情',C.acc,'#fff',27),
+  };
+
+  for(const [name,draw] of [['Handle',reusableBagHandle],['Shell',reusableBagShell],['Pocket',reusableBagPocket],['Zipper',reusableBagZipper],['Tag',reusableBagTag]]) reusableMaterials['bag'+name]=(k)=>{k.save();k.translate(128,125);k.scale(1.5,1.5);k.translate(-150,-90);draw(k);k.restore();};
+  for(let i=0;i<4;i++) reusableMaterials['scrollToc'+i]=(k)=>{k.save();k.translate(10,20);reusableScrollToc(k,160,['简介','如何使用','费用','常见问题'],i,j=>j===i?1:0);k.restore();};
+  for(let i=0;i<3;i++) for(let active=0;active<2;active++) reusableMaterials['rollLabel'+i+'-'+active]=(k)=>txt(k,['作品','关于','联系'][i],20,52,`800 30px ${EN}`,active?C.acc:C.ink,'left','alphabetic','1px');
+  for (let i=0;i<10;i++) reusableMaterials['countdownDigit'+i] = (k) => { k.save(); k.translate(15,13); k.scale(1.3,1.3); reusableCountdownTile(k,0,0,34,50,i,2); k.restore(); };
+
   // @end
-  return { width: CW, height: CH, cycle: LOOP, cells: CELLS, fonts: [] };
+  return { materials: reusableMaterials, width: CW, height: CH, cycle: LOOP, cells: CELLS, fonts: [] };
 });

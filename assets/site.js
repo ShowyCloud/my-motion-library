@@ -136,13 +136,21 @@
     title:'Motion Prompt 中文版｜动态创意参考库', skip:'跳转到示例', navLabel:'站内导航', navHow:'使用方法', navFound:'参考案例', langLabel:'语言', themeToDark:'切换深色模式', themeToLight:'切换浅色模式', eyebrow:'给 AI 的创意词典', h1:'让创意动起来', lead:'收录 {n} 个动态图形、镜头运动、界面、网页效果与摄影术语。浏览动态示例，选择所需效果，复制提示词交给 AI。', factMoves:'示例', factPacks:'分类包', factLicense:'许可', installSkillH:'安装技能', installSkillP:'在终端运行此命令。安装后可让 AI 打开 motion-prompt 库并接收你的选择。', installPromptH:'通过提示词安装', installPromptP:'将下面的内容发送给 Codex 或 Claude Code。', installPrompt:'请阅读 https://github.com/showheyohtaki/motion-prompt 并安装 motion-prompt 技能，安装后用三句话介绍使用方法。', copy:'复制', copied:'已复制', copyFailed:'复制失败', copyCmdLabel:'复制安装命令', copyInstallLabel:'复制安装提示词', galleryH:'动态示例', packFilterLabel:'按分类包筛选', catFilterLabel:'按类别筛选', all:'全部', allIn:'本包全部', searchLabel:'搜索示例', searchPh:'搜索中文、英文、编号或标签', pause:'暂停', play:'播放', pauseLabel:'暂停全部示例', playLabel:'播放全部示例', count:'{n} 个', countOf:'{n} / {total} 个', empty:'没有找到结果，请尝试其他关键词或编号。', openLabel:'查看 #{id} {name} 的详情', loadFailed:'加载失败', howH:'使用方法', s1h:'浏览示例', s1p:'通过分类或搜索找到合适的动作，点击卡片查看详情。', s2h:'选择效果', s2p:'点击“选择”收藏所需示例，可在底部添加用途备注。', s3h:'复制并交给 AI', s3p:'复制已选内容粘贴给 AI；通过技能启动时也可直接发送。', skillH:'可以这样说', skillP:'不需要记住名称或编号，先浏览再选择即可。', say1:'打开 motion-prompt 动效库', say2:'有哪些镜头运动？', say3:'用我选的效果制作视频片头', altH:'直接使用编号', altP1:'复制已选内容，粘贴给 AI。单个示例也可以复制提示词。', altP2:'知道编号时，可以直接说“使用 #012 和 #045”。', implH:'关于参考代码', implP:'示例使用 Canvas 2D，按时间计算画面，可逐帧渲染。详细参数已逐条对照英文原文，关键数值仍可展开原文复核。示例画面中的文字已调整为中文，参数可能仍引用原画面的英文文字。', author:'原作者', authorName:'大滝昇平', thanks1:'动态示例与提示词形式受到', thanks2:'启发。', whyLink:'创作缘由', makeLink:'创建自己的词库', addLink:'添加术语', listLink:'术语列表', removeP1:'内容更正请通过', removeLink:'GitHub Issue', removeP2:'联系原作者。', dAsk:'向 AI 提出需求', ownP:'你也可以为自己的领域创建类似的词库。', ownLink:'制作方法', langsP:'原项目还提供其他语言的名称列表。', langsLink:'多语言列表', dSpec:'运动参数', dUse:'适用场景', tagsLabel:'标签', promptLabel:'将复制的提示词', copyPrompt:'复制提示词', copyCode:'复制代码', showCode:'查看代码', prev:'上一个', next:'下一个', close:'关闭', kitLink:'共享辅助代码（kit/{pack}.js）', txtLink:'详细参数与代码（{id}.txt，英文）', codeLoading:'加载中…', codeFailed:'无法加载代码，请通过本地启动脚本打开网站。', size:'{w}×{h}px · 循环 {c} 秒', pick:'选择', picked:'已选择', pickLabel:'选择 #{id} {name}', unpickLabel:'取消选择 #{id} {name}', trayCount:'已选择 {n} 个', trayWait:'AI 正在等待，请选择后发送。', trayEmpty:'点击示例上的“选择”，所选内容会显示在这里。', noteLabel:'备注（选填）', notePh:'例如：用于视频片头', send:'发送给 AI', sending:'正在发送…', copyPicked:'复制已选内容', shareUrl:'复制分享链接', clearAll:'清空选择', pickedLive:'已选择 #{id} {name}，共 {n} 个。', unpickedLive:'已取消 #{id} {name}，共 {n} 个。', clearedLive:'已清空选择。', outIntro:'我在 motion-prompt 中选择了以下 {n} 个效果，请参考使用：', outDemo:'示例', outSpec:'英文参数与代码', outNote:'备注', outEnd:'可通过 motion-prompt 技能的 get 命令获取完整参数。'
   };
   CAT.elements.forEach(function(el) { var z = window.MP_ZH_DETAILS[el.id]; if (z && !z.error && z.source_summary === el.summary.en && z.source_use === el.use.en && JSON.stringify(z.source_spec) === JSON.stringify(el.spec.en)) { el.summary['zh-Hans'] = z.summary; el.use['zh-Hans'] = z.use; el.spec['zh-Hans'] = z.spec; } });
+  if (window.MP_GENERAL_LEARNING) window.MP_GENERAL_LEARNING.apply(CAT);
   window.MPVisual.apply(CAT, window.MP_EDITOR_DATA || {overrides:{},custom:[]});
   // Local site wording and prompts stay independent of the upstream website.
   Object.assign(I18N['zh-Hans'], {title:'动态创意参考库',personalH:'打造你的动态参考库',personalP:'浏览、收藏和编辑现有示例，也可以创建属于自己的动画。',personalAction:'打开可视化编辑器',editH:'编辑和添加内容',editP:'打开可视化编辑器，调整文字与播放速度，或通过模板创建新的动态示例。保存后返回首页刷新即可查看。',s1h:'浏览示例',s1p:'通过分类或搜索找到合适的动作，点击卡片查看详情。',s2h:'选择效果',s2p:'点击“选择”收集所需示例，可在底部添加用途备注。',s3h:'复制并使用',s3p:'复制所选内容或单个示例的提示词，用于创作和交流。',outIntro:'我选择了以下 {n} 个动态效果，请参考使用：',outEnd:'请根据项目需求调整文字、颜色和素材。'});
   Object.assign(I18N.en, {title:'Motion Inspiration Library',personalH:'Make the library yours',personalP:'Explore, select and edit examples, or create your own animation.',personalAction:'Open visual editor',editH:'Edit and add examples',editP:'Open the visual editor to change text and playback speed or create an animation from a template. Save and refresh the gallery.',s1h:'Explore examples',s1p:'Use the filters or search, then open a card for details.',s2h:'Choose effects',s2p:'Select the examples you want and add an optional note.',s3h:'Copy and use',s3p:'Copy your selections or an individual prompt for your project.',outIntro:'Please use these {n} selected motion effects:',outEnd:'Adapt the text, colors and assets to the project.'});
   Object.assign(I18N.ja, {title:'モーション参考ライブラリ',personalH:'自分のライブラリを作る',personalP:'作例を探し、選び、編集し、自分のアニメーションを作成できます。',personalAction:'ビジュアルエディターを開く',editH:'編集と追加',editP:'エディターで文字や速度を変更し、テンプレートから新しい作例を作成できます。保存後に一覧を更新してください。',s1h:'作例を探す',s1p:'検索や分類を使って作例を探し、カードを開いて詳細を確認します。',s2h:'効果を選ぶ',s2p:'必要な作例を選び、メモを追加できます。',s3h:'コピーして使う',s3p:'選択内容やプロンプトをコピーして制作に使います。',outIntro:'次の{n}個の動きを参考にしてください。',outEnd:'テキストや色、素材はプロジェクトに合わせて調整してください。'});
+  Object.assign(I18N['zh-Hans'], {lead:'收录 {n} 个动态、运镜、动画法则和影视技巧示例。浏览、试听和编辑，为自己的创作寻找灵感。',personalP:'浏览、选择和编辑现有示例，也可以创建属于自己的动画。',editP:'在可视化编辑器中修改文字、播放速度及已开放的运动参数，替换支持的素材，或创建新示例。保存后刷新首页查看。',listenH:'试听与比较',listenP:'在影视技巧中选择“配乐”或“声音”，点击支持试听的示例按钮后播放；可以通过编辑器调整参数或替换音频。',listenAction:'浏览声音示例'});
+  Object.assign(I18N['zh-Hans'],{lead:'收录 {n} 个动态、运镜、动画法则和影视技巧示例。浏览和试听，为自己的创作寻找灵感。',personalH:'探索动态创意',personalP:'浏览动态示例和完整场景案例，为自己的创作寻找灵感。',personalAction:'查看场景案例',editH:'完整场景案例',editP:'切换不同情绪版本，观看镜头与动作的变化。',listenP:'在影视技巧中选择“配乐”或“声音”，点击示例试听。'});
+  Object.assign(I18N.en, {listenH:'Listen and compare',listenP:'Choose Music or Sound under Film techniques and use the listen button on supported examples. The editor can adjust parameters and replace audio.',listenAction:'Explore sound examples'});
+  Object.assign(I18N.ja, {listenH:'試聴して比較',listenP:'映像技法の音楽または音声から、試聴に対応した作例を再生できます。エディターではパラメーターの調整や音声の差し替えができます。',listenAction:'音声の作例を見る'});
+  Object.assign(I18N['zh-Hans'], {browseExamples:'浏览示例',resetFilters:'清除筛选条件',editTile:'编辑',editTileLabel:'编辑 #{id} {name}',audioBadge:'可试听',audioStart:'试听声音',audioStop:'停止试听',audioFailed:'播放失败，请重试',listenTile:'试听',stopTile:'停止',retryTile:'重试',retryLabel:'重新试听 #{id} {name}',listenLabel:'试听 #{id} {name}',stopLabel:'停止试听 #{id} {name}',listening:'正在试听 #{id} {name}',groupHint:'部分示例会同时出现在多个分类。'});
+  Object.assign(I18N.en, {browseExamples:'Browse examples',resetFilters:'Clear filters',editTile:'Edit',editTileLabel:'Edit #{id} {name}',audioBadge:'Audio',audioStart:'Play audio',audioStop:'Stop audio',audioFailed:'Could not play audio',listenTile:'Listen',stopTile:'Stop',retryTile:'Retry',retryLabel:'Retry audio for #{id} {name}',listenLabel:'Listen to #{id} {name}',stopLabel:'Stop audio for #{id} {name}',listening:'Playing #{id} {name}',groupHint:'Some examples appear in more than one category.'});
+  Object.assign(I18N.ja, {browseExamples:'作例を見る',resetFilters:'絞り込みを解除',editTile:'編集',editTileLabel:'#{id} {name}を編集',audioBadge:'試聴可',audioStart:'音声を再生',audioStop:'再生を停止',audioFailed:'再生できませんでした',listenTile:'試聴',stopTile:'停止',retryTile:'再試行',retryLabel:'#{id} {name}を再試聴',listenLabel:'#{id} {name}を試聴',stopLabel:'#{id} {name}の試聴を停止',listening:'#{id} {name}を試聴中',groupHint:'複数のカテゴリに含まれる作例があります。'});
   PROMPT = function(el, title, lang) {
-    var name = el.name[lang] || el.name.en, ask = el.ask[lang] || el.ask.en;
+    var name = el.name[lang] || el.name.en || el.name['zh-Hans'] || el.name.ja || el.id, ask = el.ask[lang] || el.ask.en || el.ask['zh-Hans'];
     var labels = lang === 'zh-Hans' ? ['请参考「' + name + '」（#' + el.id + '）。','需求：','运动参数：','实际播放速度：','倍；原始时间参数需除以该倍数。','请根据项目调整文字、颜色和素材。'] : lang === 'ja' ? ['「' + name + '」（#' + el.id + '）を参考にしてください。','依頼：','動きの仕様：','再生速度：','倍（元の時間はこの値で割ってください）。','テキストや色、素材はプロジェクトに合わせて調整してください。'] : ['Use “' + name + '” (#' + el.id + ') as a reference.','Request: ','Motion parameters:','Playback speed: ','×; divide original timings by this value.','Adapt text, colors and assets to the project.'];
     var lines=[labels[0],labels[1] + (ask || ''),'',labels[2]].concat((el.spec[lang] || el.spec.en).map(function(x){return '- ' + x;}));
     var edited = window.MPVisual.paramSummary(el);
@@ -150,11 +158,6 @@
     if(el._visual && el._visual.speed !== 1) lines.push(labels[3]+el._visual.speed+labels[4]);
     lines.push('',labels[5]); return lines.join('\n');
   };
-
-  // Public browsing copy: editing remains available in the local project.
-  Object.assign(I18N['zh-Hans'], {personalH:'探索动态创意',personalP:'浏览丰富的动态示例，寻找适合你的创作灵感。',personalAction:'浏览动态示例',editH:'收藏并使用',editP:'选择喜欢的示例，复制运动参数或提示词，用于创意交流与制作。'});
-  Object.assign(I18N.en, {personalH:'Explore motion ideas',personalP:'Browse motion examples and find inspiration for your work.',personalAction:'Browse examples',editH:'Select and use',editP:'Choose examples and copy their motion parameters or prompts.'});
-  Object.assign(I18N.ja, {personalH:'モーションの発想を探す',personalP:'動く作例から制作のヒントを見つけましょう。',personalAction:'作例を見る',editH:'選んで使う',editP:'作例を選び、動きの仕様やプロンプトをコピーできます。'});
 
   // ------------------------------------------------------------------ state
   var store = {
@@ -185,7 +188,9 @@
   }
   function names(el) {
     var ja = state.lang === 'ja';
-    return { main: state.lang === 'zh-Hans' ? (el.name['zh-Hans'] || el.name.en) : ja ? el.name.ja : el.name.en, sub: state.lang === 'zh-Hans' || ja ? el.name.en : el.name.ja };
+    var main = (state.lang === 'zh-Hans' ? el.name['zh-Hans'] : ja ? el.name.ja : el.name.en) || el.name['zh-Hans'] || el.name.en || el.name.ja || el.id;
+    var sub = (state.lang === 'zh-Hans' || ja ? el.name.en : el.name.ja) || '';
+    return {main:main, sub:sub === main ? '' : sub};
   }
   function h(tag, attrs, kids) {
     var n = document.createElement(tag);
@@ -206,7 +211,7 @@
   };
   function loadPack(p) {
     var s = document.createElement('script');
-    s.src = p.pack === 'custom' ? 'assets/custom-pack.js' : 'packs/' + p.pack + '/pack.js';
+    s.src = p.pack === 'custom' ? 'assets/custom-pack.js' : p.pack === 'principles' ? 'assets/principles-pack.js' : p.pack === 'cinema' ? 'assets/cinema-pack.js?v=20261101-eyes6' : 'packs/' + p.pack + '/pack.js';
     s.onload = function () {
       var reg = MP.packs[p.pack];
       if (!reg || ready[p.pack] === 'failed') return fail();
@@ -223,6 +228,7 @@
 
   // ------------------------------------------------------------------ drawing
   var tiles = [];        // { el, a, canvas, ctx, visible, dirty, offset, broken }
+  var tileAudio = null;  // At most one card plays audio at a time.
   var detail = { canvas: $('#d-canvas'), ctx: null, scale: 1, dirty: false, el: null, broken: false, u: 0 };
   var STILL = 0.4; // paused views show this fraction of the loop, where most moves have something on screen
   var clock = 0, lastNow = 0;
@@ -236,7 +242,7 @@
     ctx.clearRect(0, 0, w * scale, hgt * scale);
     ctx.save();
     if (scale !== 1) ctx.scale(scale, scale);
-    try { window.MPVisual.call(ctx, cell, w, hgt, u * (el._visual ? el._visual.speed : 1), el._visual && el._visual.textMap, el._visual && el._visual.parameters, el.id); } catch (e) { ctx.restore(); return false; }
+    try { window.MPVisual.call(ctx, cell, w, hgt, u * (el._visual ? el._visual.speed : 1), el._visual && el._visual.textMap, el._visual && el._visual.parameters, el.id, el._visual && el._visual.subjectAsset, el._visual && el._visual.subjectRig, el._visual && el._visual.subjectJoints, el._visual && el._visual.filmAssets, el._visual && el._visual.secondaryRig, el._visual && el._visual.secondaryJoints, el._visual && el._visual.subjectEyes, el._visual && el._visual.secondaryEyes); } catch (e) { ctx.restore(); return false; }
     ctx.restore();
     return true;
   }
@@ -253,22 +259,26 @@
     tiles.forEach(function (tl) { if (!pack || tl.el.pack === pack) tl.dirty = true; });
     detail.dirty = true;
   }
+  window.addEventListener('mp-subject-ready', function () { markDirty('principles'); markDirty('cinema'); });
   function frame(now) {
     requestAnimationFrame(frame);
     var dt = lastNow ? Math.min((now - lastNow) / 1000, 0.1) : 0;
     lastNow = now;
     if (state.playing) clock += dt;
     if (state.open) { // the gallery is covered: draw only the detail view
+      if (!state.playing && window.MPFilmAudio && MPFilmAudio.isPlaying()) { MPFilmAudio.stop(); var audioButton=document.getElementById('film-audio-play'); if(audioButton)audioButton.textContent=t('audioStart'); }
       var el = detail.el;
       if (el && !detail.broken && ready[el.pack] === 'ok' && (state.playing || detail.dirty)) {
         detail.dirty = false;
         if (state.playing) detail.u = (detail.u + dt) % el.cycle;
+        if (window.MPFilmAudio) MPFilmAudio.update(el.id,detail.u * (el._visual ? el._visual.speed : 1),el._baseCycle||el.cycle,(el._visual&&el._visual.parameters)||{},(el._visual&&el._visual.speed)||1);
         if (!paint(detail.ctx, el, detail.u, detail.scale)) detail.broken = true;
       }
       return;
     }
     for (var i = 0; i < tiles.length; i++) {
       var tl = tiles[i];
+      if (tileAudio === tl && window.MPFilmAudio && MPFilmAudio.isPlaying()) { var v=tl.el._visual||{}; MPFilmAudio.update(tl.el.id,timeFor(tl.el,tl.offset)*(v.speed||1),tl.el._baseCycle||tl.el.cycle,v.parameters||{},v.speed||1); }
       if (!tl.visible || tl.broken || ready[tl.el.pack] !== 'ok') continue;
       if (!state.playing && !tl.dirty) continue;
       tl.dirty = false;
@@ -287,6 +297,7 @@
   // ------------------------------------------------------------------ gallery
   var grid = $('#grid');
   function buildGrid() {
+    stopTileAudio();
     if (io) io.disconnect();
     tiles = [];
     grid.textContent = '';
@@ -307,11 +318,14 @@
         var pb = h('button', { type: 'button', class: 'tile-pick', 'aria-pressed': 'false', 'data-pick': el.id }, [
           pickBox(), h('span', { class: 'tile-pick-t' }),
         ]);
-        var box = h('div', { class: 'tile-box' }, [a, pb]);
-        var tl = { el: el, a: a, box: box, pick: pb, canvas: canvas, ctx: canvas.getContext('2d'), visible: !io, dirty: true, broken: false,
+        var edit = h('a', {class:'tile-edit', href:'editor.html?id='+encodeURIComponent(el.id), 'aria-label':t('editTileLabel',{id:el.id,name:nm.main}), text:t('editTile')});
+        var listen = window.MPFilmAudio && MPFilmAudio.supports(el.id) ? h('button', {type:'button',class:'tile-listen','aria-pressed':'false','aria-label':t('listenLabel',{id:el.id,name:nm.main}),text:t('listenTile')}) : null;
+        var box = h('div', { class: 'tile-box' }, [a, pb, edit, listen]);
+        var tl = { el: el, a: a, box: box, pick: pb, edit: edit, listen: listen, canvas: canvas, ctx: canvas.getContext('2d'), visible: !io, dirty: true, broken: false,
           offset: reduceMotion.matches ? STILL : (el._i * 0.6180339887) % 1 };
         a._tile = tl;
         pb.addEventListener('click', function () { togglePick(el.id); });
+        if (listen) listen.addEventListener('click', function () { toggleTileAudio(tl); });
         markTile(tl);
         a.addEventListener('click', function (ev) {
           if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey || ev.button) return;
@@ -334,15 +348,36 @@
     applyFilter();
   }
 
+  function stopTileAudio() {
+    if (!tileAudio) return;
+    var tl=tileAudio; tileAudio=null;
+    if (window.MPFilmAudio) MPFilmAudio.stop();
+    if (tl.listen) {tl.listen.disabled=false;tl.listen.setAttribute('aria-pressed','false');tl.listen.setAttribute('aria-label',t('listenLabel',{id:tl.el.id,name:names(tl.el).main}));tl.listen.textContent=t('listenTile');}
+    $('#listen-status').textContent='';
+  }
+  async function toggleTileAudio(tl) {
+    if (tileAudio===tl) {stopTileAudio();return;}
+    stopTileAudio();tileAudio=tl;tl.listen.disabled=true;
+    if (!state.playing) {state.playing=true;applyPlay();}
+    try {
+      var ok=await MPFilmAudio.start(tl.el.id,tl.el._visual&&tl.el._visual.filmAudio);
+      if (tileAudio!==tl) return;
+      if (!ok) {stopTileAudio();return;}
+      tl.listen.textContent=t('stopTile');tl.listen.setAttribute('aria-pressed','true');tl.listen.setAttribute('aria-label',t('stopLabel',{id:tl.el.id,name:names(tl.el).main}));
+      $('#listen-status').textContent=t('listening',{id:tl.el.id,name:names(tl.el).main});
+    } catch(e) {if(tileAudio===tl){stopTileAudio();tl.listen.textContent=t('retryTile');tl.listen.setAttribute('aria-label',t('retryLabel',{id:tl.el.id,name:names(tl.el).main}));$('#listen-status').textContent=t('audioFailed');}}
+    finally {tl.listen.disabled=false;}
+  }
   function haystack(el) {
     var p = packBy[el.pack];
-    var c = p.categories.filter(function (x) { return x.slug === el.category; })[0] || {};
-    return ['#' + el.id, el.id, String(+el.id), el.slug, el.pack, el.name.ja, el.name.en, el.meaning ? el.meaning.ja + ' ' + el.meaning.en : '', el.summary.ja, el.summary.en,
-      el.name['zh-Hans'], el.meaning && el.meaning['zh-Hans'], el.ask && el.ask['zh-Hans'], p.title['zh-Hans'], c['zh-Hans'], el.tags.join(' '), el.tags.map(function(tag) { return (window.MP_ZH_TAGS || {})[tag] || ''; }).join(' '), p.title.ja, p.title.en, c.ja || '', c.en || ''].join(' ').toLowerCase();
+    var c = p.categories.filter(function (x) { return x.slug === (el.filmGroups && el.filmGroups.length ? el.filmGroups[0] : el.category); })[0] || {};
+    var groupNames = p.categories.filter(function(x){return (el.filmGroups||[]).indexOf(x.slug)>=0;}).map(function(x){return [x['zh-Hans'],x.en,x.ja].join(' ');}).join(' ');
+    return [groupNames, '#' + el.id, el.id, String(+el.id), el.slug, el.pack, el.name.ja, el.name.en, el.meaning ? el.meaning.ja + ' ' + el.meaning.en : '', el.summary.ja, el.summary.en,
+      el.name['zh-Hans'], el.meaning && el.meaning['zh-Hans'], el.ask && el.ask['zh-Hans'], el._learning && el._learning[0], (el.spec['zh-Hans']||[]).join(' '), p.title['zh-Hans'], c['zh-Hans'], el.tags.join(' '), el.tags.map(function(tag) { return (window.MP_ZH_TAGS || {})[tag] || ''; }).join(' '), p.title.ja, p.title.en, c.ja || '', c.en || ''].join(' ').toLowerCase();
   }
   function matches(el) {
     if (state.pack !== 'all' && state.pack.split(',').indexOf(el.pack) < 0) return false; // one pack, or several joined by commas (camera,camera2)
-    if (state.cat !== 'all' && el.category !== state.cat) return false;
+    if (state.cat !== 'all' && (el.filmGroups && state.cat !== 'lighting-sound' && state.cat !== 'editing-techniques' ? el.filmGroups.indexOf(state.cat)<0 : el.category !== state.cat)) return false;
     if (!state.q) return true;
     if (!el._hay) el._hay = haystack(el);
     var terms = state.q.toLowerCase().replace(/＃/g, '#').split(/[\s　]+/).filter(Boolean);
@@ -360,9 +395,11 @@
     tiles.forEach(function (tl) {
       var ok = matches(tl.el);
       tl.box.hidden = !ok;
+      tl.edit.href='editor.html?id='+encodeURIComponent(tl.el.id)+(state.pack==='cinema'&&state.cat!=='all'?'&cat='+encodeURIComponent(state.cat):'');
       if (ok) shown.push(tl.el.id);
     });
     $$('.pack', grid).forEach(function (sec) { sec.hidden = !$('.tile-box:not([hidden])', sec); });
+    if (tileAudio && tileAudio.box.hidden) stopTileAudio();
     $('#empty').hidden = shown.length > 0;
     $('#count').textContent = shown.length === CAT.count ? t('count', { n: CAT.count }) : t('countOf', { n: shown.length, total: CAT.count });
   }
@@ -382,15 +419,22 @@
     });
     var p = packBy[state.pack];
     cats.hidden = !p;
-    if (!p) return;
+    if (!p) { packs.scrollLeft = 0; return; }
     cats.appendChild(chip(t('allIn'), state.cat === 'all', '', function () { setFilter(state.pack, 'all'); }));
     p.categories.forEach(function (c) {
-      cats.appendChild(chip((c[state.lang] || c.en), state.cat === c.slug, '', function () { setFilter(state.pack, c.slug); }));
+      if(c.hiddenInFilter && c.slug!==state.cat) return;
+      var amount = p.pack==='cinema' && !c.hiddenInFilter ? String(CAT.elements.filter(function(e){return e.pack===p.pack && (e.filmGroups||[]).indexOf(c.slug)>=0;}).length) : '';
+      cats.appendChild(chip((c[state.lang] || c.en), state.cat === c.slug, amount, function () { setFilter(state.pack, c.slug); }));
     });
+    if(p.pack==='cinema')cats.appendChild(h('span',{class:'group-hint',text:t('groupHint')}));
+    function reveal(row, item){if(!item)return;var r=row.getBoundingClientRect(),b=item.getBoundingClientRect();if(b.right>r.right)row.scrollLeft+=b.right-r.right+8;else if(b.left<r.left)row.scrollLeft-=r.left-b.left+8;}
+    reveal(packs,packs.querySelector('.chip[aria-pressed="true"]'));
+    reveal(cats,cats.querySelector('.chip[aria-pressed="true"]'));
   }
   function setFilter(pack, cat) {
     var focusIndex = $$('.chip').indexOf(document.activeElement);
     state.pack = pack; state.cat = cat;
+    var u=new URL(location.href); if(pack==='all')u.searchParams.delete('pack');else u.searchParams.set('pack',pack); if(cat==='all')u.searchParams.delete('cat');else u.searchParams.set('cat',cat); history.replaceState(history.state,'',u.pathname+(u.searchParams.toString()?'?'+u.searchParams.toString():'')+u.hash);
     buildChips();
     applyFilter();
     var again = $$('.chip')[focusIndex]; // the chips were rebuilt: keep keyboard focus where it was
@@ -439,7 +483,12 @@
   var codeCache = {};
   function fetchCode(id, lang) {
     var item = elBy[id];
-    if (item && item._custom) return Promise.resolve('该示例使用共享模板：assets/custom-pack.js 和 assets/visual-common.js；参数保存在 data/visual-editor.json。');
+    if (item && (item._principles || item._film)) return fetch(item._film ? 'assets/cinema-pack.js?v=20261101-eyes6' : 'assets/principles-pack.js').then(function(r) { if (!r.ok) throw new Error(String(r.status)); return r.text(); }).then(function(code) { return item._visual ? '【示例源代码】本地修改的参数、播放速度、文字、主体图片和手臂设置另存于 data/visual-editor.json，未包含在以下代码中。\n\n' + code : code; });
+    if (item && item._custom) {
+      var own = (window.MP_EDITOR_DATA.custom || []).find(function (x) { return x.id === id; });
+      if (own && own.motion === 'script') return Promise.resolve('自定义 Canvas 每帧代码（参数：ctx, width, height, time, options, media）：\n\n' + (own.effectCode || ''));
+      return Promise.resolve('该示例使用共享模板：assets/custom-pack.js 和 assets/visual-common.js；参数保存在 data/visual-editor.json。');
+    }
     if (lang === 'zh-Hans') lang = 'en';
     var key = lang + '/' + id;
     if (!codeCache[key]) {
@@ -464,14 +513,17 @@
     detail.scale = scale; detail.dirty = true;
   }
   function fillDetail(el) {
+    stopTileAudio();
     var p = packBy[el.pack], nm = names(el), lang = state.lang;
-    var c = p.categories.filter(function (x) { return x.slug === el.category; })[0];
+    if(window.MPFilmAudio){MPFilmAudio.stop();var oldAudio=document.getElementById('film-audio-play');if(oldAudio)oldAudio.remove();if(MPFilmAudio.supports(el.id)){var b=document.createElement('button');b.id='film-audio-play';b.type='button';b.className='btn btn-s film-audio-play';b.textContent=t('audioStart');b.onclick=async function(){if(MPFilmAudio.isPlaying()){MPFilmAudio.stop();b.textContent=t('audioStart');return;}try{if(!state.playing){state.playing=true;applyPlay();}await MPFilmAudio.start(el.id,el._visual&&el._visual.filmAudio);b.textContent=t('audioStop');}catch(e){b.textContent=t('audioFailed');}};detail.canvas.insertAdjacentElement('afterend',b);}}
+    var visibleGroup = el.filmGroups && (el.filmGroups.indexOf(state.cat)>=0 ? state.cat : el.filmGroups[0]);
+    var c = p.categories.filter(function (x) { return x.slug === (visibleGroup || el.category); })[0];
     detail.el = el; detail.broken = false;
     detail.u = state.playing ? 0 : STILL * el.cycle; // start from the top of the move
     detail.ctx = detail.canvas.getContext('2d');
     detail.canvas.style.aspectRatio = el.width + '/' + el.height;
     $('#d-id').textContent = '#' + el.id;
-    $('#d-edit').href = 'editor.html?id=' + encodeURIComponent(el.id);
+    $('#d-edit').href = 'editor.html?id=' + encodeURIComponent(el.id) + (state.pack==='cinema'&&state.cat!=='all'?'&cat='+encodeURIComponent(state.cat):'');
     $('#d-where').textContent = (p.title[lang] || p.title.en) + (c ? ' / ' + (c[lang] || c.en) : '');
     $('#d-name').textContent = nm.main;
     $('#d-sub').textContent = nm.sub + ' · ' + t('size', { w: el.width, h: el.height, c: el.cycle });
@@ -480,16 +532,27 @@
     ask.textContent = el.ask ? el.ask[lang] || el.ask.en || '' : ''; ask.hidden = askH.hidden = !ask.textContent;
     $('#d-summary').textContent = el.summary[lang] || el.summary.en;
     var spec = $('#d-spec'); spec.textContent = '';
-    (el.spec[lang] || el.spec.en).forEach(function (s, i) { var li = h('li', { text: s }); if (lang === 'zh-Hans' && !el._custom && !el._visual && el.spec.en[i]) { var orig = h('details', {class:'original-spec'}, [h('summary', {text:'查看英文原文'}), h('p', {text:el.spec.en[i]})]); li.appendChild(orig); } spec.appendChild(li); });
+    (el.spec[lang] || el.spec.en).forEach(function (s, i) { var li = h('li', { text: s }); if (lang === 'zh-Hans' && !el._custom && !el._principles && !el._film && !el._visual && el.spec.en[i]) { var orig = h('details', {class:'original-spec'}, [h('summary', {text:'查看英文原文'}), h('p', {text:el.spec.en[i]})]); li.appendChild(orig); } spec.appendChild(li); });
     var editedParams = window.MPVisual.paramSummary(el);
     if (editedParams.length) spec.insertBefore(h('li', {text:'已修改动画参数：' + editedParams.join('；') + '。原始说明中的对应数值可能已变化。'}), spec.firstChild);
     if (el._visual && el._visual.speed !== 1) spec.insertBefore(h('li', {text:'实际播放速度为 ' + el._visual.speed + ' 倍；原始时间参数需除以该倍数。'}), spec.firstChild);
     $('#d-use').textContent = el.use[lang] || el.use.en;
+    var practiceSection = $('#d-practice'), specText = el.spec['zh-Hans'] || [];
+    practiceSection.hidden = !(lang === 'zh-Hans' && el._learning && !specText.some(function(s) { return s.trim() === '练习：' + el._learning[0]; }));
+    $('#d-practice-text').textContent = practiceSection.hidden ? '' : el._learning[0];
+    var relatedSection = $('#d-related'), relatedList = $('#d-related-list');
+    relatedList.textContent = '';
+    var relatedIds = lang === 'zh-Hans' && el._learning ? el._learning[1] : [];
+    relatedIds.forEach(function(id) {
+      var target = elBy[id]; if (!target) return;
+      relatedList.appendChild(h('li', {}, [h('a', {href:'#'+id, text:'#'+id+' '+(target.name[lang] || target.name.en)})]));
+    });
+    relatedSection.hidden = !relatedList.children.length;
     var tags = $('#d-tags'); tags.textContent = '';
     el.tags.forEach(function (s) { var translated = state.lang === 'zh-Hans' && (window.MP_ZH_TAGS || {})[s]; tags.appendChild(h('li', { text: translated || s, title: translated ? s : '' })); });
     $('#d-prompt').textContent = PROMPT(el, p.title[lang] || p.title.en, lang);
     var kit = $('#d-kit'), txt = $('#d-txt');
-    kit.hidden = txt.hidden = !!el._custom;
+    kit.hidden = txt.hidden = !!(el._custom || el._principles || el._film);
     kit.href = 'api/v1/kit/' + el.pack + '.js'; kit.textContent = t('kitLink', { pack: el.pack });
     txt.href = 'api/v1/' + (lang === 'zh-Hans' ? 'en' : lang) + '/e/' + el.id + '.txt'; txt.textContent = t('txtLink', { id: el.id });
     var pre = $('#d-code'); pre.textContent = t('codeLoading');
@@ -525,6 +588,7 @@
   function closeDetail(silent) {
     if (!state.open && !dlg.open) return;
     var id = state.open;
+    if(window.MPFilmAudio)MPFilmAudio.stop();
     state.open = null; detail.el = null;
     if (dlg.open) { if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); }
     root.classList.remove('modal-open');
@@ -536,8 +600,8 @@
     if (back && back.focus) back.focus({ preventScroll: true });
   }
   function hashId() {
-    var m = /^#(\d{1,3})$/.exec(location.hash);
-    return m ? ('000' + m[1]).slice(-3) : null;
+    var m = /^#(\d{1,3}|(?:P(?:0[1-9]|1[0-2])|F(?:0[1-9]|1[0-9]|[1-8][0-9]|9[0-5])))$/i.exec(location.hash);
+    return m ? ('000' + m[1].toUpperCase()).slice(-3) : null;
   }
   function syncFromHash() {
     var id = hashId();
@@ -594,8 +658,8 @@
   function cleanIds(list) {
     var out = [];
     (list || []).forEach(function (x) {
-      var m = /^#?(\d{1,3})$/.exec(String(x).trim());
-      var id = m && ('000' + m[1]).slice(-3);
+      var m = /^#?(\d{1,3}|(?:P(?:0[1-9]|1[0-2])|F(?:0[1-9]|1[0-9]|[1-8][0-9]|9[0-5])))$/i.exec(String(x).trim());
+      var id = m && ('000' + m[1].toUpperCase()).slice(-3);
       if (id && elBy[id] && out.indexOf(id) < 0) out.push(id);
     });
     return out;
@@ -623,6 +687,8 @@
     // ?pack=camera shows one pack; ?pack=camera,camera2 shows a field's packs together (part 1 and part 2)
     var pk = String(q.get('pack') || '').split(',').filter(function (x) { return packBy[x]; });
     if (pk.length) state.pack = pk.join(',');
+    var requestedCat=q.get('cat'), selectedPack=packBy[state.pack];
+    if(selectedPack && selectedPack.categories.some(function(c){return c.slug===requestedCat;}))state.cat=requestedCat;
     // A waiting agent keeps its own selection, so last week's picks never slip into a new request.
     var saved = loadSaved(state.cb ? PICK_CB_KEY : PICK_KEY);
     if (state.cb && saved && saved.cb !== state.cb) saved = null;
@@ -804,12 +870,13 @@
     d.setAttribute('aria-label', t(state.playing ? 'pause' : 'play'));
     $('#play-t').textContent = t(state.playing ? 'pause' : 'play');
   }
-  function togglePlay() { state.playing = !state.playing; applyPlay(); }
+  function togglePlay() { state.playing = !state.playing; if(!state.playing)stopTileAudio(); applyPlay(); }
   $('#play').addEventListener('click', togglePlay);
   $('#d-play').addEventListener('click', togglePlay);
 
   var q = $('#q');
   q.addEventListener('input', function () { state.q = q.value.trim(); applyFilter(); });
+  $('#reset-filters').addEventListener('click', function () { state.q=''; q.value=''; setFilter('all','all'); q.focus(); });
   document.addEventListener('keydown', function (ev) {
     if (ev.key !== '/' || ev.metaKey || ev.ctrlKey || ev.altKey || dlg.open) return;
     var tag = document.activeElement && document.activeElement.tagName;

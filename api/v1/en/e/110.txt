@@ -4,7 +4,7 @@
 // Pack: photo (Photo looks, lighting & styles) · element 14 · Category: Lens & camera effects
 // What happens: The middle of the street scene bulges out; the vertical lines of the buildings and the lines of the road bow outward while the corners stay where they are.
 // Motion spec:
-//   - Scene 2: a street corner; buildings, trees and street lamps (x 114, 292, 494) behind a road at y 132–162; the person stands front left (feet at x 176, y 200, 124 px tall). 
+//   - Scene 2: a street corner; buildings, trees and street lamps (x 114, 292, 494) behind a road at y 132–162; the person stands front left (feet at x 176, y 200, 124 px tall).
 //   - Warp: a point at distance d from the centre moves to g = (1 + k) / (1 + k·d²/R²) times that distance, R = distance from the centre to a corner (289 px)
 //   - k: 0 → 1.25; the centre is magnified 2.25×, the corners do not move
 //   - Every outline is cut every 6 px before warping, so straight lines become curves

@@ -16,7 +16,8 @@ MotionPrompt.pack('photo', function () {
   const eIO = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
   // 効果の量: 0（なし）→ 1（あり）→ 0。イージングは3次のイーズインアウト
   const IN0 = 0.4, IN1 = 1.4, OUT0 = 4.0, OUT1 = 4.8;
-  const env = u => eIO(P(u, IN0, IN1)) * (1 - eIO(P(u, OUT0, OUT1)));
+  const EPCurrent = (key, value) => (typeof window !== "undefined" && window.MPParams && window.MPParams.currentId) ? window.MPParams.get(window.MPParams.currentId(), key, value) : value;
+  const env = u => eIO(P(u, EPCurrent("effectStart", IN0), EPCurrent("effectInEnd", IN1))) * (1 - eIO(P(u, EPCurrent("effectOutStart", OUT0), EPCurrent("effectEnd", OUT1))));
   // 固定シードの乱数（mulberry32）
   function rng(seed) { let s = seed >>> 0; return () => { s = s + 0x6D2B79F5 >>> 0; let t = s; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
   // 1回だけ作って使い回す物（中身は固定なので毎回同じ）
@@ -113,23 +114,31 @@ MotionPrompt.pack('photo', function () {
     k.globalAlpha = a; D.circ(x, y, r, p.sun);
     k.restore();
   }
-  function car(D, x, p, o = {}) {   // x = 車の中心、道の奥の車線を走る
-    D.rr(x - 22, 128, 42, 13, [6, 6, 0, 0], p.car);
-    D.rr(x - 18, 131, 16, 8, 2, p.glass); D.rr(x + 1, 131, 15, 8, 2, p.glass);
-    D.rr(x - 35, 140, 70, 15, 5, p.car);
-    D.rr(x + 30, 143, 5, 4, 1.5, o.head || p.glass); D.rr(x - 35, 143, 4, 4, 1.5, o.tail || p.edge);
-    D.circ(x - 21, 156, 6, p.tire); D.circ(x + 21, 156, 6, p.tire);
-    D.circ(x - 21, 156, 2.2, p.glass); D.circ(x + 21, 156, 2.2, p.glass);
+  function reusableCarPart(D,x,p,o,i) {
+    if(i===0) D.rr(x-22,128,42,13,[6,6,0,0],p.car);
+    else if(i===1) D.rr(x-18,131,16,8,2,p.glass);
+    else if(i===2) D.rr(x+1,131,15,8,2,p.glass);
+    else if(i===3) D.rr(x-35,140,70,15,5,p.car);
+    else if(i===4) D.rr(x+30,143,5,4,1.5,o.head||p.glass);
+    else if(i===5) D.rr(x-35,143,4,4,1.5,o.tail||p.edge);
+    else if(i===6) D.circ(x-21,156,6,p.tire);
+    else if(i===7) D.circ(x+21,156,6,p.tire);
+    else if(i===8) D.circ(x-21,156,2.2,p.glass);
+    else D.circ(x+21,156,2.2,p.glass);
   }
+  function car(D, x, p, o = {}) { for(let i=0;i<10;i++) reusableCarPart(D,x,p,o,i); }
 
   // 人のピクト（全身）。camera パックと同じ組み方（頭・胴・腕・脚の角丸）。x = 足元の中心、feet = 足元の y、s = 身長(px)
-  function figure(D, x, feet, s, col) {
-    const m = s / 1.79, X = v => x + v * m, Y = v => feet - v * m;
-    D.rr(X(-0.155), Y(0.88), 0.15 * m, 0.88 * m, 0.07 * m, col); D.rr(X(0.005), Y(0.88), 0.15 * m, 0.88 * m, 0.07 * m, col);
-    D.rr(X(-0.31), Y(1.40), 0.12 * m, 0.6 * m, 0.06 * m, col); D.rr(X(0.19), Y(1.40), 0.12 * m, 0.6 * m, 0.06 * m, col);
-    D.rr(X(-0.23), Y(1.46), 0.46 * m, 0.64 * m, 0.12 * m, col);
-    D.circ(x, Y(1.63), 0.16 * m, col);
+  function reusableFigurePart(D,x,feet,s,col,i) {
+    const m=s/1.79,X=v=>x+v*m,Y=v=>feet-v*m;
+    if(i===0) D.rr(X(-.155),Y(.88),.15*m,.88*m,.07*m,col);
+    else if(i===1) D.rr(X(.005),Y(.88),.15*m,.88*m,.07*m,col);
+    else if(i===2) D.rr(X(-.31),Y(1.40),.12*m,.6*m,.06*m,col);
+    else if(i===3) D.rr(X(.19),Y(1.40),.12*m,.6*m,.06*m,col);
+    else if(i===4) D.rr(X(-.23),Y(1.46),.46*m,.64*m,.12*m,col);
+    else D.circ(x,Y(1.63),.16*m,col);
   }
+  function figure(D,x,feet,s,col) { for(let i=0;i<6;i++) reusableFigurePart(D,x,feet,s,col,i); }
   // 胸から上のピクト（同じ組み方を頭の半径 R で切り出す）。cx,cy = 頭の中心
   function bustPath(k, cx, cy, R) {
     k.beginPath(); k.arc(cx, cy, R, 0, TAU);
@@ -158,10 +167,10 @@ MotionPrompt.pack('photo', function () {
     D.rect(0, 0, CW, CH, p.sky); D.rect(0, 92, CW, HZ - 92, p.sky2);
     if (o.sun) sun(D, o.sun[0], o.sun[1], o.sun[2], p, o.sun[3]);
     D.poly([[0, HZ], [0, 134], [70, 124], [150, 136], [230, 126], [330, 134], [420, 122], [539, 132], [539, HZ]], p.far);
-    building(D, 34, HZ, 38, 50, p, 1); building(D, 76, HZ, 30, 32, p, 2);
+    if (o.buildings !== false) { building(D, 34, HZ, 38, 50, p, 1); building(D, 76, HZ, 30, 32, p, 2); }
     D.rect(0, HZ, CW, CH - HZ, p.ground);
     if (o.cast) { const L = o.cast; D.poly([[402, HZ], [405, HZ], [405 + L, HZ + 9], [402 + L, HZ + 9]], p.cast); D.poly([[452, HZ], [460, HZ], [460 + L * 0.9, HZ + 16], [452 + L * 0.9, HZ + 16]], p.cast); }
-    lamp(D, 404, HZ, 58, p); tree(D, 456, HZ, 17, p);
+    if (o.lamps !== false) lamp(D, 404, HZ, 58, p); if (o.trees !== false) tree(D, 456, HZ, 17, p);
     if (o.after) o.after(D);
   }
   // ② レンズ: 街角。奥に建物の列・木・街灯、手前に道と歩道、人物は左手前
@@ -172,31 +181,32 @@ MotionPrompt.pack('photo', function () {
     const D = pen(k, o.M);
     D.rect(-40, -40, CW + 80, CH + 80, p.sky);
     if (o.sun) sun(D, o.sun[0], o.sun[1], o.sun[2], p, o.sun[3]);
-    BLD.forEach(([x, w, h], i) => building(D, x, ROAD, w, h, p, i));
-    TREES.forEach(([x, r]) => tree(D, x, ROAD, r, p));
-    LAMPS.forEach(x => lamp(D, x, ROAD, 58, p));
+    if (o.buildings !== false) BLD.forEach(([x, w, h], i) => building(D, x, ROAD, w, h, p, i));
+    if (o.trees !== false) TREES.forEach(([x, r]) => tree(D, x, ROAD, r, p));
+    if (o.lamps !== false) LAMPS.forEach(x => lamp(D, x, ROAD, 58, p));
     D.rect(-40, ROAD, CW + 80, WALK - ROAD, p.ground2);
     D.line([[-40, 147], [CW + 40, 147]], 2, p.mark, [14, 12]);
     if (o.car !== undefined && o.car !== false) car(D, o.car, p, o.carLights || {});
     D.rect(-40, WALK, CW + 80, CH - WALK + 40, p.ground); D.line([[-40, WALK], [CW + 40, WALK]], 1.4, p.edge);
     if (o.person !== false) figure(D, FIG[0], FIG[1], FIG[2], p.person);
-    D.circ(18, 206, 17, p.tree); D.circ(42, 210, 11, p.tree); D.circ(516, 204, 19, p.tree); D.circ(494, 211, 11, p.tree);
+    if (o.bushes !== false) { D.circ(18, 206, 17, p.tree); D.circ(42, 210, 11, p.tree); D.circ(516, 204, 19, p.tree); D.circ(494, 211, 11, p.tree); }
     if (o.after) o.after(D);
   }
   // ③ 仕上げ: 左に胸像、右に丘と家と木と太陽。日は右から当たり、胸像の右の縁が光る
   const QX = 140, QY = 82, QR = 28;
+  function reusableLandscapeBust(k,p) { bust(k, QX, QY, QR, p.person, kk => { headShade(kk, QX, QY, QR, 0.86, 1, p.lit); kk.fillStyle = p.lit; kk.fillRect(QX + 1.55 * QR, QY + QR, QR, CH); }); }
   function stageLand(k, p, o = {}) {
     const D = pen(k);
     D.rect(0, 0, CW, CH, p.sky); D.rect(0, 100, CW, 60, p.sky2);
     if (o.sunOn !== false) sun(D, 432, 54, 15, p);
     if (o.land !== false) {
       D.poly([[150, 162], [150, 130], [210, 116], [262, 124], [318, 100], [372, 114], [430, 104], [490, 120], [539, 110], [539, 162]], p.far);
-      building(D, 346, 134, 30, 24, p, 3);
+      if (o.buildings !== false) building(D, 346, 134, 30, 24, p, 3);
       D.poly([[150, 162], [150, 146], [226, 136], [300, 144], [368, 130], [440, 140], [500, 132], [539, 136], [539, 162]], p.mid);
       D.rect(0, 160, CW, CH - 160, p.ground);
-      tree(D, 486, 162, 19, p); tree(D, 452, 162, 12, p);
+      if (o.trees !== false) { tree(D, 486, 162, 19, p); tree(D, 452, 162, 12, p); }
     } else D.rect(0, 160, CW, CH - 160, p.ground);
-    if (o.person !== false) bust(k, QX, QY, QR, p.person, kk => { headShade(kk, QX, QY, QR, 0.86, 1, p.lit); kk.fillStyle = p.lit; kk.fillRect(QX + 1.55 * QR, QY + QR, QR, CH); });
+    if (o.person !== false) reusableLandscapeBust(k,p);
     if (o.after) o.after(D);
   }
 
@@ -255,14 +265,16 @@ MotionPrompt.pack('photo', function () {
   // Numeric controls are optional; original constants are used without the local editor.
   const EP = (id, key, value) => (typeof window !== "undefined" && window.MPParams) ? window.MPParams.get(id, key, value) : value;
 
+  function reusableBackPalette() { return Object.assign({}, BASE, { sky: '#FFF4DC', sky2: '#FFEBC4', far: '#F6E2BE', ground: '#F7EAD3', bld: '#F7E9D2', winOff: '#EEDCBF', win: '#EEDCBF', tree: '#EEDCBF', edge: '#E3CFAE', post: '#CDB894', trunk: '#E3CFAE', bulb: '#E3CFAE' }); }
+  function reusableSilhouettePalette() { const p=mapPal(BASE, () => '#2A2D36'); Object.assign(p, { sky: '#FFEDC4', sky2: '#FFCF73', far: '#4A4546', sun: BASE.sun, glow: BASE.glow }); return p; }
   // @element 01
   // 逆光: 太陽が画面の外から頭の真後ろへ回り込み、輪郭が光って人物は暗くなる
   CELLS[0] = cell((k, u) => {
     const a = env(u);
-    const BACK = Object.assign({}, BASE, { sky: '#FFF4DC', sky2: '#FFEBC4', far: '#F6E2BE', ground: '#F7EAD3', bld: '#F7E9D2', winOff: '#EEDCBF', win: '#EEDCBF', tree: '#EEDCBF', edge: '#E3CFAE', post: '#CDB894', trunk: '#E3CFAE', bulb: '#E3CFAE' });
-    stagePortrait(k, pal(BASE, BACK, a), { sun: [lerp(40, PX, a), lerp(-40, PY - 22, a), 20, 1] });
+    const BACK = reusableBackPalette();
+    stagePortrait(k, pal(BASE, BACK, a), { sun: [lerp(EP("097", "extra1", 40), PX, a), lerp(EP("097", "extra2", -40), PY - 22, a), 20, 1] });
     // 輪郭の光: 胸像の形を太い線でなぞってから中を塗り、縁だけを残す
-    k.save(); k.globalAlpha = a; bustPath(k, PX, PY, PR); k.strokeStyle = BASE.lit; k.lineWidth = 7; k.lineJoin = 'round'; k.stroke(); k.restore();
+    k.save(); k.globalAlpha = a; bustPath(k, PX, PY, PR); k.strokeStyle = BASE.lit; k.lineWidth = EP("097", "rimWidth", 7); k.lineJoin = 'round'; k.stroke(); k.restore();
     bust(k, PX, PY, PR, mixc(BASE.person, BASE.shade, a));
     // かすみ: 全体に光の色を薄く重ねる
     k.save(); k.globalAlpha = EP("097", "glow", 0.22) * a; k.fillStyle = BASE.glow; k.fillRect(0, 0, CW, CH); k.restore();
@@ -274,7 +286,7 @@ MotionPrompt.pack('photo', function () {
     const a = env(u);
     stagePortrait(k, pal(BASE, DARK, a));
     k.save(); k.globalAlpha = a; k.fillStyle = BASE.lit;
-    for (const dx of [-EP("098", "offset", 3.5), EP("098", "offset", 3.5)]) { k.save(); k.translate(dx, -2.5); bustPath(k, PX, PY, PR); k.fill(); k.restore(); }
+    for (const dx of [-EP("098", "offset", 3.5), EP("098", "offset", 3.5)]) { k.save(); k.translate(dx, -EP("098", "verticalOffset", 2.5)); bustPath(k, PX, PY, PR); k.fill(); k.restore(); }
     k.restore();
     bust(k, PX, PY, PR, mixc(BASE.person, DARK.person, a));
     plan(k, [[Math.PI * 0.75, a], [-Math.PI * 0.75, a]]);
@@ -284,19 +296,15 @@ MotionPrompt.pack('photo', function () {
   // @element 03
   // シルエット: 露出を明るい空に合わせると、人物も建物も木も黒い形だけになる
   CELLS[2] = cell((k, u) => {
-    const a = env(u), INK = '#2A2D36';
-    const SILH = mapPal(BASE, () => INK);
-    Object.assign(SILH, { sky: '#FFEDC4', sky2: '#FFCF73', far: '#4A4546', sun: BASE.sun, glow: BASE.glow });
-    stagePortrait(k, pal(BASE, SILH, a), { sun: [404, lerp(60, EP("099", "value1", 128), a), 20, a] });
+    const a = env(u), SILH = reusableSilhouettePalette();
+    stagePortrait(k, pal(BASE, SILH, a), { sun: [404, lerp(EP("099", "extra1", 60), EP("099", "value1", 128), a), 20, a] });
     bust(k, PX, PY, PR, mixc(BASE.person, '#22252D', a));
     hud(k, `${(-2 * a).toFixed(1).replace('-0.0', '±0.0')} EV`);
   });
 
   // @element 04
   // スプリットライティング: 光が真横（90°）へ回り、顔の右半分が影に沈む
-  CELLS[3] = cell((k, u) => {
-    const a = env(u), az = lerp(EP("100", "value1", 0.35), Math.PI / 2, a);
-    stagePortrait(k, pal(BASE, DIM, a));
+  function reusableSplitBust(k, a, az) {
     const lit = mixc(BASE.person, BASE.lit, a), sh = mixc(BASE.person, BASE.shade, a), W = torsoW(PR);
     bust(k, PX, PY, PR, BASE.person, kk => {
       kk.fillStyle = lit; kk.beginPath(); kk.arc(PX, PY, PR, 0, TAU); kk.fill();
@@ -304,58 +312,69 @@ MotionPrompt.pack('photo', function () {
       torso(kk, PX, PY, PR, PX - W, PX - Math.cos(az) * EP("100", "value2", 0.4) * W - 0.4 * W, lit);
       torso(kk, PX, PY, PR, PX + Math.cos(az) * W, PX + W, sh);
     });
+  }
+  CELLS[3] = cell((k, u) => {
+    const a = env(u), az = lerp(EP("100", "value1", 0.35), EP("100", "lightAngleEnd", 1.5707963267948966), a);
+    stagePortrait(k, pal(BASE, DIM, a));
+    reusableSplitBust(k, a, az);
     plan(k, [[az, a]]);
     hud(k, `${Math.round(az * 180 / Math.PI)}° · ↑0°`);
   });
 
   // @element 05
   // レンブラントライティング: 斜め45°・上からの光。影側の頬に三角形の光が残る
-  CELLS[4] = cell((k, u) => {
-    const a = Math.min(1, env(u) * EP("101", "strength", 1)), R = PR, W = torsoW(R);
-    stagePortrait(k, pal(BASE, DIM, a));
+  function reusableRembrandtBust(k, a) {
+    const R = PR, W = torsoW(R);
     const lit = mixc(BASE.person, BASE.lit, a), sh = mixc(BASE.person, BASE.shade, a);
     bust(k, PX, PY, R, BASE.person, kk => {
       kk.fillStyle = lit; kk.beginPath(); kk.arc(PX, PY, R, 0, TAU); kk.fill();
       kk.fillStyle = sh; kk.fillRect(PX + 0.04 * R, PY - R - 2, R * 2, R * 2 + 4);       // 鼻筋から右は影
       kk.beginPath(); kk.arc(PX, PY, R, 0, TAU); kk.clip();
       kk.fillStyle = lit; kk.beginPath();                                                   // 影側の頬に残る光の三角形
-      kk.moveTo(PX + 0.24 * R, PY - 0.12 * R); kk.lineTo(PX + 0.7 * R, PY - 0.12 * R); kk.lineTo(PX + 0.24 * R, PY + 0.5 * R); kk.closePath(); kk.fill();
+      kk.moveTo(PX + 0.24 * R, PY - 0.12 * R); kk.lineTo(PX + EP("101", "triangleWidth", 0.7) * R, PY - 0.12 * R); kk.lineTo(PX + 0.24 * R, PY + EP("101", "triangleHeight", 0.5) * R); kk.closePath(); kk.fill();
     });
     bust(k, PX, PY, R, 'rgba(0,0,0,0)', kk => {
       kk.fillStyle = 'rgba(0,0,0,0)';
       torso(kk, PX, PY, R, PX - W, PX - 0.45 * W, lit);
       torso(kk, PX, PY, R, PX + 0.3 * W, PX + W, sh);
     });
+  }
+  CELLS[4] = cell((k, u) => {
+    const a = Math.min(1, env(u) * EP("101", "strength", 1));
+    stagePortrait(k, pal(BASE, DIM, a));
+    reusableRembrandtBust(k,a);
     plan(k, [[Math.PI / 4, a]]);
     hud(k, '45° · ↑45°');
   });
 
   // @element 06
   // バタフライライティング: 顔の正面・高い位置からの光。顔は左右対称に明るく、あごの下にだけ小さな影
-  CELLS[5] = cell((k, u) => {
-    const a = Math.min(1, env(u) * EP("102", "strength", 1)), R = PR, W = torsoW(R);
-    stagePortrait(k, pal(BASE, DIM, a));
+  function reusableButterflyBust(k, a) {
+    const R = PR, W = torsoW(R);
     const lit = mixc(BASE.person, BASE.lit, a), sh = mixc(BASE.person, BASE.shade, a);
     bust(k, PX, PY, R, BASE.person, kk => {
       torso(kk, PX, PY, R, PX - 0.8 * W, PX + 0.8 * W, lit);
-      kk.fillStyle = sh; kk.beginPath(); kk.ellipse(PX, PY + R * 1.06, R * 0.72, R * 0.38, 0, 0, TAU); kk.fill();    // あごの下の影（左右対称）
+      kk.fillStyle = sh; kk.beginPath(); kk.ellipse(PX, PY + R * 1.06, R * EP("102", "shadowWidth", 0.72), R * EP("102", "shadowHeight", 0.38), 0, 0, TAU); kk.fill();    // あごの下の影（左右対称）
       kk.fillStyle = lit; kk.beginPath(); kk.arc(PX, PY, R, 0, TAU); kk.fill();
     });
+  }
+  CELLS[5] = cell((k, u) => {
+    const a = Math.min(1, env(u) * EP("102", "strength", 1));
+    stagePortrait(k, pal(BASE, DIM, a));
+    reusableButterflyBust(k,a);
     plan(k, [[0, a]]);
     hud(k, '0° · ↑45°');
   });
 
   // @element 07
   // ゴールデンアワー: 太陽が地平線近くまで下り、全体が橙に染まって影が長く伸びる
-  CELLS[6] = cell((k, u) => {
-    const a = env(u), R = PR, W = torsoW(R);
-    const GOLD = {
+  function reusableGoldenPalette() { return {
       sky: '#FFE8BC', sky2: '#FFCF80', far: '#F2C58C', mid: '#E8B27A', ground: '#F6DDB0', ground2: '#ECC892', mark: '#F6DDB0', cast: '#DDAA6E',
       bld: '#F7DCAE', edge: '#D9AE76', win: '#ECC892', winOff: '#ECC892', tree: '#E9C08A', trunk: '#C9965E', post: '#B98A58', bulb: '#C9965E',
       person: '#5C5470', shade: '#3E3650', lit: '#FFB547', car: '#A08E8E', glass: '#F6DDB0', tire: '#3E3650', sun: '#F59A24', glow: '#FFD48A'
-    };
-    const p = pal(BASE, GOLD, a);
-    stagePortrait(k, p, { sun: [lerp(110, EP("103", "value1", 96), a), lerp(-30, 136, a), 18, 1], cast: lerp(0, 150, a) });
+    }; }
+  function reusableGoldenBust(k,p,GOLD,a) {
+    const R = PR, W = torsoW(R);
     const lit = mixc(p.person, GOLD.lit, a), sh = mixc(p.person, GOLD.shade, a);
     bust(k, PX, PY, R, p.person, kk => {
       kk.fillStyle = lit; kk.beginPath(); kk.arc(PX, PY, R, 0, TAU); kk.fill();
@@ -363,17 +382,24 @@ MotionPrompt.pack('photo', function () {
       torso(kk, PX, PY, R, PX - W, PX - 0.5 * W, lit);
       torso(kk, PX, PY, R, PX + 0.4 * W, PX + W, sh);
     });
+  }
+  CELLS[6] = cell((k, u) => {
+    const a = env(u), GOLD = reusableGoldenPalette();
+    const p = pal(BASE, GOLD, a);
+    stagePortrait(k, p, { sun: [lerp(EP("103", "extra1", 110), EP("103", "value1", 96), a), lerp(EP("103", "extra3", -30), EP("103", "extra2", 136), a), 18, 1], cast: lerp(0, EP("103", "extra4", 150), a) });
+    reusableGoldenBust(k,p,GOLD,a);
     hud(k, clock(lerp(720, 1060, a)));
   });
 
+  function reusableBlueHourGlow(D,p,a) { const k2 = D.k; k2.save(); k2.globalAlpha = 0.35 * a; D.circ(413, HZ - 53, 13, BASE.glow); k2.globalAlpha = 0.6 * a; D.circ(413, HZ - 53, 8, BASE.glow); k2.restore(); D.circ(413, HZ - 53, 4, p.bulb); }
   // @element 08
   // ブルーアワー: 日が沈んだ後、空が深い青になり、窓と街灯の暖かい光が灯る
   CELLS[7] = cell((k, u) => {
     const a = env(u);
     const p = pal(BASE, NIGHT, a);
     stagePortrait(k, p, {
-      sun: [120, lerp(40, 190, P(a, EP("104", "value1", 0), 0.7)), 18, 1 - P(a, EP("104", "value2", 0.4), 0.8)],
-      after: D => { const k2 = D.k; k2.save(); k2.globalAlpha = 0.35 * a; D.circ(413, HZ - 53, 13, BASE.glow); k2.globalAlpha = 0.6 * a; D.circ(413, HZ - 53, 8, BASE.glow); k2.restore(); D.circ(413, HZ - 53, 4, p.bulb); }
+      sun: [120, lerp(EP("104", "extra2", 40), EP("104", "extra1", 190), P(a, EP("104", "value1", 0), EP("104", "sunMoveEnd", 0.7))), 18, 1 - P(a, EP("104", "value2", 0.4), EP("104", "sunFadeEnd", 0.8))],
+      after: D => reusableBlueHourGlow(D,p,a)
     });
     bust(k, PX, PY, PR, p.person);
     hud(k, clock(lerp(720, 1115, a)));
@@ -381,22 +407,25 @@ MotionPrompt.pack('photo', function () {
 
   // @element 09
   // ボケ: 絞りを開けると、人物はくっきりのまま、背景の灯りが大きな丸になってにじむ
+  function reusableBokehPoints() { return once('bokeh-pts', () => { const o=LAMPS.map(x=>[x+9,ROAD-53,1.25,0]),r=rng(9); for(let i=0;i<12;i++) o.push([22+i*45+r()*20,44+r()*70,.6+r()*.6,1]); return o; }); }
+  function reusableBokehLight(k,x,y,s,w,a) {
+    const r=(2.4+EP("105", "bokehGrowth", 15)*a)*s;
+    k.globalAlpha=lerp(EP("105", "extra1", 1),EP("105", "value1", .55),a); k.fillStyle=w?BASE.glow:BASE.lit; k.beginPath(); k.arc(x,y,r,0,TAU); k.fill();
+    k.globalAlpha=.7*a; k.strokeStyle=BASE.lit; k.lineWidth=1.2; k.stroke();
+  }
+  function reusableBokehBackground(k,p,a) {
+    const [B, kb] = layer('bokeh'); stageStreet(kb, p, { person: false });
+    const [Bb, kbb] = layer('bokeh-b'); kbb.filter = `blur(${(EP("105", "backgroundBlur", 6) * a).toFixed(2)}px)`; kbb.drawImage(B, 0, 0); kbb.filter = 'none';
+    k.drawImage(B, 0, 0); k.drawImage(Bb, 0, 0);
+  }
   CELLS[8] = cell((k, u) => {
     const a = env(u), p = pal(BASE, DIM, a);
-    const [B, kb] = layer('bokeh'); stageStreet(kb, p, { person: false });
-    const [Bb, kbb] = layer('bokeh-b'); kbb.filter = `blur(${(6 * a).toFixed(2)}px)`; kbb.drawImage(B, 0, 0); kbb.filter = 'none';
-    k.drawImage(B, 0, 0); k.drawImage(Bb, 0, 0);
+    reusableBokehBackground(k,p,a);
     // 灯り: 街灯3つと、窓や遠くの灯り12個（横に45pxおき・高さと大きさは固定シード）。絞りを開くほど丸が大きく薄くなる
-    const pts = once('bokeh-pts', () => {
-      const o = LAMPS.map(x => [x + 9, ROAD - 53, 1.25, 0]), r = rng(9);
-      for (let i = 0; i < 12; i++) o.push([22 + i * 45 + r() * 20, 44 + r() * 70, 0.6 + r() * 0.6, 1]);
-      return o;
-    });
+    const pts = reusableBokehPoints();
     k.save();
     for (const [x, y, s, w] of pts) {
-      const r = (2.4 + 15 * a) * s;
-      k.globalAlpha = lerp(1, EP("105", "value1", 0.55), a); k.fillStyle = w ? BASE.glow : BASE.lit; k.beginPath(); k.arc(x, y, r, 0, TAU); k.fill();
-      k.globalAlpha = 0.7 * a; k.strokeStyle = BASE.lit; k.lineWidth = 1.2; k.stroke();
+      reusableBokehLight(k,x,y,s,w,a);
     }
     k.restore();
     figure(pen(k), FIG[0], FIG[1], FIG[2], p.person);
@@ -407,11 +436,11 @@ MotionPrompt.pack('photo', function () {
   // @element 10
   // ティルトシフト: 上下の帯がぼけて中央の帯だけピントが合い、街と小さな人と車が模型のように見える
   CELLS[9] = cell((k, u) => {
-    const a = env(u), carX = lerp(-60, EP("106", "value1", 600), u / CYC);
+    const a = env(u), carX = lerp(EP("106", "extra1", -60), EP("106", "value1", 600), u / CYC);
     const minis = D => { [[196, 26], [322, 26], [340, 23], [452, 25]].forEach(([x, h]) => figure(D, x, 172, h, BASE.person)); };
     const [S, ks] = layer('tilt'); stageStreet(ks, BASE, { car: carX, person: false, after: minis });
-    const [B1, k1] = layer('tilt-1'); k1.filter = `blur(${(3 * a).toFixed(2)}px)`; k1.drawImage(S, 0, 0); k1.filter = 'none';
-    const [B2, k2] = layer('tilt-2'); k2.filter = `blur(${(7 * a).toFixed(2)}px)`; k2.drawImage(S, 0, 0); k2.filter = 'none';
+    const [B1, k1] = layer('tilt-1'); k1.filter = `blur(${(EP("106", "innerBlur", 3) * a).toFixed(2)}px)`; k1.drawImage(S, 0, 0); k1.filter = 'none';
+    const [B2, k2] = layer('tilt-2'); k2.filter = `blur(${(EP("106", "outerBlur", 7) * a).toFixed(2)}px)`; k2.drawImage(S, 0, 0); k2.filter = 'none';
     k.drawImage(S, 0, 0);
     const band = (img, y0, y1) => { k.save(); k.beginPath(); k.rect(0, y0, CW, y1 - y0); k.clip(); k.drawImage(img, 0, 0); k.restore(); };
     band(B2, 0, 42); band(B1, 42, 66); band(B1, 176, 190); band(B2, 190, CH);
@@ -423,191 +452,217 @@ MotionPrompt.pack('photo', function () {
 
   // @element 11
   // 長時間露光: シャッターを開け続けると、夜道の車は消え、ライトだけが光の線になる
+  function reusableExposureTrails(kk,x,a) {
+    kk.save(); kk.globalAlpha = a; kk.lineCap = 'round';
+    const x0 = EP("107", "extra1", -60), x1 = Math.min(x, CW + 40);
+    const ln = (ya, yb, c1, c2, w1, w2) => { kk.strokeStyle = c1; kk.lineWidth = w1; kk.beginPath(); kk.moveTo(x0, ya); kk.lineTo(x1, ya); kk.stroke(); kk.strokeStyle = c2; kk.lineWidth = w2; kk.beginPath(); kk.moveTo(x0, yb); kk.lineTo(x1, yb); kk.stroke(); };
+    ln(145, 149, '#FF5B4D', '#FF8A6E', 2.6, 1.4);
+    for (const [y, c, lw] of [[135, '#FFE9B8', 2.6], [138.5, BASE.lit, 1.6], [141.5, '#FFE9B8', 1.2]]) { kk.strokeStyle = c; kk.lineWidth = lw; kk.beginPath(); kk.moveTo(-10, y); kk.lineTo(CW + 10, y); kk.stroke(); }
+    kk.restore();
+  }
   CELLS[10] = cell((k, u) => {
-    const a = env(u), x = lerp(-60, EP("107", "value1", 600), u / CYC);
+    const a = env(u), x = lerp(EP("107", "extra1", -60), EP("107", "value1", 600), u / CYC);
     const p = pal(BASE, NIGHT, a);
     stageStreet(k, p, {
       car: false, person: false,
       after: D => {
-        const kk = D.k;
-        // 車の通った跡: 尾灯（赤）と前照灯（白〜アンバー）の線。車の後ろに伸びる
-        kk.save(); kk.globalAlpha = a; kk.lineCap = 'round';
-        const x0 = -60, x1 = Math.min(x, CW + 40);
-        const ln = (ya, yb, c1, c2, w1, w2) => { kk.strokeStyle = c1; kk.lineWidth = w1; kk.beginPath(); kk.moveTo(x0, ya); kk.lineTo(x1, ya); kk.stroke(); kk.strokeStyle = c2; kk.lineWidth = w2; kk.beginPath(); kk.moveTo(x0, yb); kk.lineTo(x1, yb); kk.stroke(); };
-        ln(145, 149, '#FF5B4D', '#FF8A6E', 2.6, 1.4);
-        // 反対車線の車たちの跡（画面いっぱい）
-        for (const [y, c, lw] of [[135, '#FFE9B8', 2.6], [138.5, BASE.lit, 1.6], [141.5, '#FFE9B8', 1.2]]) { kk.strokeStyle = c; kk.lineWidth = lw; kk.beginPath(); kk.moveTo(-10, y); kk.lineTo(CW + 10, y); kk.stroke(); }
-        kk.restore();
+        reusableExposureTrails(D.k,x,a);
       }
     });
     // 車の本体は露光が長いほど薄く写る
-    k.save(); k.globalAlpha = 1 - 0.9 * a; const D = pen(k);
+    k.save(); k.globalAlpha = 1 - EP("107", "carFade", 0.9) * a; const D = pen(k);
     car(D, x, p, { head: BASE.lit, tail: '#FF5B4D' }); k.restore();
     figure(pen(k), FIG[0], FIG[1], FIG[2], p.person);
     hud(k, a > 0.5 ? '8″' : '1/250');
   });
 
+  function reusablePanningBackground(k,a) {
+    const S = EP("108", "backgroundStreak", 46) * a, n = S < 0.5 ? 1 : 12;
+    for (let i = 0; i < n; i++) {   // 背景を横にずらして重ね、平均をとる（流れ）
+      k.save(); k.globalAlpha = 1 / (i + 1); k.translate(n > 1 ? lerp(-S / 2, S / 2, i / (n - 1)) : 0, 0); stageStreet(k, BASE, { car: false, person: false }); k.restore();
+    }
+  }
   // @element 12
   // 流し撮り: 走る車を追ってカメラを振ると、車はくっきり、背景だけ横に流れる
   CELLS[11] = cell((k, u) => {
     const a = env(u);
-    const drive = lerp(-80, EP("108", "value2", 620), u / CYC), x = lerp(drive, 270 + EP("108", "value1", 10) * Math.sin(u / CYC * TAU), a);
-    const S = 46 * a, n = S < 0.5 ? 1 : 12;
-    for (let i = 0; i < n; i++) {   // 背景を横にずらして重ね、平均をとる（流れ）
-      k.save(); k.globalAlpha = 1 / (i + 1); k.translate(n > 1 ? lerp(-S / 2, S / 2, i / (n - 1)) : 0, 0); stageStreet(k, BASE, { car: false, person: false }); k.restore();
-    }
+    const drive = lerp(EP("108", "extra1", -80), EP("108", "value2", 620), u / CYC), x = lerp(drive, 270 + EP("108", "value1", 10) * Math.sin(u / CYC * TAU), a);
+    reusablePanningBackground(k,a);
     const D = pen(k); car(D, x, BASE, { head: BASE.lit });
     // 車輪の回転（1周に12回転＝継ぎ目なし）
     k.save(); k.strokeStyle = BASE.tire; k.lineWidth = 1.6;
-    for (const wx of [x - 21, x + 21]) { const t = u / CYC * TAU * 12; k.beginPath(); k.moveTo(wx - Math.cos(t) * 5, 156 - Math.sin(t) * 5); k.lineTo(wx + Math.cos(t) * 5, 156 + Math.sin(t) * 5); k.stroke(); }
+    for (const wx of [x - 21, x + 21]) { const t = u / CYC * TAU * EP("108", "wheelTurns", 12); k.beginPath(); k.moveTo(wx - Math.cos(t) * 5, 156 - Math.sin(t) * 5); k.lineTo(wx + Math.cos(t) * 5, 156 + Math.sin(t) * 5); k.stroke(); }
     k.restore();
     hud(k, a > 0.5 ? '1/15' : '1/1000');
   });
 
   // @element 13
   // レンズフレア: 建物の陰から太陽が出ると、画面の中心をはさんで反対側へ光の玉が並ぶ
-  CELLS[12] = cell((k, u) => {
-    const a = env(u), sx = lerp(428, 474, a), sy = lerp(74, 30, a);
-    stageStreet(k, BASE, { sun: [sx, sy, 13, 1] });
+  const FLARE_GHOSTS = [[0.45, 7, 'c', 0.6], [0.8, 13, 'h', 0.55], [1.15, 5, 'c', 0.7], [1.45, 22, 'h', 0.4], [1.75, 9, 'c', 0.55], [2.0, 30, 'r', 0.55]];
+  function reusableFlareGhost(k,x,y,r,kind,al,a) {
+    k.globalAlpha = al * a;
+    if (kind === 'r') { k.strokeStyle = BASE.lit; k.lineWidth = 3; k.beginPath(); k.arc(x, y, r, 0, TAU); k.stroke(); return; }
+    k.fillStyle = kind === 'h' ? BASE.glow : BASE.lit; k.beginPath();
+    if (kind === 'h') for (let i = 0; i < 6; i++) { const t2 = i / 6 * TAU; k.lineTo(x + Math.cos(t2) * r, y + Math.sin(t2) * r); } else k.arc(x, y, r, 0, TAU);
+    k.closePath(); k.fill();
+  }
+  function reusableLensFlare(k,sx,sy,a) {
     const cx = CW / 2, cy = CH / 2, dx = cx - sx, dy = cy - sy;
     k.save();
     // 太陽の光の筋
     k.globalAlpha = 0.75 * a; k.strokeStyle = BASE.lit; k.lineWidth = 1.6; k.lineCap = 'round';
-    for (let i = 0; i < 8; i++) { const t = i / 8 * TAU + 0.2, L = i % 2 ? 26 : 44; k.beginPath(); k.moveTo(sx + Math.cos(t) * EP("109", "value1", 17), sy + Math.sin(t) * EP("109", "value2", 17)); k.lineTo(sx + Math.cos(t) * L, sy + Math.sin(t) * L); k.stroke(); }
+    for (let i = 0; i < EP("109", "rayCount", 8); i++) { const t = i / EP("109", "rayCount", 8) * TAU + 0.2, L = i % 2 ? 26 : 44; k.beginPath(); k.moveTo(sx + Math.cos(t) * EP("109", "value1", 17), sy + Math.sin(t) * EP("109", "value2", 17)); k.lineTo(sx + Math.cos(t) * L, sy + Math.sin(t) * L); k.stroke(); }
     // 光の玉: 太陽から中心を通る線の上（t = 0.45〜2.0）
-    const G = [[0.45, 7, 'c', 0.6], [0.8, 13, 'h', 0.55], [1.15, 5, 'c', 0.7], [1.45, 22, 'h', 0.4], [1.75, 9, 'c', 0.55], [2.0, 30, 'r', 0.55]];
-    for (const [t, r, kind, al] of G) {
-      const x = sx + dx * t, y = sy + dy * t;
-      k.globalAlpha = al * a;
-      if (kind === 'r') { k.strokeStyle = BASE.lit; k.lineWidth = 3; k.beginPath(); k.arc(x, y, r, 0, TAU); k.stroke(); continue; }
-      k.fillStyle = kind === 'h' ? BASE.glow : BASE.lit; k.beginPath();
-      if (kind === 'h') for (let i = 0; i < 6; i++) { const t2 = i / 6 * TAU; k.lineTo(x + Math.cos(t2) * r, y + Math.sin(t2) * r); } else k.arc(x, y, r, 0, TAU);
-      k.closePath(); k.fill();
-    }
+    for (const [t, r, kind, al] of FLARE_GHOSTS) reusableFlareGhost(k,sx + dx * t,sy + dy * t,r,kind,al,a);
     k.restore();
+  }
+  CELLS[12] = cell((k, u) => {
+    const a = env(u), sx = lerp(EP("109", "extra2", 428), EP("109", "extra1", 474), a), sy = lerp(EP("109", "extra4", 74), EP("109", "extra3", 30), a);
+    stageStreet(k, BASE, { sun: [sx, sy, 13, 1] });
+    reusableLensFlare(k,sx,sy,a);
   });
 
+  function reusableFisheyeMap(kk) { const cx = CW / 2, cy = CH / 2, R2 = cx * cx + cy * cy; return kk < 0.002 ? null : (x, y) => { const dx = x - cx, dy = y - cy, g = (1 + kk) / (1 + kk * (dx * dx + dy * dy) / R2); return [cx + dx * g, cy + dy * g]; }; }
   // @element 14
   // 魚眼レンズ: 中心がふくらみ、建物の縦の線が外側へ丸く曲がる
   CELLS[13] = cell((k, u) => {
-    const a = env(u), kk = EP("110", "value2", 1.25) * a, cx = CW / 2, cy = CH / 2, R2 = cx * cx + cy * cy;
-    const M = kk < 0.002 ? null : (x, y) => { const dx = x - cx, dy = y - cy, g = (1 + kk) / (1 + kk * (dx * dx + dy * dy) / R2); return [cx + dx * g, cy + dy * g]; };
+    const a = env(u), kk = EP("110", "value2", 1.25) * a, M = reusableFisheyeMap(kk);
     stageStreet(k, BASE, { M });
     hud(k, `${Math.round(lerp(24, 8, a))}mm`);
   });
 
-  // @element 15
-  // 色収差: 赤・緑・青を少しずつ違う大きさで重ね、画面の端ほど縁に赤と青のずれが出る
-  CELLS[14] = cell((k, u) => {
-    const a = env(u), s = EP("111", "value1", 0.02) * a, cx = CW / 2, cy = CH / 2;
-    if (s < 0.0005) { stageStreet(k, BASE); return; }
-    const [S, ks] = layer('ca'); stageStreet(ks, BASE);
+  function reusableChromaticScene(k,a,drawSource) {
+    const s = EP("111", "value1", 0.02) * a, cx = CW / 2, cy = CH / 2;
+    if (s < 0.0005) { drawSource(k); return; }
+    const [S, ks] = layer('ca'); drawSource(ks);
     k.fillStyle = '#000000'; k.fillRect(0, 0, CW, CH);
     for (const [col, sc] of [['#FF0000', 1 + EP("111", "value2", 2) * s], ['#00FF00', 1 + s], ['#0000FF', 1]]) {
       const [L, kl] = layer('ca-' + col); kl.drawImage(S, 0, 0); kl.globalCompositeOperation = 'multiply'; kl.fillStyle = col; kl.fillRect(0, 0, CW, CH); kl.globalCompositeOperation = 'source-over';
       k.save(); k.globalCompositeOperation = 'lighter'; k.translate(cx, cy); k.scale(sc, sc); k.translate(-cx, -cy); k.drawImage(L, 0, 0); k.restore();
     }
+  }
+  // @element 15
+  // 色収差: 赤・緑・青を少しずつ違う大きさで重ね、画面の端ほど縁に赤と青のずれが出る
+  CELLS[14] = cell((k, u) => {
+    reusableChromaticScene(k,env(u),kk=>stageStreet(kk,BASE));
   });
 
   // @element 16
   // 周辺減光（ビネット）: 四隅だけがなだらかに暗くなり、中央の人物に目が集まる
-  CELLS[15] = cell((k, u) => {
-    const a = env(u);
-    stageStreet(k, BASE);
+  function reusableVignette(k,a) {
     // 楕円の放射グラデーション: 半径の45%までは素通し、外へ向かって 0 → 70% の濃さ
     k.save(); k.translate(CW / 2, CH / 2); k.scale(1, CH / CW * EP("112", "value1", 1.35));
     const g = k.createRadialGradient(0, 0, CW * 0.45 * EP("112", "value2", 0.62), 0, 0, CW * 0.62);
-    g.addColorStop(0, 'rgba(32,35,43,0)'); g.addColorStop(1, `rgba(32,35,43,${(0.7 * a).toFixed(3)})`);
+    g.addColorStop(0, 'rgba(32,35,43,0)'); g.addColorStop(1, `rgba(32,35,43,${(EP("112", "darkness", 0.7) * a).toFixed(3)})`);
     k.fillStyle = g; k.fillRect(-CW, -CW, CW * 2, CW * 2); k.restore();
+  }
+  CELLS[15] = cell((k, u) => {
+    const a = env(u);
+    stageStreet(k, BASE);
+    reusableVignette(k,a);
   });
 
   // @element 17
   // ハイキー: 明るい色だけになり、影はごく薄く、明るさの山が右端へ寄る
-  CELLS[16] = cell((k, u) => {
-    const a = env(u);
-    const HIGH = {
+  function reusableHighPalette() { return {
       sky: '#FFFFFF', sky2: '#FFFFFF', far: '#F5F6F8', mid: '#EEF0F3', ground: '#FBFBFA', ground2: '#F3F3F1', mark: '#FFFFFF', cast: '#F3F3F1',
       bld: '#FBFBFA', edge: '#E9E9E7', win: '#F2F2F0', winOff: '#F2F2F0', tree: '#F0F0EE', trunk: '#E5E5E3', post: '#DADAD8', bulb: '#E5E5E3',
       person: '#B9C0CE', shade: '#A6AEBF', lit: '#FFE6AE', car: '#E4E7EC', glass: '#FFFFFF', tire: '#C5CAD3', sun: '#FFD889', glow: '#FFF3D8'
-    };
+    }; }
+  CELLS[16] = cell((k, u) => {
+    const a = env(u);
+    const HIGH = reusableHighPalette();
     stageLand(k, pal(BASE, HIGH, a));
-    histo(k, lerp(0.56, EP("113", "value1", 0.85), a), lerp(0.2, 0.09, a));
+    histo(k, lerp(EP("113", "extra1", 0.56), EP("113", "value1", 0.85), a), lerp(EP("113", "extra3", 0.2), EP("113", "extra2", 0.09), a));
   });
 
   // @element 18
   // ローキー: 画面の大半が暗く沈み、横からの光が当たる縁だけが浮かぶ
+  function reusableLowPalette() { return Object.assign({}, DARK, { sun: DARK.sky, glow: DARK.sky, person: '#25272E', lit: '#FFB547' }); }
   CELLS[17] = cell((k, u) => {
     const a = env(u);
-    const LOW = Object.assign({}, DARK, { sun: DARK.sky, glow: DARK.sky, person: '#25272E', lit: '#FFB547' });
+    const LOW = reusableLowPalette();
     stageLand(k, pal(BASE, LOW, a));
-    histo(k, lerp(0.56, EP("114", "value1", 0.14), a), lerp(0.2, 0.08, a));
+    histo(k, lerp(EP("114", "extra1", 0.56), EP("114", "value1", 0.14), a), lerp(EP("114", "extra3", 0.2), EP("114", "extra2", 0.08), a));
   });
 
   // @element 19
   // モノクロ: 色を抜き、明るさだけで見せる（コントラストを少し強める）
+  function reusableMonoPalette() { return mapPal(BASE, c => { const g = clamp((lum(c) - 140) * EP("115", "value1", 1.25) + 140, 0, 255); return toHex([g, g, g]); }); }
   CELLS[18] = cell((k, u) => {
     const a = env(u);
-    const GRAY = mapPal(BASE, c => { const g = clamp((lum(c) - 140) * EP("115", "value1", 1.25) + 140, 0, 255); return toHex([g, g, g]); });
+    const GRAY = reusableMonoPalette();
     stageLand(k, pal(BASE, GRAY, a));
   });
 
   // @element 20
   // デュオトーン: 暗い所を藍、明るい所をピンクの2色だけに置き換える
+  function reusableDuoPalette() { return mapPal(BASE, c => mixc('#1F2A5C', '#FF9FB2', Math.pow(clamp((lum(c) - 70) / (250 - 70)), EP("116", "duoExponent", 2.4)))); }
   CELLS[19] = cell((k, u) => {
     const a = Math.min(1, env(u) * EP("116", "strength", 1));
-    const DUO = mapPal(BASE, c => mixc('#1F2A5C', '#FF9FB2', Math.pow(clamp((lum(c) - 70) / (250 - 70)), 2.4)));
+    const DUO = reusableDuoPalette();
     stageLand(k, pal(BASE, DUO, a));
   });
 
   // @element 21
   // ティール＆オレンジ: 空と影を青緑、日の当たる肌と太陽を橙に寄せる
-  CELLS[20] = cell((k, u) => {
-    const a = Math.min(1, env(u) * EP("117", "strength", 1));
-    const TO = {
+  function reusableTealOrangePalette() { return {
       sky: '#CFE6E3', sky2: '#B7DAD6', far: '#8CC1BE', mid: '#62A2A1', ground: '#3F8083', ground2: '#2F6A6E', mark: '#CFE6E3', cast: '#2F6A6E',
       bld: '#A8D1CE', edge: '#4E8E8F', win: '#62A2A1', winOff: '#62A2A1', tree: '#2F6A6E', trunk: '#1F5357', post: '#1F5357', bulb: '#1F5357',
       person: '#1D4E53', shade: '#143F43', lit: '#FF9248', car: '#2F6A6E', glass: '#CFE6E3', tire: '#143F43', sun: '#FF8236', glow: '#FFC48C'
-    };
+    }; }
+  CELLS[20] = cell((k, u) => {
+    const a = Math.min(1, env(u) * EP("117", "strength", 1));
+    const TO = reusableTealOrangePalette();
     stageLand(k, pal(BASE, TO, a));
   });
 
   // @element 22
   // フィルムグレイン: 細かい粒子が全体に乗り、全体が少し暖かい色に寄る
+  function reusableGrain(k,a) {
+    const G = once('grain', () => { const r = rng(22), o = []; for (let i = 0; i < 2600; i++) o.push([r() * CW, r() * CH, 0.8 + r() * 0.9, r() < 0.55 ? 0 : 1, 0.16 + r() * 0.22]); return o; });
+    k.save(); for (const [x, y, s, d, al] of G.slice(0, EP("118", "grainCount", 2600))) { k.globalAlpha = al * a; k.fillStyle = d ? '#FFFFFF' : '#3A3530'; k.fillRect(x, y, s, s); } k.restore();
+  }
   CELLS[21] = cell((k, u) => {
     const a = Math.min(1, env(u) * EP("118", "strength", 1));
-    const FILM = mapPal(BASE, c => mixc(c, '#F2DDBE', 0.16));
+    const FILM = mapPal(BASE, c => mixc(c, '#F2DDBE', EP("118", "warmth", 0.16)));
     const p = pal(BASE, FILM, a);
-    const G = once('grain', () => { const r = rng(22), o = []; for (let i = 0; i < 2600; i++) o.push([r() * CW, r() * CH, 0.8 + r() * 0.9, r() < 0.55 ? 0 : 1, 0.16 + r() * 0.22]); return o; });
-    const grain = kk => { kk.save(); for (const [x, y, s, d, al] of G) { kk.globalAlpha = al * a; kk.fillStyle = d ? '#FFFFFF' : '#3A3530'; kk.fillRect(x, y, s, s); } kk.restore(); };
-    stageLand(k, p); grain(k);
+    stageLand(k, p); reusableGrain(k,a);
   });
 
   // @element 23
   // ライトリーク: 右端から、フィルムに光がもれたような赤と橙のにじみが帯になって入る
+  function reusableLightLeak(k,a,w) {
+    k.save();
+    // 縦長の楕円を右端の外に中心を置いて重ねる（外ほど淡い黄、端ほど赤）
+    const band = (rx, col, al) => { k.globalAlpha = al * a; k.fillStyle = col; k.beginPath(); k.ellipse(CW + 30 + EP("119", "sway", 6) * w, CH / 2, rx * a, CH * 1.1, 0, 0, TAU); k.fill(); };
+    band(250, '#FFD089', 0.35); band(170, '#FF9A3D', 0.4); band(95, '#FF5A3A', 0.45); band(45, '#FF3B30', 0.5);
+    k.restore();
+  }
   CELLS[22] = cell((k, u) => {
     const a = Math.min(1, env(u) * EP("119", "strength", 1)), w = Math.sin(u / CYC * TAU);
     stageLand(k, BASE);
-    k.save();
-    // 縦長の楕円を右端の外に中心を置いて重ねる（外ほど淡い黄、端ほど赤）
-    const band = (rx, col, al) => { k.globalAlpha = al * a; k.fillStyle = col; k.beginPath(); k.ellipse(CW + 30 + 6 * w, CH / 2, rx * a, CH * 1.1, 0, 0, TAU); k.fill(); };
-    band(250, '#FFD089', 0.35); band(170, '#FF9A3D', 0.4); band(95, '#FF5A3A', 0.45); band(45, '#FF3B30', 0.5);
-    k.restore();
+    reusableLightLeak(k,a,w);
   });
 
   // @element 24
   // 二重露光: 背景が白く飛び、胸像の形の中にだけ丘と家と木と太陽が写り込む
-  CELLS[23] = cell((k, u) => {
-    const a = Math.min(1, env(u) * EP("120", "strength", 1));
-    const DX = Object.assign({}, BASE, { sky: '#D3DBE6', sky2: '#D3DBE6', far: '#9AA8BD', mid: '#76869F', ground: '#55647E', bld: '#E8ECF2', edge: '#55647E', win: '#9AA8BD', winOff: '#9AA8BD', tree: '#3F4C66', trunk: '#3F4C66' });
-    const draw = kk => {
-      kk.fillStyle = '#FFFFFF'; kk.fillRect(0, 0, CW, CH);
+  function reusableDoubleExposure(kk,DX,scale) {
       kk.save(); bustPath(kk, QX, QY, QR); kk.clip();
       // 風景を0.7倍にして、太陽が頭の右上、丘の稜線が首のあたりに来るように置く
-      kk.translate(QX, QY); kk.scale(0.7, 0.7); kk.translate(-415, -77);
+      kk.translate(QX, QY); kk.scale(scale, scale); kk.translate(-415, -77);
       kk.fillStyle = DX.sky; kk.fillRect(0, -200, CW * 2, CH * 3);
       stageLand(kk, DX, { person: false });
       kk.fillStyle = DX.ground; kk.fillRect(-CW, 200, CW * 3, CH * 3);
       kk.restore();
+  }
+  function reusableDoubleExposurePalette() { return Object.assign({}, BASE, { sky: '#D3DBE6', sky2: '#D3DBE6', far: '#9AA8BD', mid: '#76869F', ground: '#55647E', bld: '#E8ECF2', edge: '#55647E', win: '#9AA8BD', winOff: '#9AA8BD', tree: '#3F4C66', trunk: '#3F4C66' }); }
+  CELLS[23] = cell((k, u) => {
+    const a = Math.min(1, env(u) * EP("120", "strength", 1));
+    const DX = reusableDoubleExposurePalette();
+    const draw = kk => {
+      kk.fillStyle = '#FFFFFF'; kk.fillRect(0, 0, CW, CH);
+      reusableDoubleExposure(kk,DX,EP("120", "landscapeScale", 0.7));
     };
     if (a >= 0.999) { draw(k); return; }   // 効果が入りきったら直接描く（拡大表示でも輪郭がくっきり）
     stageLand(k, BASE);
@@ -616,6 +671,127 @@ MotionPrompt.pack('photo', function () {
     k.save(); k.globalAlpha = a; k.drawImage(L, 0, 0); k.restore();
   });
 
+  // Reusable components are drawn by the same helpers as the examples.
+  const reusableMaterials = {
+    nightExposureCar: (k) => { k.save();k.translate(128,128);k.scale(2.6,2.6);k.translate(-128,-144);car(pen(k),128,NIGHT,{head:BASE.lit,tail:'#FF5B4D'});k.restore(); },
+    tiltShiftEmpty: (k) => {
+      const [S,ks]=layer('tilt-empty'); stageStreet(ks,BASE,{car:false,person:false});
+      const [B1,k1]=layer('tilt-empty-1'); k1.filter=`blur(${EP("106","innerBlur",3).toFixed(2)}px)`; k1.drawImage(S,0,0); k1.filter='none';
+      const [B2,k2]=layer('tilt-empty-2'); k2.filter=`blur(${EP("106","outerBlur",7).toFixed(2)}px)`; k2.drawImage(S,0,0); k2.filter='none';
+      k.drawImage(S,0,0); const band=(img,y0,y1)=>{k.save();k.beginPath();k.rect(0,y0,CW,y1-y0);k.clip();k.drawImage(img,0,0);k.restore();}; band(B2,0,42);band(B1,42,66);band(B1,176,190);band(B2,190,CH);
+    },
+    chromaticEmpty: (k) => reusableChromaticScene(k,1,kk=>stageStreet(kk,BASE,{person:false,car:false})),
+    chromaticPerson: (k) => {
+      const [S,ks]=layer('ca-isolated-person'); figure(pen(ks),FIG[0],FIG[1],FIG[2],BASE.person);
+      for(const [col,sc] of [['#FF0000',1+EP("111","value2",2)*EP("111","value1",.02)],['#00FF00',1+EP("111","value1",.02)],['#0000FF',1]]) {
+        const [L,kl]=layer('ca-isolated-'+col); kl.drawImage(S,0,0); kl.globalCompositeOperation='multiply'; kl.fillStyle=col; kl.fillRect(0,0,CW,CH); kl.globalCompositeOperation='destination-in'; kl.drawImage(S,0,0); kl.globalCompositeOperation='source-over';
+        k.save();k.globalCompositeOperation='lighter';k.translate(CW/2,CH/2);k.scale(sc,sc);k.translate(-CW/2,-CH/2);k.drawImage(L,0,0);k.restore();
+      }
+    },
+    blueHourBackdrop: (k) => stagePortrait(k,NIGHT,{after:D=>reusableBlueHourGlow(D,NIGHT,1)}),
+    blueHourLampGlow: (k) => { k.save(); k.translate(128,128); k.scale(4,4); k.translate(-413,-97); reusableBlueHourGlow(pen(k),NIGHT,1); k.restore(); },
+    panningBackground: (k) => reusablePanningBackground(k,1),
+    bokehBackground: (k) => reusableBokehBackground(k,DIM,1),
+    fisheyeEmpty: (k) => stageStreet(k,BASE,{M:reusableFisheyeMap(1.25),person:false,car:false,buildings:false,trees:false,lamps:false,bushes:false}),
+    fisheyePerson: (k) => figure(pen(k,reusableFisheyeMap(1.25)),FIG[0],FIG[1],FIG[2],BASE.person),
+    planRim: (k) => { k.save(); k.translate(10,10); k.scale(2.5,2.5); k.translate(-460,-129); plan(k,[[Math.PI*.75,1],[-Math.PI*.75,1]]); k.restore(); },
+    planSplit: (k) => { k.save(); k.translate(10,10); k.scale(2.5,2.5); k.translate(-460,-129); plan(k,[[Math.PI/2,1]]); k.restore(); },
+    planRembrandt: (k) => { k.save(); k.translate(10,10); k.scale(2.5,2.5); k.translate(-460,-129); plan(k,[[Math.PI/4,1]]); k.restore(); },
+    planButterfly: (k) => { k.save(); k.translate(10,10); k.scale(2.5,2.5); k.translate(-460,-129); plan(k,[[0,1]]); k.restore(); },
+    histogramHigh: (k) => { k.save(); k.translate(10,10); k.scale(2,2); k.translate(-430,-149); histo(k,.85,.09); k.restore(); },
+    histogramLow: (k) => { k.save(); k.translate(10,10); k.scale(2,2); k.translate(-430,-149); histo(k,.14,.08); k.restore(); },
+    exposureTrails: (k) => reusableExposureTrails(k,CW+40,1),
+    lensFlare: (k) => reusableLensFlare(k,474,30,1),
+    bokehLights: (k) => { k.save(); for(const [x,y,s,w] of reusableBokehPoints()) reusableBokehLight(k,x,y,s,w,1); k.restore(); },
+    vignette: (k) => reusableVignette(k,1),
+    filmGrain: (k) => reusableGrain(k,1),
+    lightLeak: (k) => reusableLightLeak(k,1,0),
+    backlitBust: (k) => { k.save(); k.translate(128,65); k.scale(1.45,1.45); k.translate(-PX,-PY); k.save(); bustPath(k,PX,PY,PR); k.strokeStyle=BASE.lit; k.lineWidth=7; k.lineJoin='round'; k.stroke(); k.restore(); bust(k,PX,PY,PR,BASE.shade); k.restore(); },
+    rimBust: (k) => { k.save(); k.translate(128,65); k.scale(1.45,1.45); k.translate(-PX,-PY); k.fillStyle=BASE.lit; for(const dx of [-3.5,3.5]) { k.save(); k.translate(dx,-2.5); bustPath(k,PX,PY,PR); k.fill(); k.restore(); } bust(k,PX,PY,PR,DARK.person); k.restore(); },
+    silhouetteBust: (k) => bust(k,128,65,42,'#22252D'),
+    doubleExposureBust: (k) => { k.save(); k.translate(128,65); k.scale(1.5,1.5); k.translate(-QX,-QY); reusableDoubleExposure(k,reusableDoubleExposurePalette(),0.7); k.restore(); },
+    goldenBackground: (k) => stagePortrait(k,reusableGoldenPalette(),{sun:[96,136,18,1],cast:150}),
+    goldenBare: (k) => stagePortrait(k,reusableGoldenPalette(),{buildings:false,lamps:false,trees:false}),
+    goldenBust: (k) => { const p=reusableGoldenPalette(); k.save(); k.translate(128,65); k.scale(1.45,1.45); k.translate(-PX,-PY); reusableGoldenBust(k,p,p,1); k.restore(); },
+    goldenTree: (k) => tree(pen(k),128,225,70,reusableGoldenPalette()),
+    goldenLamp: (k) => lamp(pen(k),115,225,185,reusableGoldenPalette()),
+    goldenSun: (k) => sun(pen(k),128,128,42,reusableGoldenPalette()),
+    landscapeHigh: (k) => stageLand(k,reusableHighPalette(),{person:false}),
+    landscapeLow: (k) => stageLand(k,reusableLowPalette(),{person:false}),
+    highBust: (k) => { k.save(); k.translate(128,65); k.scale(1.5,1.5); k.translate(-QX,-QY); reusableLandscapeBust(k,reusableHighPalette()); k.restore(); },
+    lowBust: (k) => { k.save(); k.translate(128,65); k.scale(1.5,1.5); k.translate(-QX,-QY); reusableLandscapeBust(k,reusableLowPalette()); k.restore(); },
+    landscapeMono: (k) => stageLand(k,reusableMonoPalette(),{person:false}),
+    landscapeDuo: (k) => stageLand(k,reusableDuoPalette(),{person:false}),
+    landscapeTealOrange: (k) => stageLand(k,reusableTealOrangePalette(),{person:false}),
+    monoPerson: (k) => figure(pen(k),128,225,194,reusableMonoPalette().person),
+    duoPerson: (k) => figure(pen(k),128,225,194,reusableDuoPalette().person),
+    tealOrangePerson: (k) => figure(pen(k),128,225,194,reusableTealOrangePalette().person),
+    monoBust: (k) => { k.save(); k.translate(128,65); k.scale(1.5,1.5); k.translate(-QX,-QY); reusableLandscapeBust(k,reusableMonoPalette()); k.restore(); },
+    duoBust: (k) => { k.save(); k.translate(128,65); k.scale(1.5,1.5); k.translate(-QX,-QY); reusableLandscapeBust(k,reusableDuoPalette()); k.restore(); },
+    tealOrangeBust: (k) => { k.save(); k.translate(128,65); k.scale(1.5,1.5); k.translate(-QX,-QY); reusableLandscapeBust(k,reusableTealOrangePalette()); k.restore(); },
+    splitBust: (k) => { k.save(); k.translate(128,65); k.scale(1.45,1.45); k.translate(-PX,-PY); reusableSplitBust(k,1,Math.PI/2); k.restore(); },
+    rembrandtBust: (k) => { k.save(); k.translate(128,65); k.scale(1.45,1.45); k.translate(-PX,-PY); reusableRembrandtBust(k,1); k.restore(); },
+    butterflyBust: (k) => { k.save(); k.translate(128,65); k.scale(1.45,1.45); k.translate(-PX,-PY); reusableButterflyBust(k,1); k.restore(); },
+    portraitBareDay: (k) => stagePortrait(k,BASE,{buildings:false,lamps:false,trees:false}),
+    portraitBareNight: (k) => stagePortrait(k,NIGHT,{buildings:false,lamps:false,trees:false}),
+    streetBareDay: (k) => stageStreet(k,BASE,{person:false,car:false,buildings:false,trees:false,lamps:false,bushes:false}),
+    streetBareNight: (k) => stageStreet(k,NIGHT,{person:false,car:false,buildings:false,trees:false,lamps:false,bushes:false}),
+    landscapeBareDay: (k) => stageLand(k,BASE,{person:false,buildings:false,trees:false,sunOn:false}),
+    landscapeBareNight: (k) => stageLand(k,NIGHT,{person:false,buildings:false,trees:false,sunOn:false}),
+    treeNight: (k) => tree(pen(k),128,225,70,NIGHT),
+    lampNight: (k) => lamp(pen(k),115,225,185,NIGHT),
+    littleHouseDay: (k) => { k.save(); k.translate(128,185); k.scale(4,4); k.translate(-361,-134); building(pen(k),346,134,30,24,BASE,3); k.restore(); },
+    littleHouseNight: (k) => { k.save(); k.translate(128,185); k.scale(4,4); k.translate(-361,-134); building(pen(k),346,134,30,24,NIGHT,3); k.restore(); },
+    personNight: (k) => figure(pen(k),128,225,194,NIGHT.person),
+    bust: (k) => bust(k,128,63,42,BASE.person),
+    bustNight: (k) => bust(k,128,63,42,NIGHT.person),
+    carNight: (k) => { k.save(); k.translate(128,128); k.scale(2.6,2.6); k.translate(-128,-144); car(pen(k),128,NIGHT,{head:NIGHT.lit}); k.restore(); },
+    buildingDay: (k) => building(pen(k),68,225,120,180,BASE,3),
+    buildingNight: (k) => building(pen(k),68,225,120,180,NIGHT,3),
+    portraitDay: (k) => stagePortrait(k,BASE),
+    portraitNight: (k) => stagePortrait(k,NIGHT),
+    streetDay: (k) => stageStreet(k,BASE,{person:false,car:false}),
+    streetNight: (k) => stageStreet(k,NIGHT,{person:false,car:false}),
+    landscapeDay: (k) => stageLand(k,BASE,{person:false}),
+    landscapeNight: (k) => stageLand(k,NIGHT,{person:false}),
+    person: (k) => figure(pen(k),128,225,194,BASE.person),
+    car: (k) => { k.save(); k.translate(128,128); k.scale(2.6,2.6); k.translate(-128,-144); car(pen(k),128,BASE); k.restore(); },
+    tree: (k) => tree(pen(k),128,225,70,BASE),
+    sun: (k) => sun(pen(k),128,128,42,BASE),
+    lamp: (k) => lamp(pen(k),115,225,185,BASE),
+  };
+  for(let i=0;i<BLD.length;i++) reusableMaterials['fisheyeBuilding'+i]=(k)=>{const [x,w,h]=BLD[i];building(pen(k,reusableFisheyeMap(1.25)),x,ROAD,w,h,BASE,i);};
+  for(let i=0;i<TREES.length;i++) reusableMaterials['fisheyeTree'+i]=(k)=>{const [x,r]=TREES[i];tree(pen(k,reusableFisheyeMap(1.25)),x,ROAD,r,BASE);};
+  for(let i=0;i<LAMPS.length;i++) reusableMaterials['fisheyeLamp'+i]=(k)=>lamp(pen(k,reusableFisheyeMap(1.25)),LAMPS[i],ROAD,58,BASE);
+  for(const [i,x,y,r] of [[0,18,206,17],[1,42,210,11],[2,516,204,19],[3,494,211,11]]) reusableMaterials['fisheyeBush'+i]=(k)=>pen(k,reusableFisheyeMap(1.25)).circ(x,y,r,BASE.tree);
+  for(let tone=0;tone<2;tone++) for(let i=0;i<10;i++) reusableMaterials['photoCarPart'+tone+'-'+i]=(k)=>{k.save();k.translate(128,128);k.scale(2.6,2.6);k.translate(-128,-144);reusableCarPart(pen(k),128,tone?NIGHT:BASE,tone?{head:BASE.lit,tail:'#FF5B4D'}:{},i);k.restore();};
+  const photoPersonPalettes=[()=>BASE,()=>NIGHT,reusableMonoPalette,reusableDuoPalette,reusableTealOrangePalette];
+  for(let tone=0;tone<photoPersonPalettes.length;tone++) for(let i=0;i<6;i++) reusableMaterials['photoPersonPart'+tone+'-'+i]=(k)=>reusableFigurePart(pen(k),128,225,194,photoPersonPalettes[tone]().person,i);
+  const buildingPalettes=[()=>BASE,()=>NIGHT];
+  for(let tone=0;tone<buildingPalettes.length;tone++) for(let i=0;i<BLD.length;i++) reusableMaterials['streetBuilding'+tone+'-'+i]=(k)=>{const [x,w,h]=BLD[i],sc=Math.min(180/w,190/h);k.save();k.translate(128,225);k.scale(sc,sc);k.translate(-x-w/2,-ROAD);building(pen(k),x,ROAD,w,h,buildingPalettes[tone](),i);k.restore();};
+  const portraitBuildingPalettes=[()=>BASE,()=>NIGHT,reusableBackPalette,()=>DARK,reusableSilhouettePalette,()=>DIM,reusableGoldenPalette];
+  for(let tone=0;tone<portraitBuildingPalettes.length;tone++) for(let i=0;i<2;i++) reusableMaterials['portraitBuilding'+tone+'-'+i]=(k)=>{const [x,w,h]=i?[76,30,32]:[34,38,50],sc=Math.min(180/w,190/h);k.save();k.translate(128,225);k.scale(sc,sc);k.translate(-x-w/2,-HZ);building(pen(k),x,HZ,w,h,portraitBuildingPalettes[tone](),i+1);k.restore();};
+  const landscapePalettes = [reusableHighPalette, reusableLowPalette, reusableMonoPalette, reusableDuoPalette, reusableTealOrangePalette];
+  for(let i=0;i<landscapePalettes.length;i++) {
+    const palette=landscapePalettes[i];
+    reusableMaterials['landscapeBareFinish'+i]=(k)=>stageLand(k,palette(),{person:false,buildings:false,trees:false,sunOn:false});
+    reusableMaterials['landscapeTreeFinish'+i]=(k)=>tree(pen(k),128,225,70,palette());
+    reusableMaterials['landscapeHouseFinish'+i]=(k)=>{k.save();k.translate(128,185);k.scale(4,4);k.translate(-361,-134);building(pen(k),346,134,30,24,palette(),3);k.restore();};
+    reusableMaterials['landscapeSunFinish'+i]=(k)=>sun(pen(k),128,128,42,palette());
+  }
+  const portraitPalettes = [reusableBackPalette, () => DARK, reusableSilhouettePalette, () => DIM];
+  for(let i=0;i<portraitPalettes.length;i++) {
+    const palette=portraitPalettes[i];
+    reusableMaterials['portraitVariant'+i]=(k)=>stagePortrait(k,palette());
+    reusableMaterials['portraitBareVariant'+i]=(k)=>stagePortrait(k,palette(),{buildings:false,lamps:false,trees:false});
+    reusableMaterials['treeVariant'+i]=(k)=>tree(pen(k),128,225,70,palette());
+    reusableMaterials['lampVariant'+i]=(k)=>lamp(pen(k),115,225,185,palette());
+    reusableMaterials['buildingVariant'+i]=(k)=>building(pen(k),68,225,120,180,palette(),3);
+  }
+  reusableMaterials.backGlow=(k)=>{k.save(); k.globalAlpha=EP("097", "glow", 0.22); k.fillStyle=BASE.glow; k.fillRect(0,0,CW,CH); k.restore();};
+  for(let i=0;i<FLARE_GHOSTS.length;i++) reusableMaterials['flareGhost'+i]=(k)=>{const [,r,kind,al]=FLARE_GHOSTS[i]; k.save(); k.translate(128,128); k.scale(2.7,2.7); reusableFlareGhost(k,0,0,r,kind,al,1); k.restore();};
+  for(let i=0;i<15;i++) reusableMaterials['bokehLight'+i]=(k)=>{const p=reusableBokehPoints()[i]; k.save(); k.translate(128,128); k.scale(3,3); reusableBokehLight(k,0,0,p[2],p[3],1); k.restore();};
+
   // @end
-  return { width: CW, height: CH, cycle: CYC, cells: CELLS, fonts: [] };
+  return { materials: reusableMaterials, width: CW, height: CH, cycle: CYC, cells: CELLS, fonts: [] };
 });

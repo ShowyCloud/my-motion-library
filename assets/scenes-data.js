@@ -1,0 +1,57 @@
+/* 场景文案与镜头配置：后续可在此文件修改或扩充。时长单位为秒。 */
+window.MP_SCENES = [
+{id:'letter',title:'人物发现一封信',description:'一个人在桌边发现信封，打开后作出反应。',shots:['环境全景：人物走向桌子','中景：注意到桌上的信','特写：拿起并打开信封','近景：人物阅读后的反应'],links:[['F01','景别组合'],['F12','视觉信息揭示'],['F21','事件与反应镜头'],['F41','环境声']],versions:[
+{name:'基础',durations:[2.5,2.5,2.7,2.3],palette:'neutral',approach:'均衡的镜头时长和中性光线，清楚交代发现、打开与反应。',sound:'建议使用轻微室内环境声、纸张摩擦声。'},
+{name:'温馨',durations:[3.3,2.7,3.4,3.0],palette:'warm',approach:'暖光、较慢动作和更长的反应停留，让阅读显得从容。',sound:'建议使用柔和环境声、轻纸声与舒缓配乐。'},
+{name:'悬疑',durations:[2.8,2.2,3.5,2.7],palette:'mystery',approach:'冷暗环境、细节镜头延长，保留人物阅读后的停顿。',sound:'建议使用低弱室内底噪，突出信封的纸声。'}]},
+{id:'argument',title:'两人发生争执',description:'两人对话，一方表达不满，另一方作出反应，关系发生变化。',shots:['全景：建立两人位置','中景：左侧人物表达不满','中景：右侧人物作出回应','全景：两人之间的距离变化'],links:[['F02','双人正反打'],['F03','180 度轴线'],['F14','对话轴线与视线'],['F25','剪辑节奏对比'],['F48','左右声像']],versions:[
+{name:'基础',durations:[2.6,2.4,2.4,2.6],palette:'neutral',approach:'先建立空间，再依次观察两人的动作与反应。',sound:'建议使用室内环境声，保留两人的对话空间。'},
+{name:'激烈',durations:[1.8,1.5,1.5,2.2],palette:'hot',approach:'缩短对话镜头并加强手势和画面反差，最后保留关系变化。',sound:'建议用较急促的对白节奏和突出动作的衣物声。'},
+{name:'压抑',durations:[3.4,3.5,3.6,3.5],palette:'mystery',approach:'延长人物停顿，使用冷暗光线和克制的动作。',sound:'建议保留较长停顿与低弱室内底噪。'}]},
+{id:'room',title:'进入陌生房间',description:'人物推门进入房间，观察空间，注意到远处的物体。',shots:['外景：人物靠近并推开门','全景：进入并观察房间','细节：灯光照出远处的物体','近景：人物察觉后的反应'],links:[['F05','动作衔接剪辑'],['F06','前景遮挡与揭示'],['F07','三层景深构图'],['F28','自然动机光'],['F40','画外声与揭示']],versions:[
+{name:'基础',durations:[2.6,3,2.4,2.5],palette:'neutral',approach:'依次展示入门、空间、细节与反应，保持动作方向一致。',sound:'建议使用开门、脚步和空间环境声。'},
+{name:'好奇',durations:[3,3.4,3,2.6],palette:'warm',approach:'温和光线与较慢的观察动作，突出探索感。',sound:'建议使用轻脚步、柔和环境声和少量音乐。'},
+{name:'惊悚',durations:[3.3,3.4,3.7,2.1],palette:'mystery',approach:'冷暗光线、延迟揭示和更快的最终反应制造紧张感。',sound:'建议用低弱环境声和不明来源的画外声。'}]}
+];
+window.MP_SCENES.push(
+{id:'reunion',title:'久别重逢',description:'两个人发现彼此，犹豫片刻后走近。',shots:['全景：两人在空间两侧出现','近景：第一人认出对方','近景：第二人的回应','全景：两人走近'],links:[['F01','景别组合'],['F04','视线匹配'],['F11','人物走位与画面调度'],['F21','事件与反应镜头']],versions:[
+{name:'基础',durations:[2.6,2.2,2.2,3],palette:'neutral',approach:'先建立位置，再通过视线和回应引出靠近。',sound:'可加入轻微环境声和靠近时的脚步。'},
+{name:'喜悦',durations:[2.2,1.8,1.8,2.7],palette:'warm',approach:'暖色和更大的手势，让人物更快走近。',sound:'可选轻快的背景音乐和脚步声。'},
+{name:'迟疑',durations:[3.2,3.1,3.1,4],palette:'mystery',approach:'冷暗色调、克制动作与更长的停顿，表现不确定。',sound:'可保留环境底噪，让音乐和动作声更克制。'}]},
+{id:'pursuit',title:'追逐与躲藏',description:'一人穿过空间，另一人追来，前者躲到遮挡物后。',shots:['全景：前方人物穿过画面','全景：追赶者进入同一空间','中景：前方人物转入遮挡处','近景：追赶者寻找'],links:[['F13','行进轴线与画面方向'],['F06','前景遮挡与揭示'],['F22','遮挡隐藏切点'],['F84','悬念与信息控制']],versions:[
+{name:'基础',durations:[2.4,2.4,2.6,2.6],palette:'neutral',approach:'保持人物移动方向，交代追与躲的顺序。',sound:'可使用脚步与遮挡物附近的环境声。'},
+{name:'紧张',durations:[1.7,1.7,2.1,2.1],palette:'hot',approach:'更快的镜头切换与更强的身体倾斜，突出急迫。',sound:'可使用急促脚步和低频背景音。'},
+{name:'悬疑',durations:[3,2.7,3.3,3.6],palette:'mystery',approach:'延长遮挡后的等待，让寻找过程更令人不安。',sound:'可降低背景音量，突出间隔较长的脚步声。'}]},
+{id:'farewell',title:'车站送别',description:'两人在站台相对，一人转身离开，另一人目送。',shots:['全景：建立站台和人物位置','中景：两人作最后的交流','全景：一人转身离开','近景：留下的人目送'],links:[['F02','双人正反打'],['F13','行进轴线与画面方向'],['F21','事件与反应镜头'],['F37','音乐留白']],versions:[
+{name:'基础',durations:[2.6,2.5,3,2.5],palette:'neutral',approach:'交代告别、离开与目送的顺序。',sound:'可使用站台环境声和远去的脚步。'},
+{name:'温暖',durations:[3,2.8,3.2,3],palette:'warm',approach:'暖光与轻微挥手，让告别带有期待。',sound:'可使用柔和音乐与低声环境音。'},
+{name:'伤感',durations:[3.4,3.4,4,3.8],palette:'mystery',approach:'延长停顿与目送，使用较克制的动作。',sound:'可减少配乐，让环境声和停顿更突出。'}]}
+);
+window.MP_SCENES.push(
+{id:'handoff',title:'物品交接',description:'一人拿出物品，交给对方，对方接过后观察。',shots:['全景：两人相对站立','近景：递出物品','近景：物品移动到对方面前','中景：对方观察物品'],links:[['F04','视线匹配'],['F05','动作衔接剪辑'],['F12','视觉信息揭示'],['F94','道具运动连续性']],versions:[
+{name:'基础',durations:[2.5,2.5,2.5,2.5],palette:'neutral',approach:'交代双方位置、物品移动与接收后的反应。',sound:'可加入轻微环境声和物品移动声。'},
+{name:'信任',durations:[3,3,3,3],palette:'warm',approach:'暖色画面和从容的交接，表现双方愿意合作。',sound:'可使用柔和背景音和轻微道具声。'},
+{name:'戒备',durations:[3.2,3.3,3.5,3],palette:'mystery',approach:'延长递出前的等待，让接收动作更谨慎。',sound:'可降低背景音量，保留明显的停顿。'}]},
+{id:'search',title:'寻找失物',description:'人物在房间里寻找物品，发现线索后靠近查看。',shots:['全景：人物进入并环顾','中景：人物在桌边寻找','特写：物品细节','近景：人物靠近并确认'],links:[['F04','视线匹配'],['F12','视觉信息揭示'],['F82','延迟揭示'],['F21','事件与反应镜头']],versions:[
+{name:'基础',durations:[2.5,2.7,2.3,2.5],palette:'neutral',approach:'依次展示寻找、线索和确认。',sound:'可使用室内环境声与轻微动作声。'},
+{name:'轻松',durations:[2.7,2.8,2.3,2.5],palette:'warm',approach:'用暖色和轻快的动作表现一次日常寻找。',sound:'可使用轻柔背景音和小幅物品声。'},
+{name:'焦急',durations:[1.8,1.8,1.7,2],palette:'hot',approach:'加快寻找节奏，加大人物身体倾斜。',sound:'可使用急促的动作声和低音背景。'}]},
+{id:'hazard',title:'发现危险',description:'人物前进时注意到危险标记，停下并向后退。',shots:['全景：人物向前移动','中景：注意到前方标记','特写：危险标记','中景：人物后退'],links:[['F04','视线匹配'],['F06','前景遮挡与揭示'],['F21','事件与反应镜头'],['F84','悬念与信息控制']],versions:[
+{name:'基础',durations:[2.4,2.5,2.2,2.5],palette:'neutral',approach:'先交代移动方向，再通过特写和反应说明危险。',sound:'可使用环境底噪和提示音。'},
+{name:'紧张',durations:[1.8,1.7,1.5,1.8],palette:'hot',approach:'快速停顿与较大的后退动作强调紧迫。',sound:'可使用短促提示音和动作声。'},
+{name:'悬疑',durations:[3,3,3.4,3],palette:'mystery',approach:'降低画面亮度并延长标记出现前后的停留。',sound:'可使用低弱环境声和稀疏提示音。'}]}
+);
+window.MP_SCENES.push(
+{id:'product',title:'产品展示',description:'人物发现桌上的物品，拿起展示细节，再放回原处。',shots:['全景：人物发现产品','中景：拿起产品','特写：展示产品细节','中景：产品放回'],links:[['F01','景别组合'],['F05','动作衔接剪辑'],['F12','视觉信息揭示'],['F94','道具运动连续性']],versions:[
+{name:'基础',durations:[2.5,2.5,3,2.5],palette:'neutral',approach:'均衡展示发现、拿起、细节和放回。',sound:'建议使用室内底噪与轻微物品触碰声。'},
+{name:'轻快',durations:[2,1.8,2.4,2],palette:'warm',approach:'较快的动作和暖色调让展示更轻松。',sound:'可使用轻快音乐与清脆的物品声。'},
+{name:'庄重',durations:[3.4,3.3,4,3.2],palette:'mystery',approach:'延长展示和停留，突出物品的分量。',sound:'可保留低弱环境声与缓慢的动作声。'}]},
+{id:'mysterysound',title:'无对白悬念',description:'人物听见异响，寻找声音来源，发现线索后作出选择。',shots:['全景：人物听见异响','中景：寻找来源','近景：发现线索','中景：人物作出选择'],links:[['F06','前景遮挡与揭示'],['F21','事件与反应镜头'],['F40','画外声与揭示'],['F84','悬念与信息控制']],versions:[
+{name:'基础',durations:[2.5,2.8,2.7,2.5],palette:'neutral',approach:'按听见、寻找、发现与反应的顺序交代信息。',sound:'可加入环境声与一次画外异响。'},
+{name:'好奇',durations:[2.3,2.7,2.4,2.6],palette:'warm',approach:'人物较主动地靠近线索。',sound:'可选择轻微而可辨的提示音。'},
+{name:'紧张',durations:[3.3,3.5,3.1,2],palette:'mystery',approach:'延长寻找与等待，再快速后退。',sound:'建议使用低弱环境声和突出的异响。'}]},
+{id:'group',title:'多人互动',description:'一人表达，另一人回应，第三人在旁观察，最后三人关系发生变化。',shots:['全景：建立三人位置','中景：第一人表达','中景：第二人回应','全景：第三人靠近'],links:[['F02','双人正反打'],['F03','180 度轴线'],['F11','人物走位与画面调度'],['F21','事件与反应镜头']],versions:[
+{name:'基础',durations:[2.8,2.5,2.5,2.7],palette:'neutral',approach:'依次展示表达、回应和旁观者的变化。',sound:'可使用环境声与轻微衣物声。'},
+{name:'融洽',durations:[2.5,2.2,2.2,2.8],palette:'warm',approach:'动作更开放，第三人更快靠近。',sound:'可使用温和环境声与轻快背景音。'},
+{name:'对峙',durations:[3,2.5,3,3.5],palette:'mystery',approach:'延长回应，第三人缓慢介入。',sound:'可使用克制的背景声与较长停顿。'}]}
+);

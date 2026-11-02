@@ -4,7 +4,7 @@
 // Pack: photo (Photo looks, lighting & styles) · element 08 · Category: Lighting & time of day
 // What happens: Once the sun has set, the sky turns two bands of deep blue, the windows and street lamp come on in amber and the person becomes a dark blue shape.
 // Motion spec:
-//   - Scene 1: a head-and-shoulders figure in front of a horizon at y 150 (head centre x 270, y 78, radius 29 px, no face or hair). 
+//   - Scene 1: a head-and-shoulders figure in front of a horizon at y 150 (head centre x 270, y 78, radius 29 px, no face or hair).
 //   - Sun: radius 18 px at x 120, sinking from y 40 to y 190 while the effect reaches 70%, fading out between 40% and 80%
 //   - Colour: sky #2C3B5E at the top and #4A6191 near the horizon, ground #283452, buildings #34446B, figure #1C2439
 //   - Lights: one window in three and the lamp bulb turn #FFC75A; flat rings of 13 px and 8 px (#FFE3A3 at 35% and 60%) around the bulb

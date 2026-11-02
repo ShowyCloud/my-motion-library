@@ -4,7 +4,7 @@
 // Pack: photo (Photo looks, lighting & styles) · element 02 · Category: Lighting & time of day
 // What happens: The surroundings go dark and two lights behind the person, left and right, draw thin bright edges only along both sides of the head and shoulders; the plan at the bottom right shows where the two lights are.
 // Motion spec:
-//   - Scene 1: a head-and-shoulders figure in front of a horizon at y 150 (head centre x 270, y 78, radius 29 px, no face or hair). 
+//   - Scene 1: a head-and-shoulders figure in front of a horizon at y 150 (head centre x 270, y 78, radius 29 px, no face or hair).
 //   - Background: light scene → dark scene (sky #2B2D33, ground #24252A); figure #4D5A75 → #1F2128
 //   - Bright edges: two copies of the figure in amber #FFC75A, shifted 3.5 px left and right and 2.5 px up, placed behind the dark figure (3.5 px wide edges)
 //   - Plan at the bottom right (66×66 px): lights at ±135° seen from above (behind, left and right); top-right readout "±135°"

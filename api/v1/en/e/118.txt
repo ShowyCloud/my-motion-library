@@ -4,7 +4,7 @@
 // Pack: photo (Photo looks, lighting & styles) · element 22 · Category: Tones & finishing looks
 // What happens: Fine grain appears over the whole of the same landscape and the colours lean slightly towards a warm cream.
 // Motion spec:
-//   - Scene 3: a bust on the left (head centre x 140, y 82, radius 28 px) and hills, a house, trees and the sun (x 432, y 54, radius 15 px) on the right. 
+//   - Scene 3: a bust on the left (head centre x 140, y 82, radius 28 px) and hills, a house, trees and the sun (x 432, y 54, radius 15 px) on the right.
 //   - Grain: 2,600 squares (fixed seed), 0.8–1.7 px; 55% dark #3A3530, 45% white
 //   - Grain opacity: 16–38% × the effect; the grain does not move (no flicker)
 //   - Colour: every colour moves 16% towards #F2DDBE

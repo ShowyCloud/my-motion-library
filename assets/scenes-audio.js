@@ -1,0 +1,10 @@
+/* 场景试听：背景音循环，动作音在对应镜头进度触发；音频来自本地示意样本或自选文件。 */
+window.MPSceneAudio=(()=>{
+ let tracks=[],active='',lastShot=-1,fired=false,generation=0;
+ function stop(){generation++;tracks.forEach(a=>{a.pause();a.removeAttribute('src');a.load()});tracks=[];active='';lastShot=-1;fired=false}
+ async function start(id,mode,files={}){stop();let token=generation;const music=new Audio(files.music||('assets/film-audio-'+(mode===1?'b':'a')+'.wav'));music.loop=true;music.volume=files.audioControl?.musicVolume??(mode===2?.12:.18);music.playbackRate=mode===2?.72:mode===1?1.08:1;let effect=new Audio(files.effect||('assets/film-audio-'+((id==='room'||id==='pursuit'||id==='farewell')?'footstep':(id==='argument'||id==='reunion')?'cloth':'prop')+'.wav'));effect.volume=files.audioControl?.effectVolume??.35;effect.preload='auto';tracks=[music,effect];active=id;try{await music.play();if(token!==generation)return false;return true}catch(e){stop();throw e}}
+ function trigger(){let a=tracks[1];try{a.currentTime=0;a.play().catch(()=>{})}catch(_){}}
+ function seek(id,shot,progress,settings){if(active!==id)return;lastShot=shot;let at=id==='handoff'&&settings?settings.effectAt:.32,matching=id==='handoff'&&settings?shot===settings.effectShot-1:['letter','handoff','search','hazard'].includes(id)?shot===2:id==='argument'?(shot===1||shot===2):(shot===0||shot===1);fired=matching&&progress>at+1e-6}
+ function update(id,shot,mode,progress,settings){if(active!==id||tracks.length<2)return;if(settings){tracks[0].volume=settings.musicVolume;tracks[1].volume=settings.effectVolume;}if(shot!==lastShot){if(id==='handoff'&&settings&&lastShot===settings.effectShot-1&&!fired)trigger();lastShot=shot;fired=false}let matching=id==='handoff'&&settings?shot===settings.effectShot-1:['letter','handoff','search','hazard'].includes(id)?shot===2:id==='argument'?(shot===1||shot===2):(shot===0||shot===1);let at=id==='handoff'&&settings?settings.effectAt:.32;if(matching&&!fired&&progress>=at){fired=true;trigger()}}
+ return {start,stop,update,seek,isPlaying:id=>!!active&&active===id};
+})();

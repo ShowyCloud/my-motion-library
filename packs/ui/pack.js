@@ -74,21 +74,34 @@ MotionPrompt.pack('ui', function () {
 
   // @element 01
   // 01 モーダル（Modal dialog）
+  function reusableModal() {
+    shadowed(() => fillRR(-140, -70, 280, 140, 12, '#fff'), 24, 8, .25);
+    bar(-116, -48, 120, C.ink, 11); bar(-116, -20, 232); bar(-116, -2, 180);
+    fillRR(28, 26, 88, 30, 7, C.blue);
+    X.strokeStyle = '#9a9896'; X.lineWidth = 2.2; X.lineCap = 'round'; X.beginPath(); X.moveTo(110, -54); X.lineTo(120, -44); X.moveTo(120, -54); X.lineTo(110, -44); X.stroke();
+  }
+  function reusableDrawer(px,pw,h) {
+    shadowed(() => { X.fillStyle = '#fff'; X.fillRect(px, 0, pw, h); }, 22, 0, .25);
+    circle(px + 34, 32, 14, C.mb); bar(px + 58, 27, 100, C.line2, 10);
+    for (let i = 0; i < 4; i++) { const y = 62 + i * 32; if (i === 0) fillRR(px + 12, y - 2, pw - 24, 28, 6, C.lb); fillRR(px + 22, y + 5, 14, 14, 3, i === 0 ? C.blue : C.line2); bar(px + 46, y + 7, 90 + (i % 2) * 30, i === 0 ? C.sb : C.line); }
+  }
+  function reusableBottomSheet(w,sy,sh) {
+    shadowed(() => { rr(0, sy, w, sh + 20, 18); X.fillStyle = '#fff'; X.fill(); }, 22, -4, .2);
+    fillRR(w / 2 - 26, sy + 10, 52, 6, 3, C.line2); bar(28, sy + 30, 160, C.ink, 11);
+    for (let i = 0; i < 2; i++) { const y = sy + 56 + i * 36; fillRR(28, y, 26, 26, 6, i ? C.mb : C.blue); bar(66, y + 4, 220, C.line); bar(66, y + 17, 140, C.line, 7); }
+  }
   CELLS[0] = ui((w, h, t) => {
     pageLines(24, 18, 494);
     fillRR(24, 92, 120, 36, 8, C.blue); text('打开', 84, 110, 16, '#fff', 600, 'center');
     fillRR(170, 92, 348, 36, 8, C.block); fillRR(24, 142, 494, 38, 8, C.block);
-    const a = eo(seg(t, 1.0, 1.32)) * (1 - eio(seg(t, 3.3, 3.58)));
+    const a = eo(seg(t, EP("049", "extra1", 1.0), EP("049", "openEnd", 1.32))) * (1 - eio(seg(t, EP("049", "closeStart", 3.3), EP("049", "closeEnd", 3.58))));
     if (a > 0) {
-      X.fillStyle = `rgba(18,20,28,${.42 * a})`; X.fillRect(0, 0, w, h);
+      X.fillStyle = `rgba(18,20,28,${EP("049", "overlayOpacity", 0.42) * a})`; X.fillRect(0, 0, w, h);
       X.save(); X.globalAlpha = a; X.translate(271, 97); const s = EP("049", "scale", .9) + (1 - EP("049", "scale", .9)) * a; X.scale(s, s);
-      shadowed(() => fillRR(-140, -70, 280, 140, 12, '#fff'), 24, 8, .25);
-      bar(-116, -48, 120, C.ink, 11); bar(-116, -20, 232); bar(-116, -2, 180);
-      fillRR(28, 26, 88, 30, 7, C.blue);
-      X.strokeStyle = '#9a9896'; X.lineWidth = 2.2; X.lineCap = 'round'; X.beginPath(); X.moveTo(110, -54); X.lineTo(120, -44); X.moveTo(120, -54); X.lineTo(110, -44); X.stroke();
+      reusableModal();
       X.restore();
     }
-    pointer([[.3, w + 30, h + 30], [.95, 86, 114], [1.5, 86, 114], [3.0, 389, 50], [3.5, 389, 50], [4.2, w + 30, h + 30]], [1.0, 3.3], t);
+    pointer([[.3, w + 30, h + 30], [EP("049", "extra1", 1.0) - .05, 86, 114], [1.5, 86, 114], [EP("049", "closeStart", 3.3) - .3, 389, 50], [EP("049", "closeStart", 3.3) + .2, 389, 50], [4.2, w + 30, h + 30]], [EP("049", "extra1", 1.0), EP("049", "closeStart", 3.3)], t);
   });
 
   // @element 02
@@ -96,15 +109,13 @@ MotionPrompt.pack('ui', function () {
   CELLS[1] = ui((w, h, t) => {
     strokeRR(24, 14, 110, 34, 8, C.line2, 1.5); text('菜单', 79, 31, 15, '#555', 600, 'center');
     bar(160, 26, 140, C.line2, 11); pageLines(24, 70, 494); fillRR(24, 138, 494, 42, 8, C.block);
-    const a = eo(seg(t, 1.0, EP("050", "value1", 1.38))) * (1 - eio(seg(t, 3.3, 3.65)));
+    const a = eo(seg(t, EP("050", "openStart", 1), EP("050", "value1", 1.38))) * (1 - eio(seg(t, EP("050", "closeStart", 3.3), EP("050", "extra1", 3.65))));
     if (a > 0) {
       X.fillStyle = `rgba(18,20,28,${.36 * a})`; X.fillRect(0, 0, w, h);
-      const pw = 210, px = -pw + pw * a;
-      shadowed(() => { X.fillStyle = '#fff'; X.fillRect(px, 0, pw, h); }, 22, 0, .25);
-      circle(px + 34, 32, 14, C.mb); bar(px + 58, 27, 100, C.line2, 10);
-      for (let i = 0; i < 4; i++) { const y = 62 + i * 32; if (i === 0) fillRR(px + 12, y - 2, pw - 24, 28, 6, C.lb); fillRR(px + 22, y + 5, 14, 14, 3, i === 0 ? C.blue : C.line2); bar(px + 46, y + 7, 90 + (i % 2) * 30, i === 0 ? C.sb : C.line); }
+      const pw = EP("050", "panelWidth", 210), px = -pw + pw * a;
+      reusableDrawer(px,pw,h);
     }
-    pointer([[.3, w + 30, h + 30], [.95, 70, 34], [1.6, 70, 34], [3.0, 420, 120], [3.6, 420, 120], [4.2, w + 30, h + 30]], [1.0, 3.3], t);
+    pointer([[.3, w + 30, h + 30], [EP("050", "openStart", 1) - .05, 70, 34], [EP("050", "openStart", 1) + 0.6, 70, 34], [EP("050", "closeStart", 3.3) - .3, 420, 120], [EP("050", "closeStart", 3.3) + 0.3, 420, 120], [4.2, w + 30, h + 30]], [EP("050", "openStart", 1), EP("050", "closeStart", 3.3)], t);
   });
 
   // @element 03
@@ -112,71 +123,84 @@ MotionPrompt.pack('ui', function () {
   CELLS[2] = ui((w, h, t) => {
     pageLines(24, 16, 494); fillRR(24, 76, 239, 54, 8, C.block); fillRR(279, 76, 239, 54, 8, C.block);
     fillRR(186, 144, 170, 36, 18, C.blue); text('查看详情', 271, 162, 15, '#fff', 600, 'center');
-    const open = eo(seg(t, 1.05, EP("051", "value1", 1.45)));
-    const drag = eio(seg(t, 3.0, 3.6));
+    const open = eo(seg(t, EP("051", "openStart", 1.05), EP("051", "value1", 1.45)));
+    const drag = eio(seg(t, EP("051", "extra2", 3.0), EP("051", "extra1", 3.6)));
     const a = open * (1 - drag);
     if (open > 0 && a > 0.001) {
       X.fillStyle = `rgba(18,20,28,${.36 * a})`; X.fillRect(0, 0, w, h);
-      const sh = 136, sy = h - sh * a;
-      shadowed(() => { rr(0, sy, w, sh + 20, 18); X.fillStyle = '#fff'; X.fill(); }, 22, -4, .2);
-      fillRR(w / 2 - 26, sy + 10, 52, 6, 3, C.line2);
-      bar(28, sy + 30, 160, C.ink, 11);
-      for (let i = 0; i < 2; i++) { const y = sy + 56 + i * 36; fillRR(28, y, 26, 26, 6, i ? C.mb : C.blue); bar(66, y + 4, 220, C.line); bar(66, y + 17, 140, C.line, 7); }
+      const sh = EP("051", "sheetHeight", 136), sy = h - sh * a;
+      reusableBottomSheet(w,sy,sh);
     }
-    const sy = h - 136 * a;
-    finger([[.3, 271, 162], [1.6, 271, 162], [2.75, w / 2, h - 136 + 13], [3.0, w / 2, h - 136 + 13], [3.6, w / 2, h + 10]], [1.0, 3.0], t, (t > .6 && t < 1.6) || (t > 2.75 && t < 3.6));
+    const sy = h - EP("051", "sheetHeight", 136) * a;
+    finger([[.3, 271, 162], [1.6, 271, 162], [EP("051", "extra2", 3.0) - .25, w / 2, h - EP("051", "sheetHeight", 136) + 13], [EP("051", "extra2", 3.0), w / 2, h - EP("051", "sheetHeight", 136) + 13], [EP("051", "extra1", 3.6), w / 2, h + 10]], [EP("051", "openStart", 1.05) - .05, EP("051", "extra2", 3.0)], t, (t > .6 && t < 1.6) || (t > EP("051", "extra2", 3.0) - .25 && t < EP("051", "extra1", 3.6)));
   });
 
   // @element 04
   // 04 アコーディオン（Accordion）
+  function reusableAccordionRow(y,i,ex,EX) {
+    const H0=34,extra=i===0?EX*ex:0;
+    strokeRR(24,y,494,H0+extra,8,i===0&&ex>.05?C.sb:C.line2,1.5);
+    bar(42,y+12,[180,220,150][i],i===0&&ex>.05?C.blue:C.line2,10);
+    chevron(494,y+17,6,i===0?Math.PI*ex:0,i===0&&ex>.05?C.blue:'#9a9896');
+    if(i===0&&ex>0){X.save();rr(24,y,494,H0+extra,8);X.clip();X.globalAlpha=ex;bar(42,y+H0+6,420);bar(42,y+H0+24,320);X.restore();}
+    return H0+extra;
+  }
   CELLS[3] = ui((w, h, t) => {
-    const ex = eio(seg(t, 1.0, EP("052", "value1", 1.35))) * (1 - eio(seg(t, 3.3, 3.62)));
-    let y = 12; const H0 = 34, EX = 58;
+    const ex = eio(seg(t, EP("052", "openStart", 1), EP("052", "value1", 1.35))) * (1 - eio(seg(t, EP("052", "closeStart", 3.3), EP("052", "closeEnd", 3.62))));
+    let y = 12; const H0 = 34, EX = EP("052", "expandHeight", 58);
     for (let i = 0; i < 3; i++) {
-      const extra = i === 0 ? EX * ex : 0;
-      strokeRR(24, y, 494, H0 + extra, 8, i === 0 && ex > .05 ? C.sb : C.line2, 1.5);
-      bar(42, y + 12, [180, 220, 150][i], i === 0 && ex > .05 ? C.blue : C.line2, 10);
-      chevron(494, y + 17, 6, i === 0 ? Math.PI * ex : 0, i === 0 && ex > .05 ? C.blue : '#9a9896');
-      if (i === 0 && ex > 0) { X.save(); rr(24, y, 494, H0 + extra, 8); X.clip(); X.globalAlpha = ex; bar(42, y + H0 + 6, 420); bar(42, y + H0 + 24, 320); X.restore(); }
-      y += H0 + extra + 6;
+      y+=reusableAccordionRow(y,i,ex,EX)+6;
     }
-    pointer([[.3, w + 30, h + 30], [.95, 300, 31], [1.6, 300, 31], [3.0, 300, 31], [3.55, 300, 31], [4.2, w + 30, h + 30]], [1.0, 3.3], t);
+    pointer([[.3, w + 30, h + 30], [EP("052", "openStart", 1) - .05, 300, 31], [EP("052", "openStart", 1) + 0.6, 300, 31], [EP("052", "closeStart", 3.3) - .3, 300, 31], [EP("052", "closeStart", 3.3) + 0.25, 300, 31], [4.2, w + 30, h + 30]], [EP("052", "openStart", 1), EP("052", "closeStart", 3.3)], t);
   });
 
   // @element 05
   // 05 ドロップダウン（Dropdown menu）
+  function reusableDropdownList(oy,hi) {
+    shadowed(() => fillRR(24, oy, 260, 112, 8, '#fff'), 18, 6, .18); strokeRR(24, oy, 260, 112, 8, C.border, 1);
+    ['东京', '大阪', '名古屋', '福冈'].forEach((s, i) => { const yy = oy + 4 + i * 26; if (i === hi + (hi === 1 ? 0 : 0) && hi >= 0) fillRR(28, yy, 252, 26, 5, C.lb); text(s, 40, yy + 13, 15, i === hi ? C.blue : '#444', i === hi ? 600 : 500); });
+  }
   CELLS[4] = ui((w, h, t) => {
     bar(24, 14, 90, C.line2, 10);
-    const open = eo(seg(t, 1.0, EP("053", "value1", 1.25))) * (1 - eio(seg(t, 2.3, 2.45)));
-    const chosen = seg(t, 2.32, 2.42) * (1 - seg(t, 3.9, 4.08));
-    const ph = (1 - seg(t, 2.2, 2.3)) + seg(t, 4.1, 4.3); // プレースホルダーは先に消し、名前が消えてから戻す（重ねない）
-    strokeRR(24, 34, 260, 38, 8, open > .1 || (chosen > 0 && t < 2.9) ? C.blue : C.line2, open > .1 ? 2 : 1.5);
+    const open = eo(seg(t, 1.0, EP("053", "value1", 1.25))) * (1 - eio(seg(t, EP("053", "selectTime", 2.3), EP("053", "selectTime", 2.3) + .15)));
+    const chosen = seg(t, EP("053", "selectTime", 2.3) + .02, EP("053", "selectTime", 2.3) + .12) * (1 - seg(t, 3.9, 4.08));
+    const ph = (1 - seg(t, EP("053", "selectTime", 2.3) - .1, EP("053", "selectTime", 2.3))) + seg(t, 4.1, 4.3); // プレースホルダーは先に消し、名前が消えてから戻す（重ねない）
+    strokeRR(24, 34, 260, 38, 8, open > .1 || (chosen > 0 && t < EP("053", "selectTime", 2.3) + .6) ? C.blue : C.line2, open > .1 ? 2 : 1.5);
     if (ph > 0) { X.globalAlpha = clamp(ph); text('请选择', 40, 53, 15, '#9a9896', 500); X.globalAlpha = 1; }
     if (chosen > 0) { X.globalAlpha = chosen; text('名古屋', 40, 53, 16, C.ink, 600); X.globalAlpha = 1; }
     chevron(262, 52, 5, Math.PI * open, '#777');
     fillRR(310, 34, 208, 70, 8, C.block); bar(310, 120, 208); bar(310, 138, 160); bar(24, 150, 200); bar(24, 168, 150);
     if (open > 0) {
-      X.save(); X.globalAlpha = open; const oy = 78 - 6 * (1 - open);
-      shadowed(() => fillRR(24, oy, 260, 112, 8, '#fff'), 18, 6, .18); strokeRR(24, oy, 260, 112, 8, C.border, 1);
-      const hi = seg(t, 1.55, 1.75) > 0 ? (t < 1.95 ? 1 : 2) : -1;
-      ['东京', '大阪', '名古屋', '福冈'].forEach((s, i) => { const yy = oy + 4 + i * 26; if (i === hi + (hi === 1 ? 0 : 0) && hi >= 0) fillRR(28, yy, 252, 26, 5, C.lb); text(s, 40, yy + 13, 15, i === hi ? C.blue : '#444', i === hi ? 600 : 500); });
+      X.save(); X.globalAlpha = open; const oy = 78 - EP("053", "listLift", 6) * (1 - open);
+      const hi = seg(t, EP("053", "hoverFirst", 1.55), EP("053", "hoverFirst", 1.55) + .2) > 0 ? (t < EP("053", "hoverSecond", 1.95) ? 1 : 2) : -1;
+      reusableDropdownList(oy,hi);
       X.restore();
     }
-    pointer([[.3, w + 30, h + 30], [.95, 200, 56], [1.25, 200, 56], [1.6, 170, 121], [2.0, 170, 147], [2.45, 170, 147], [3.2, 170, 147], [4.2, w + 30, h + 30]], [1.0, 2.3], t);
+    pointer([[.3, w + 30, h + 30], [.95, 200, 56], [1.25, 200, 56], [EP("053", "hoverFirst", 1.55) + .05, 170, 121], [EP("053", "hoverSecond", 1.95) + .05, 170, 147], [EP("053", "selectTime", 2.3) + .15, 170, 147], [3.2, 170, 147], [4.2, w + 30, h + 30]], [1.0, EP("053", "selectTime", 2.3)], t);
   });
 
   // @element 06
   // 06 ツールチップ（Tooltip）
+  function reusableTooltip(x, yy) {
+    fillRR(x - 92, yy, 184, 36, 8, C.dark);
+    X.beginPath(); X.moveTo(x - 8, yy + 36); X.lineTo(x, yy + 44); X.lineTo(x + 8, yy + 36); X.fillStyle = C.dark; X.fill();
+    text('将会出现一个小解释', x, yy + 18, 15, '#fff', 600, 'center');
+  }
+  function reusableToast(tx, ty, life) {
+    const tw0 = 214, th = 52;
+    shadowed(() => fillRR(tx, ty, tw0, th, 10, C.dark), 18, 6, .25);
+    circle(tx + 26, ty + 24, 11, C.blue); check(tx + 26, ty + 24, 5, '#fff', 2.4);
+    text('已保存', tx + 46, ty + 24, 15, '#fff', 600);
+    fillRR(tx + 10, ty + th - 7, (tw0 - 20) * life, 3, 1.5, C.sb);
+  }
   CELLS[5] = ui((w, h, t) => {
     pageLines(24, 16, 494);
     bar(24, 116, 150, C.line2, 11); ring(196, 121, 13, C.blue, 2.2); text('?', 196, 122, 16, C.blue, 700, 'center', NUMF);
     fillRR(24, 146, 494, 34, 8, C.block);
     const a = eo(seg(t, EP("054", "value1", 1.15), 1.35)) * (1 - seg(t, 3.25, EP("054", "value2", 3.45)));
     if (a > 0) {
-      X.save(); X.globalAlpha = a; const yy = 64 + 6 * (1 - a);
-      fillRR(196 - 92, yy, 184, 36, 8, C.dark);
-      X.beginPath(); X.moveTo(196 - 8, yy + 36); X.lineTo(196, yy + 44); X.lineTo(196 + 8, yy + 36); X.fillStyle = C.dark; X.fill();
-      text('将会出现一个小解释', 196, yy + 18, 15, '#fff', 600, 'center'); X.restore();
+      X.save(); X.globalAlpha = a; const yy = 64 + EP("054", "tooltipLift", 6) * (1 - a);
+      reusableTooltip(196, yy); X.restore();
     }
     // 乗せるだけ（クリックしない）
     pointer([[.3, w + 30, h + 30], [1.05, 200, 126], [3.15, 200, 126], [4.1, w + 30, h + 30]], [], t);
@@ -184,22 +208,25 @@ MotionPrompt.pack('ui', function () {
 
   // @element 07
   // 07 ポップオーバー（Popover）
+  function reusablePopover(px,py,pw,ph) {
+    shadowed(() => { fillRR(px, py, pw, ph, 10, '#fff'); }, 22, 6, .2); strokeRR(px, py, pw, ph, 10, C.border, 1);
+    X.beginPath(); X.moveTo(px + 1, py + 60); X.lineTo(px - 10, py + 68); X.lineTo(px + 1, py + 76); X.fillStyle = '#fff'; X.fill();
+    X.beginPath(); X.moveTo(px, py + 60); X.lineTo(px - 10, py + 68); X.lineTo(px, py + 76); X.strokeStyle = C.border; X.lineWidth = 1; X.stroke();
+    bar(px + 18, py + 18, 130, C.ink, 11); bar(px + 18, py + 42, 250); bar(px + 18, py + 60, 200);
+    strokeRR(px + 130, py + 82, 70, 26, 6, C.line2, 1.5); fillRR(px + 210, py + 82, 72, 26, 6, C.blue); text('确定', px + 246, py + 95, 14, '#fff', 700, 'center', NUMF);
+  }
   CELLS[6] = ui((w, h, t) => {
     pageLines(24, 16, 494);
     strokeRR(24, 112, 108, 36, 8, C.blue, 2); text('详情', 78, 130, 15, C.blue, 600, 'center');
     fillRR(24, 160, 494, 22, 6, C.block);
-    const a = eo(seg(t, 1.0, EP("055", "value1", 1.28))) * (1 - eio(seg(t, 3.3, 3.5)));
+    const a = eo(seg(t, EP("055", "openStart", 1), EP("055", "value1", 1.28))) * (1 - eio(seg(t, EP("055", "closeStart", 3.3), EP("055", "closeEnd", 3.5))));
     if (a > 0) {
-      X.save(); X.globalAlpha = a; X.translate(6 * (1 - a), 0);
+      X.save(); X.globalAlpha = a; X.translate(EP("055", "popoverSlide", 6) * (1 - a), 0);
       const px = 156, py = 62, pw = 300, ph = 120;
-      shadowed(() => { fillRR(px, py, pw, ph, 10, '#fff'); }, 22, 6, .2); strokeRR(px, py, pw, ph, 10, C.border, 1);
-      X.beginPath(); X.moveTo(px + 1, 122); X.lineTo(px - 10, 130); X.lineTo(px + 1, 138); X.fillStyle = '#fff'; X.fill();
-      X.beginPath(); X.moveTo(px, 122); X.lineTo(px - 10, 130); X.lineTo(px, 138); X.strokeStyle = C.border; X.lineWidth = 1; X.stroke();
-      bar(px + 18, py + 18, 130, C.ink, 11); bar(px + 18, py + 42, 250); bar(px + 18, py + 60, 200);
-      strokeRR(px + 130, py + 82, 70, 26, 6, C.line2, 1.5); fillRR(px + 210, py + 82, 72, 26, 6, C.blue); text('确定', px + 246, py + 95, 14, '#fff', 700, 'center', NUMF);
+      reusablePopover(px,py,pw,ph);
       X.restore();
     }
-    pointer([[.3, w + 30, h + 30], [.95, 84, 134], [1.6, 84, 134], [3.0, 402, 157], [3.5, 402, 157], [4.2, w + 30, h + 30]], [1.0, 3.3], t);
+    pointer([[.3, w + 30, h + 30], [EP("055", "openStart", 1) - .05, 84, 134], [EP("055", "openStart", 1) + 0.6, 84, 134], [EP("055", "closeStart", 3.3) - .3, 402, 157], [EP("055", "closeStart", 3.3) + 0.2, 402, 157], [4.2, w + 30, h + 30]], [EP("055", "openStart", 1), EP("055", "closeStart", 3.3)], t);
   });
 
   // @element 08
@@ -207,19 +234,17 @@ MotionPrompt.pack('ui', function () {
   CELLS[7] = ui((w, h, t) => {
     bar(24, 16, 90, C.line2, 10); strokeRR(24, 34, 300, 34, 7, C.line2, 1.5); bar(24, 82, 90, C.line2, 10); strokeRR(24, 100, 300, 34, 7, C.line2, 1.5);
     fillRR(24, 146, 110, 36, 8, C.blue); text('保存', 79, 164, 16, '#fff', 600, 'center');
-    const tin = eo(seg(t, 1.05, EP("056", "value1", 1.4))), tout = eio(seg(t, 3.2, 3.55));
+    const tin = eo(seg(t, 1.05, EP("056", "value1", 1.4))), tout = eio(seg(t, EP("056", "extra2", 3.2), EP("056", "extra1", 3.55)));
     if (tin > 0 && tout < 1) {
-      const tw0 = 214, th = 52, tx = w - 18 - tw0 + (1 - tin) * 240 + tout * 240, ty = h - 16 - th;
-      shadowed(() => fillRR(tx, ty, tw0, th, 10, C.dark), 18, 6, .25);
-      circle(tx + 26, ty + 24, 11, C.blue); check(tx + 26, ty + 24, 5, '#fff', 2.4);
-      text('已保存', tx + 46, ty + 24, 15, '#fff', 600);
-      const life = 1 - seg(t, 1.4, 3.2); fillRR(tx + 10, ty + th - 7, (tw0 - 20) * life, 3, 1.5, C.sb);
+      const tw0 = 214, th = 52, tx = w - 18 - tw0 + (1 - tin) * EP("056", "toastDistance", 240) + tout * EP("056", "toastDistance", 240), ty = h - 16 - th;
+      const life = 1 - seg(t, EP("056", "value1", 1.4), EP("056", "extra2", 3.2)); reusableToast(tx, ty, life);
     }
     pointer([[.3, -30, h + 30], [.95, 84, 168], [1.5, 84, 168], [2.2, -40, h + 40]], [1.0], t);
   });
 
   // @element 09
   // 09 タブ（Tabs）
+  function reusablePricingCard(x,y,k) { fillRR(x,y,158,112,10,k===1?C.lb:'#f6f5f3'); strokeRR(x,y,158,112,10,k===1?C.sb:C.line,1.5); bar(x+16,y+16,60,k===1?C.blue:C.line2,10); text(['¥0','¥980','¥1,980'][k],x+16,y+50,22,k===1?C.blue:'#555',700,'left',NUMF); bar(x+16,y+80,110); }
   CELLS[8] = ui((w, h, t) => {
     const labs = ['概述', '费用', '评论'], xs = [24, 114, 204], ws = [70, 70, 100];
     const c1 = eio(seg(t, 1.0, 1.25)), c2 = eio(seg(t, 2.2, 2.45)), c3 = eio(seg(t, EP("057", "value1", 3.4), 3.65));
@@ -232,12 +257,12 @@ MotionPrompt.pack('ui', function () {
     // 中身（切替時にクロスフェード）
     const tabAlpha = [
       1 - seg(t, 1.0, EP("057", "value2", 1.2)) + seg(t, 3.45, 3.65),
-      seg(t, 1.1, 1.3) - seg(t, 2.2, 2.4),
+      seg(t, 1.1, 1.3) - seg(t, EP("057", "extra1", 2.2), 2.4),
       seg(t, 2.3, 2.5) - seg(t, 3.4, 3.6)];
     tabAlpha.forEach((a, i) => {
-      a = clamp(a); if (a <= 0) return; X.save(); X.globalAlpha = a; X.translate(0, 8 * (1 - a));
+      a = clamp(a); if (a <= 0) return; X.save(); X.globalAlpha = a; X.translate(0, EP("057", "contentRise", 8) * (1 - a));
       if (i === 0) { bar(24, 70, 220, C.line2, 11); bar(24, 94, 494); bar(24, 112, 400); fillRR(24, 134, 494, 46, 8, C.block); }
-      if (i === 1) { for (let k = 0; k < 3; k++) { const x = 24 + k * 168; fillRR(x, 68, 158, 112, 10, k === 1 ? C.lb : '#f6f5f3'); strokeRR(x, 68, 158, 112, 10, k === 1 ? C.sb : C.line, 1.5); bar(x + 16, 84, 60, k === 1 ? C.blue : C.line2, 10); text(['¥0', '¥980', '¥1,980'][k], x + 16, 118, 22, k === 1 ? C.blue : '#555', 700, 'left', NUMF); bar(x + 16, 148, 110); } }
+      if (i === 1) { for (let k = 0; k < 3; k++) reusablePricingCard(24+k*168,68,k); }
       if (i === 2) { for (let k = 0; k < 3; k++) { const y = 70 + k * 38; circle(40, y + 14, 14, k === 0 ? C.mb : C.line); bar(64, y + 4, 120, C.line2, 10); bar(64, y + 20, 360); } }
       X.restore();
     });
@@ -246,22 +271,29 @@ MotionPrompt.pack('ui', function () {
 
   // @element 10
   // 10 カルーセル（Carousel）
+  function reusableCarouselCircles(x,y,sw,sh) { fillRR(x,y,sw,sh,8,'#e3ebfd'); circle(x+90,y+69,34,C.mb); circle(x+165,y+69,34,C.sb); circle(x+240,y+69,34,C.mb); }
+  function reusableCarouselBars(x,y,sw,sh) { fillRR(x,y,sw,sh,8,C.lb); for(let k=0;k<5;k++){const bh=[40,70,55,95,80][k];fillRR(x+60+k*46,y+118-bh,30,bh,4,k===3?C.blue:C.mb);} }
   CELLS[9] = ui((w, h, t) => {
-    const p = eio(seg(t, 1.0, EP("058", "value1", 1.4))) + eio(seg(t, 2.1, 2.5)) + eio(seg(t, 3.2, 3.6));
-    const sw = 330, gap = 18, cx = w / 2;
+    const p = eio(seg(t, 1.0, EP("058", "value1", 1.4))) + eio(seg(t, EP("058", "extra1", 2.1), 2.5)) + eio(seg(t, EP("058", "extra3", 3.2), EP("058", "extra2", 3.6)));
+    const sw = 330, gap = EP("058", "slideGap", 18), cx = w / 2;
     X.save(); X.beginPath(); X.rect(0, 0, w, 160); X.clip();
     for (let j = Math.floor(p) - 2; j <= Math.floor(p) + 2; j++) {
       const x = cx - sw / 2 + (j - p) * (sw + gap), idx = ((j % 3) + 3) % 3;
       if (idx === 0) mountains(x, 14, sw, 138);
-      if (idx === 1) { fillRR(x, 14, sw, 138, 8, '#e3ebfd'); circle(x + 90, 83, 34, C.mb); circle(x + 165, 83, 34, C.sb); circle(x + 240, 83, 34, C.mb); }
-      if (idx === 2) { fillRR(x, 14, sw, 138, 8, C.lb); for (let k = 0; k < 5; k++) { const bh = [40, 70, 55, 95, 80][k]; fillRR(x + 60 + k * 46, 132 - bh, 30, bh, 4, k === 3 ? C.blue : C.mb); } }
+      if (idx === 1) reusableCarouselCircles(x,14,sw,138);
+      if (idx === 2) reusableCarouselBars(x,14,sw,138);
     }
     X.restore();
     [[30, 83, Math.PI / 2], [w - 30, 83, -Math.PI / 2]].forEach(([x, y, r]) => { shadowed(() => circle(x, y, 18, '#fff'), 10, 3, .2); chevron(x, y, 5, r, '#555'); });
     const act = Math.round(p) % 3;
     for (let k = 0; k < 3; k++) { const on = k === act; fillRR(w / 2 - 30 + k * 22 - (on ? 4 : 0), 172, on ? 16 : 8, 8, 4, on ? C.blue : C.line2); }
-    pointer([[.3, w + 30, h + 30], [.95, w - 28, 88], [3.4, w - 28, 88], [4.2, w + 30, h + 30]], [1.0, 2.1, 3.2], t);
+    pointer([[.3, w + 30, h + 30], [.95, w - 28, 88], [EP("058", "extra3", 3.2) + .2, w - 28, 88], [4.2, w + 30, h + 30]], [1.0, EP("058", "extra1", 2.1), EP("058", "extra3", 3.2)], t);
   });
+
+  function reusableToggle(tx,ty,k,travel) {
+      fillRR(tx, ty, 64, 34, 17, '#d9d7d5'); if (k > 0) { X.globalAlpha = k; fillRR(tx, ty, 64, 34, 17, C.blue); X.globalAlpha = 1; }
+      shadowed(() => circle(tx + 17 + travel * k, ty + 17, 13, '#fff'), 4, 1, .25);
+  }
 
   // @element 11
   // 11 トグルスイッチ（Toggle switch）
@@ -271,69 +303,80 @@ MotionPrompt.pack('ui', function () {
       const y = 14 + i * 60; bar(24, y + 10, [170, 140, 190][i], C.line2, 11); bar(24, y + 30, [260, 220, 240][i], C.line, 8);
       if (i < 2) { X.fillStyle = C.line; X.fillRect(24, y + 52, 494, 1.5); }
       const k = st[i], tx = 450, ty = y + 10;
-      fillRR(tx, ty, 64, 34, 17, '#d9d7d5'); if (k > 0) { X.globalAlpha = k; fillRR(tx, ty, 64, 34, 17, C.blue); X.globalAlpha = 1; }
-      shadowed(() => circle(tx + 17 + 30 * k, ty + 17, 13, '#fff'), 4, 1, .25);
+      reusableToggle(tx,ty,k,EP("059", "knobTravel", 30));
     }
     pointer([[.3, w + 30, h + 30], [.95, 486, 30], [1.35, 486, 30], [1.75, 486, 90], [2.5, 486, 90], [2.95, 486, 30], [3.25, 486, 30], [3.55, 486, 90], [3.85, 486, 90], [4.3, w + 30, h + 30]], [1.0, 1.8, 3.0, 3.6], t);
   });
 
+  const UI_CHART_SETS = [[30, 55, 40, 70, 50, 85, 60], [60, 40, 90, 75, 100, 55, 80], [95, 70, 110, 60, 85, 115, 100]];
+  function reusableChartColumn(x,base,bh,i) { fillRR(x,base-bh,34,bh,5,i===5?C.blue:C.mb); }
   // @element 12
   // 12 セグメントコントロール（Segmented control）
+  function reusableSegmented(sx,sy,pos) {
+    const sw=300,sh=40,cw=sw/3; fillRR(sx,sy,sw,sh,10,'#efedeb');
+    shadowed(()=>fillRR(sx+4+pos*cw,sy+4,cw-8,sh-8,8,C.blue),6,2,.2);
+    ['日','周','月'].forEach((s,i)=>{const near=1-clamp(Math.abs(pos-i));text(s,sx+cw*i+cw/2,sy+sh/2+1,17,near>.5?'#fff':'#6d6b69',700,'center');});
+  }
   CELLS[11] = ui((w, h, t) => {
-    const pos = eio(seg(t, 1.0, EP("060", "value1", 1.25))) + eio(seg(t, 2.1, 2.35)) - 2 * eio(seg(t, 3.3, 3.55));
-    const sx = 121, sy = 12, sw = 300, sh = 40, cw = sw / 3;
-    fillRR(sx, sy, sw, sh, 10, '#efedeb');
-    shadowed(() => fillRR(sx + 4 + pos * cw, sy + 4, cw - 8, sh - 8, 8, C.blue), 6, 2, .2);
-    ['日', '周', '月'].forEach((s, i) => { const near = 1 - clamp(Math.abs(pos - i)); text(s, sx + cw * i + cw / 2, sy + sh / 2 + 1, 17, near > .5 ? '#fff' : '#6d6b69', 700, 'center'); });
-    const sets = [[30, 55, 40, 70, 50, 85, 60], [60, 40, 90, 75, 100, 55, 80], [95, 70, 110, 60, 85, 115, 100]];
+    const pos = eio(seg(t, 1.0, EP("060", "value1", 1.25))) + eio(seg(t, 2.1, EP("060", "secondEnd", 2.35))) - 2 * eio(seg(t, EP("060", "extra1", 3.3), EP("060", "returnEnd", 3.55)));
+    const sx = 121, sy = 12; reusableSegmented(sx,sy,pos);
+    const sets = UI_CHART_SETS;
     const fi = Math.floor(pos), fr = pos - fi, gi = Math.min(2, fi + 1);
     X.fillStyle = C.line; X.fillRect(60, 182, 422, 1.5);
-    for (let k = 0; k < 7; k++) { const bh = lerp(sets[fi][k], sets[gi][k], eio(fr)); fillRR(72 + k * 58, 180 - bh, 34, bh, 5, k === 5 ? C.blue : C.mb); }
-    pointer([[.3, w + 30, h + 30], [.95, 276, 36], [1.6, 276, 36], [2.05, 376, 36], [2.8, 376, 36], [3.25, 176, 36], [3.7, 176, 36], [4.25, w + 30, h + 30]], [1.0, 2.1, 3.3], t);
+    for (let k = 0; k < 7; k++) { const bh = lerp(sets[fi][k], sets[gi][k], eio(fr)); reusableChartColumn(72 + k * 58, 180, bh, k); }
+    pointer([[.3, w + 30, h + 30], [.95, 276, 36], [1.6, 276, 36], [2.05, 376, 36], [2.8, 376, 36], [EP("060", "extra1", 3.3) - .05, 176, 36], [EP("060", "extra1", 3.3) + .4, 176, 36], [4.25, w + 30, h + 30]], [1.0, 2.1, EP("060", "extra1", 3.3)], t);
   });
 
+  function reusableFilterResult(cx,cy,i) { strokeRR(cx, cy, 242, 54, 8, C.line2, 1.5); fillRR(cx + 10, cy + 10, 34, 34, 6, i === 0 ? C.mb : C.line); bar(cx + 54, cy + 14, 120, C.line2, 10); bar(cx + 54, cy + 32, 150, C.line, 7); }
   // @element 13
   // 13 チップ（Filter chips）
+  function reusableFilterChip(s,x,y,k,expansion) {
+    const cw0=tw(s,15,600)+32+(k>0?expansion*k:0);
+    fillRR(x,y,cw0,34,17,k>.5?C.lb:'#fff'); strokeRR(x,y,cw0,34,17,k>.5?C.blue:C.line2,1.5);
+    if(k>0) { X.globalAlpha=k; check(x+18,y+17,5,C.blue,2.4); X.globalAlpha=1; }
+    text(s,x+16+expansion*k,y+18,15,k>.5?C.blue:'#555',600); return cw0;
+  }
   CELLS[12] = ui((w, h, t) => {
     const chips = ['全部', '新品', '热门', '免费']; let x = 24; const pos = [];
     const on = [0, eo(seg(t, EP("061", "value1", 0.95), 1.1)) * (1 - eo(seg(t, 3.0, EP("061", "value2", 3.15)))), 0, eo(seg(t, 1.75, 1.9)) * (1 - eo(seg(t, 3.6, 3.75)))];
     chips.forEach((s, i) => {
-      const k = on[i], cw0 = tw(s, 15, 600) + 32 + (k > 0 ? 18 * k : 0);
-      fillRR(x, 12, cw0, 34, 17, k > .5 ? C.lb : '#fff'); strokeRR(x, 12, cw0, 34, 17, k > .5 ? C.blue : C.line2, 1.5);
-      if (k > 0) { X.globalAlpha = k; check(x + 18, 29, 5, C.blue, 2.4); X.globalAlpha = 1; }
-      text(s, x + 16 + 18 * k, 30, 15, k > .5 ? C.blue : '#555', 600);
+      const k=on[i],cw0=reusableFilterChip(s,x,12,k,EP("061", "selectedExpansion", 18));
       pos.push(x + cw0 / 2); x += cw0 + 10;
     });
     // 一覧：条件に合わないカードが消える
     const vis = [1, 1 - Math.max(on[1], on[3]), 1 - on[3], 1];
     for (let i = 0; i < 4; i++) {
       const cx = 24 + (i % 2) * 252, cy = 60 + Math.floor(i / 2) * 64, a = clamp(.12 + .88 * vis[i]);
-      X.save(); X.globalAlpha = a; strokeRR(cx, cy, 242, 54, 8, C.line2, 1.5); fillRR(cx + 10, cy + 10, 34, 34, 6, i === 0 ? C.mb : C.line); bar(cx + 54, cy + 14, 120, C.line2, 10); bar(cx + 54, cy + 32, 150, C.line, 7); X.restore();
+      X.save(); X.globalAlpha = a; reusableFilterResult(cx,cy,i); X.restore();
     }
     const p1 = pos[1] || 120, p3 = pos[3] || 300;
     pointer([[.3, w + 30, h + 30], [.9, p1, 32], [1.3, p1, 32], [1.7, p3, 32], [2.5, p3, 32], [2.95, p1, 32], [3.2, p1, 32], [3.55, p3, 32], [3.85, p3, 32], [4.3, w + 30, h + 30]], [0.95, 1.75, 3.0, 3.6], t);
   });
 
+  function reusableRangeTrack(x0,x1,ty,lx,hx) { fillRR(x0, ty - 4, x1 - x0, 8, 4, '#e3e1df'); fillRR(lx, ty - 4, hx - lx, 8, 4, C.blue); }
   // @element 14
   // 14 レンジスライダー（Range slider）
+  function reusableSliderHandle(kx,ty,val,act,w) {
+    if(act) circle(kx,ty,24,'rgba(31,90,232,.14)');
+    shadowed(()=>circle(kx,ty,act?15:13,'#fff'),6,2,.25); ring(kx,ty,act?15:13,C.blue,3);
+    const bw=tw(val,15,700,NUMF)+18,bx=clamp(kx-bw/2,4,w-4-bw);
+    fillRR(bx,ty-60,bw,28,7,act?C.blue:C.lb);
+    X.beginPath(); X.moveTo(kx-6,ty-32); X.lineTo(kx,ty-26); X.lineTo(kx+6,ty-32); X.fillStyle=act?C.blue:C.lb; X.fill();
+    text(val,bx+bw/2,ty-46,15,act?'#fff':C.blue,700,'center',NUMF);
+  }
   CELLS[13] = ui((w, h, t) => {
     // つまみ2つで範囲を選ぶ：下限 ¥1,000→¥3,000、上限 ¥10,000→¥8,000、のち元へ戻す
-    const LO = tt => .1 + .2 * eio(seg(tt, 1.0, EP("062", "value1", 1.6))) - .2 * eio(seg(tt, 3.55, 3.9));
-    const HI = tt => 1.0 - .2 * eio(seg(tt, 2.1, 2.6)) + .2 * eio(seg(tt, 2.95, 3.3));
+    const LO = tt => .1 + (EP("062", "lowTarget", 0.3) - .1) * eio(seg(tt, 1.0, EP("062", "value1", 1.6))) - (EP("062", "lowTarget", 0.3) - .1) * eio(seg(tt, 3.55, EP("062", "extra1", 3.9)));
+    const HI = tt => 1.0 - (1 - EP("062", "highTarget", 0.8)) * eio(seg(tt, EP("062", "extra3", 2.1), EP("062", "extra2", 2.6))) + (1 - EP("062", "highTarget", 0.8)) * eio(seg(tt, EP("062", "extra5", 2.95), EP("062", "extra4", 3.3)));
     const x0 = 54, x1 = 488, ty = 120, X_ = v => lerp(x0, x1, v);
     const lo = LO(t), hi = HI(t), lx = X_(lo), hx = X_(hi);
     const yen = v => '¥' + (Math.round(v * 100) * 100).toLocaleString('en-US');
     text('价格', 24, 26, 16, '#555', 700);
     text(yen(lo) + ' 〜 ' + yen(hi), w - 24, 26, 17, C.blue, 700, 'right', NUMF);
-    fillRR(x0, ty - 4, x1 - x0, 8, 4, '#e3e1df'); fillRR(lx, ty - 4, hx - lx, 8, 4, C.blue);
+    reusableRangeTrack(x0,x1,ty,lx,hx);
     const loAct = (t > 1.0 && t < 1.7) || (t > 3.55 && t < 3.95), hiAct = t > 2.1 && t < 3.3;
     [[lx, lo, loAct], [hx, hi, hiAct]].forEach(([kx, v, act]) => {
-      if (act) circle(kx, ty, 24, 'rgba(31,90,232,.14)');
-      shadowed(() => circle(kx, ty, act ? 15 : 13, '#fff'), 6, 2, .25); ring(kx, ty, act ? 15 : 13, C.blue, 3);
-      const val = yen(v), bw = tw(val, 15, 700, NUMF) + 18, bx = clamp(kx - bw / 2, 4, w - 4 - bw);
-      fillRR(bx, ty - 60, bw, 28, 7, act ? C.blue : C.lb);
-      X.beginPath(); X.moveTo(kx - 6, ty - 32); X.lineTo(kx, ty - 26); X.lineTo(kx + 6, ty - 32); X.fillStyle = act ? C.blue : C.lb; X.fill();
-      text(val, bx + bw / 2, ty - 46, 15, act ? '#fff' : C.blue, 700, 'center', NUMF);
+      reusableSliderHandle(kx,ty,yen(v),act,w);
     });
     text('¥0', x0, 154, 14, '#9a9896', 500, 'center', NUMF); text('¥10,000', x1 - 10, 154, 14, '#9a9896', 500, 'center', NUMF);
     bar(24, 174, 220, C.line, 8);
@@ -352,47 +395,59 @@ MotionPrompt.pack('ui', function () {
 
   // @element 15
   // 15 ステッパー（Stepper (+/−)）
-  CELLS[14] = ui((w, h, t) => {
-    bar(171, 24, 90, C.line2, 10);
-    const plus = [EP("063", "first", .9), 1.35, 1.8], minus = [2.8, 3.25, 3.7];
-    let n = 1; plus.forEach(c => { if (t >= c) n++; }); minus.forEach(c => { if (t >= c) n--; });
-    const last = [...plus, ...minus].filter(c => t >= c).pop();
-    const pop = last !== undefined ? 1 - seg(t, last, last + .25) : 0;
-    const bx = 171, by = 52, bw = 200, bh = 60;
+  function reusableStepper(bx,by,bw,bh,n,pressM,pressP,pop) {
     strokeRR(bx, by, bw, bh, 12, C.line2, 1.8);
-    const pressP = plus.some(c => t >= c - .05 && t < c + .15), pressM = minus.some(c => t >= c - .05 && t < c + .15);
     if (pressM) fillRR(bx + 2, by + 2, 58, bh - 4, 10, C.lb); if (pressP) fillRR(bx + bw - 60, by + 2, 58, bh - 4, 10, C.lb);
     X.fillStyle = C.line2; X.fillRect(bx + 60, by + 10, 1.5, bh - 20); X.fillRect(bx + bw - 61, by + 10, 1.5, bh - 20);
     text('−', bx + 30, by + bh / 2, 30, '#555', 500, 'center', NUMF); text('+', bx + bw - 30, by + bh / 2, 30, C.blue, 500, 'center', NUMF);
-    X.save(); X.translate(bx + bw / 2, by + bh / 2 + 1); X.scale(1 + .18 * pop, 1 + .18 * pop); text(String(n), 0, 0, 30, pop > .05 ? C.blue : C.ink, 700, 'center', NUMF); X.restore();
+    X.save(); X.translate(bx + bw / 2, by + bh / 2 + 1); X.scale(1 + EP("063", "popAmount", 0.18) * pop, 1 + EP("063", "popAmount", 0.18) * pop); text(String(n), 0, 0, 30, pop > .05 ? C.blue : C.ink, 700, 'center', NUMF); X.restore();
+  }
+  CELLS[14] = ui((w, h, t) => {
+    bar(171, 24, 90, C.line2, 10);
+    const plus = [EP("063", "first", .9), EP("063", "plusSecond", 1.35), EP("063", "plusThird", 1.8)], minus = [EP("063", "minusFirst", 2.8), EP("063", "minusSecond", 3.25), EP("063", "minusThird", 3.7)];
+    let n = 1; plus.forEach(c => { if (t >= c) n++; }); minus.forEach(c => { if (t >= c) n--; });
+    const last = [...plus, ...minus].filter(c => t >= c).pop();
+    const pop = last !== undefined ? 1 - seg(t, last, last + EP("063", "popDuration", 0.25)) : 0;
+    const bx = 171, by = 52, bw = 200, bh = 60;
+    const pressP = plus.some(c => t >= c - .05 && t < c + .15), pressM = minus.some(c => t >= c - .05 && t < c + .15);
+    reusableStepper(bx,by,bw,bh,n,pressM,pressP,pop);
     bar(171, 136, 200, C.line); bar(171, 154, 140, C.line);
-    pointer([[.3, w + 30, h + 30], [.85, 342, 86], [2.3, 342, 86], [2.75, 202, 86], [3.75, 202, 86], [4.3, w + 30, h + 30]], [...plus, ...minus], t);
+    pointer([[.3, w + 30, h + 30], [plus[0] - .05, 342, 86], [Math.min(plus[2] + .5, minus[0] - .1), 342, 86], [minus[0] - .05, 202, 86], [minus[2] + .05, 202, 86], [4.3, w + 30, h + 30]], [...plus, ...minus], t);
   });
 
   // @element 16
   // 16 ページネーション（Pagination）
+  function reusablePagination(x0,d,g,pos,y) {
+    const items=['‹','1','2','3','4','5','›']; circle(x0+(1+pos)*(d+g)+d/2,y,d/2,C.blue);
+    items.forEach((s,i)=>{const cx=x0+i*(d+g)+d/2,on=i>=1&&i<=5&&Math.abs(pos-(i-1))<.5;text(s,cx,y+1,i===0||i===6?22:16,on?'#fff':'#666',700,'center',NUMF);});
+  }
   CELLS[15] = ui((w, h, t) => {
     const page = t < 1.05 ? 0 : t < 2.15 ? 1 : t < 3.35 ? 2 : 0;
-    const fade = Math.min(...[1.05, 2.15, 3.35].map(c => Math.abs(t - c) < .2 ? Math.abs(t - c) / EP("064", "value2", .2) : 1));
+    const fade = Math.min(...[1.05, 2.15, 3.35].map(c => Math.abs(t - c) < EP("064", "value2", .2) ? Math.abs(t - c) / EP("064", "value2", .2) : 1));
     X.save(); X.globalAlpha = fade;
     for (let k = 0; k < 3; k++) { const y = 10 + k * 40; fillRR(24, y, 52, 32, 6, (k + page) % 3 === 0 ? C.mb : C.line); bar(90, y + 4, [200, 160, 240, 180][(k + page) % 4], C.line2, 10); bar(90, y + 20, [320, 280, 360][(k + 2 * page) % 3], C.line, 7); }
     X.restore();
     const items = ['‹', '1', '2', '3', '4', '5', '›'], d = 36, g = 8, total = items.length * d + (items.length - 1) * g, x0 = (w - total) / 2;
-    const pos = eio(seg(t, 1.0, 1.2)) + eio(seg(t, 2.1, EP("064", "value1", 2.3))) - 2 * eio(seg(t, 3.3, 3.5));
-    circle(x0 + (1 + pos) * (d + g) + d / 2, 160, d / 2, C.blue);
-    items.forEach((s, i) => { const cx = x0 + i * (d + g) + d / 2; const on = i >= 1 && i <= 5 && Math.abs(pos - (i - 1)) < .5; text(s, cx, 161, i === 0 || i === 6 ? 22 : 16, on ? '#fff' : '#666', 700, 'center', NUMF); });
+    const pos = eio(seg(t, 1.0, EP("064", "firstMoveEnd", 1.2))) + eio(seg(t, 2.1, EP("064", "value1", 2.3))) - 2 * eio(seg(t, 3.3, 3.5));
+    reusablePagination(x0,d,g,pos,160);
     const px = i => x0 + i * (d + g) + d / 2 + 4;
     pointer([[.3, w + 30, h + 30], [.95, px(2), 166], [1.6, px(2), 166], [2.05, px(3), 166], [2.8, px(3), 166], [3.25, px(1), 166], [3.65, px(1), 166], [4.25, w + 30, h + 30]], [1.0, 2.1, 3.3], t);
   });
 
   // @element 17
   // 17 ハンバーガーメニュー（Hamburger menu）
+  function reusableMenuIcon(a) {
+    X.strokeStyle=a>.02?C.blue:'#333'; X.lineWidth=3; X.lineCap='round';
+    X.save(); X.translate(0,-8*(1-a)); X.rotate(Math.PI/4*a); X.beginPath(); X.moveTo(-12,0); X.lineTo(12,0); X.stroke(); X.restore();
+    X.globalAlpha=1-a; X.beginPath(); X.moveTo(-12,0); X.lineTo(12,0); X.stroke(); X.globalAlpha=1;
+    X.save(); X.translate(0,8*(1-a)); X.rotate(-Math.PI/4*a); X.beginPath(); X.moveTo(-12,0); X.lineTo(12,0); X.stroke(); X.restore();
+  }
   CELLS[16] = ui((w, h, t) => {
     const a = eio(seg(t, 1.0, EP("065", "value1", 1.3))) * (1 - eio(seg(t, 3.3, 3.6)));
     pageLines(24, 66, 494); fillRR(24, 134, 494, 46, 8, C.block);
     if (a > 0) {
       X.save(); X.beginPath(); X.rect(0, 44, w, h); X.clip();
-      const mh = 140, my = 44 - mh + mh * a;
+      const mh = EP("065", "menuHeight", 140), my = 44 - mh + mh * a;
       shadowed(() => { X.fillStyle = '#fff'; X.fillRect(0, my, w, mh); }, 16, 6, .16);
       for (let k = 0; k < 4; k++) { const y = my + 14 + k * 32; bar(24, y + 6, [110, 150, 90, 130][k], k === 0 ? C.blue : C.line2, 11); if (k < 3) { X.fillStyle = C.line; X.fillRect(24, y + 26, w - 48, 1); } }
       X.restore();
@@ -400,18 +455,16 @@ MotionPrompt.pack('ui', function () {
     X.fillStyle = '#fff'; X.fillRect(0, 0, w, 44); X.fillStyle = C.line; X.fillRect(0, 44, w, 1.5);
     fillRR(24, 15, 76, 16, 4, C.mb);
     // 三本線 → ×
-    const hx = w - 42, hy = 22; X.save(); X.translate(hx, hy); X.strokeStyle = a > .02 ? C.blue : '#333'; X.lineWidth = 3; X.lineCap = 'round';
-    X.save(); X.translate(0, -8 * (1 - a)); X.rotate(Math.PI / 4 * a); X.beginPath(); X.moveTo(-12, 0); X.lineTo(12, 0); X.stroke(); X.restore();
-    X.globalAlpha = 1 - a; X.beginPath(); X.moveTo(-12, 0); X.lineTo(12, 0); X.stroke(); X.globalAlpha = 1;
-    X.save(); X.translate(0, 8 * (1 - a)); X.rotate(-Math.PI / 4 * a); X.beginPath(); X.moveTo(-12, 0); X.lineTo(12, 0); X.stroke(); X.restore();
+    const hx = w - 42, hy = 22; X.save(); X.translate(hx, hy); reusableMenuIcon(a);
     X.restore();
     pointer([[.3, w + 30, h + 30], [.95, w - 38, 26], [3.5, w - 38, 26], [4.2, w + 30, h + 30]], [1.0, 3.3], t);
   });
 
   // @element 18
   // 18 パンくずリスト（Breadcrumbs）
+  function reusableCourseCard(cx,cy,k,hov) { strokeRR(cx,cy,158,118,8,hov?C.blue:C.line2,hov?2:1.5); mountains(cx+10,cy+10,138,58,k%2); bar(cx+10,cy+80,90,k===0?C.sb:C.line2,10); bar(cx+10,cy+98,120,C.line,7); }
   CELLS[17] = ui((w, h, t) => {
-    const up = eio(seg(t, 1.0, EP("066", "value1", 1.25))) * (1 - eio(seg(t, 2.7, 2.95))); // 1=「講座」の階層にいる
+    const up = eio(seg(t, 1.0, EP("066", "value1", 1.25))) * (1 - eio(seg(t, 2.7, EP("066", "returnEnd", 2.95)))); // 1=「講座」の階層にいる
     let x = 24; const y = 24;
     text('首页', x, y, 17, C.blue, 600); x += tw('首页', 17, 600) + 10; text('›', x, y, 17, '#aaa', 500); x += 18;
     const kx = x, kw = tw('课程', 17, 700);
@@ -422,12 +475,17 @@ MotionPrompt.pack('ui', function () {
     X.fillStyle = C.line; X.fillRect(24, 46, 494, 1.5);
     // 中身：詳細ページ ⇄ 一覧ページ
     if (up < 1) { X.save(); X.globalAlpha = 1 - up; bar(24, 64, 200, C.ink, 13); bar(24, 92, 494); bar(24, 110, 420); fillRR(24, 132, 494, 48, 8, C.block); X.restore(); }
-    if (up > 0) { X.save(); X.globalAlpha = up; for (let k = 0; k < 3; k++) { const cx = 24 + k * 168, hov = k === 0 && t > 2.45 && t < 2.8; strokeRR(cx, 62, 158, 118, 8, hov ? C.blue : C.line2, hov ? 2 : 1.5); mountains(cx + 10, 72, 138, 58, k % 2); bar(cx + 10, 142, 90, k === 0 ? C.sb : C.line2, 10); bar(cx + 10, 160, 120, C.line, 7); } X.restore(); }
+    if (up > 0) { X.save(); X.globalAlpha = up; for (let k = 0; k < 3; k++) { const cx = 24 + k * 168, hov = k === 0 && t > 2.45 && t < 2.8; reusableCourseCard(cx,62,k,hov); } X.restore(); }
     pointer([[.3, w + 30, h + 30], [.95, kx + kw / 2, 30], [1.6, kx + kw / 2, 30], [2.4, 104, 120], [3.1, 104, 120], [3.9, w + 30, h + 30]], [1.0, 2.7], t);
   });
 
   // @element 19
   // 19 メガメニュー（Mega menu）
+  function reusableMegaMenu(w,py,hover) {
+    shadowed(() => { X.fillStyle = '#fff'; X.fillRect(0, py, w, 146); }, 18, 8, .16);
+    for (let c = 0; c < 3; c++) { const cx = 24 + c * 130; bar(cx, py + 16, 80, C.blue, 10); for (let k = 0; k < 3; k++) { const hov = c === 1 && k === 1 && hover; if (hov) fillRR(cx - 6, py + 34 + k * 26, 112, 22, 5, C.lb); bar(cx, py + 40 + k * 26, [90, 70, 100][(k + c) % 3], hov ? C.sb : C.line2, 9); } }
+    mountains(414, py + 14, 104, 112);
+  }
   CELLS[18] = ui((w, h, t) => {
     const a = eo(seg(t, EP("067", "value1", 1.05), 1.3)) * (1 - eio(seg(t, EP("067", "value2", 3.15), 3.4)));
     pageLines(24, 62, 494); fillRR(24, 130, 494, 50, 8, C.block);
@@ -436,10 +494,8 @@ MotionPrompt.pack('ui', function () {
     const nav = [['产品', 190], ['费用', 262], ['支持', 334]];
     nav.forEach(([s, x], i) => { const on = i === 0 && a > .3; text(s, x, 22, 16, on ? C.blue : '#555', on ? 700 : 600); if (on) fillRR(x, 36, tw(s, 16, 700), 3, 1.5, C.blue); chevron(x + tw(s, 16, 700) + 10, 22, 3.5, 0, on ? C.blue : '#999', 1.8); });
     if (a > 0) {
-      X.save(); X.globalAlpha = a; X.beginPath(); X.rect(0, 43, w, h); X.clip(); const py = 43 - 12 * (1 - a);
-      shadowed(() => { X.fillStyle = '#fff'; X.fillRect(0, py, w, 146); }, 18, 8, .16);
-      for (let c = 0; c < 3; c++) { const cx = 24 + c * 130; bar(cx, py + 16, 80, C.blue, 10); for (let k = 0; k < 3; k++) { const hov = c === 1 && k === 1 && t > 1.75 && t < 2.9; if (hov) fillRR(cx - 6, py + 34 + k * 26, 112, 22, 5, C.lb); bar(cx, py + 40 + k * 26, [90, 70, 100][(k + c) % 3], hov ? C.sb : C.line2, 9); } }
-      mountains(414, py + 14, 104, 112);
+      X.save(); X.globalAlpha = a; X.beginPath(); X.rect(0, 43, w, h); X.clip(); const py = 43 - EP("067", "panelDrop", 12) * (1 - a);
+      reusableMegaMenu(w,py,t>1.75&&t<2.9);
       X.restore();
     }
     // 乗せるだけで開く（クリックしない）
@@ -448,20 +504,23 @@ MotionPrompt.pack('ui', function () {
 
   // @element 20
   // 20 ステップインジケーター（Step indicator）
+  function reusableStep(x,i,done,cur,lab) {
+    circle(x,35,17,done||cur?C.blue:'#fff'); if(!(done||cur))ring(x,35,16,C.line2,2);
+    if(done)check(x,35,7,'#fff',2.6);else text(String(i+1),x,36,16,cur?'#fff':'#9a9896',700,'center',NUMF);
+    text(lab,x,70,14,done||cur?C.blue:'#9a9896',600,'center');
+  }
   CELLS[19] = ui((w, h, t) => {
     const clicks = [.9, 1.7, 2.5]; let step = 0; clicks.forEach(c => { if (t >= c) step++; });
     const reset = seg(t, 3.75, EP("068", "value1", 4.05)), back = seg(t, 4.05, 4.3);
     const showStep = reset >= 1 ? 0 : step;
     const xs = [80, 207, 334, 461], labs = ['输入', '确认', '付款', '已完成'];
-    const prog = clicks.reduce((s, c) => s + eio(seg(t, c, c + .3)), 0);
+    const prog = clicks.reduce((s, c) => s + eio(seg(t, c, c + EP("068", "stepDuration", 0.3))), 0);
     X.save(); X.globalAlpha = reset < 1 ? 1 - reset : back;
     const pr = reset >= 1 ? 0 : prog;
     fillRR(xs[0], 33, xs[3] - xs[0], 4, 2, '#e3e1df'); fillRR(xs[0], 33, (xs[1] - xs[0]) * pr, 4, 2, C.blue);
     xs.forEach((x, i) => {
       const done = i < showStep || (showStep === 3 && i === 3), cur = i === showStep && showStep < 3;
-      circle(x, 35, 17, done || cur ? C.blue : '#fff'); if (!(done || cur)) ring(x, 35, 16, C.line2, 2);
-      if (done) check(x, 35, 7, '#fff', 2.6); else text(String(i + 1), x, 36, 16, cur ? '#fff' : '#9a9896', 700, 'center', NUMF);
-      text(labs[i], x, 70, 14, done || cur ? C.blue : '#9a9896', 600, 'center');
+      reusableStep(x,i,done,cur,labs[i]);
     });
     X.restore();
     strokeRR(24, 96, 494, 30, 7, C.line2, 1.5); bar(36, 106, 160, C.line); bar(24, 148, 200, C.line);
@@ -471,6 +530,12 @@ MotionPrompt.pack('ui', function () {
 
   // @element 21
   // 21 スケルトン（Skeleton screen）
+  function reusableSkeletonRow(y,w,t) {
+    const g='#e9e7e5'; fillRR(24,y,96,56,8,g); fillRR(136,y+4,200,14,7,g); fillRR(136,y+26,340,10,5,g); fillRR(136,y+42,260,10,5,g);
+    const sx=-200+((t-1.1)%EP("069", "shimmerPeriod",.9))/EP("069", "shimmerPeriod",.9)*(w+400);
+    X.beginPath(); X.roundRect(24,y,96,56,8); X.roundRect(136,y+4,200,14,7); X.roundRect(136,y+26,340,10,5); X.roundRect(136,y+42,260,10,5); X.clip();
+    const gr=X.createLinearGradient(sx-80,0,sx+80,0); gr.addColorStop(0,'rgba(255,255,255,0)'); gr.addColorStop(.5,'rgba(255,255,255,.75)'); gr.addColorStop(1,'rgba(255,255,255,0)'); X.fillStyle=gr; X.fillRect(0,y-2,w,64);
+  }
   CELLS[20] = ui((w, h, t) => {
     const sk = seg(t, 1.05, 1.2) * (1 - seg(t, 3.0, EP("069", "value1", 3.3)));
     ring(w - 40, 26, 14, C.line2, 1.8); X.beginPath(); X.arc(w - 40, 26, 7, -Math.PI * .1, Math.PI * 1.4); X.strokeStyle = '#666'; X.lineWidth = 2.2; X.stroke();
@@ -479,20 +544,7 @@ MotionPrompt.pack('ui', function () {
       const y = 56 + k * 66;
       X.save(); X.globalAlpha = 1 - sk; mountains(24, y, 96, 56, k); bar(136, y + 6, 200, C.ink, 11); bar(136, y + 26, 340); bar(136, y + 42, 260); X.restore();
       if (sk > 0) {
-        X.save(); X.globalAlpha = sk; const g = '#e9e7e5';
-        fillRR(24, y, 96, 56, 8, g); fillRR(136, y + 4, 200, 14, 7, g); fillRR(136, y + 26, 340, 10, 5, g); fillRR(136, y + 42, 260, 10, 5, g);
-        // 光が横に流れる
-        const sx = -200 + ((t - 1.1) % 0.9) / 0.9 * (w + 400);
-        // Clip the sheen to the skeleton blocks; the underlying card is opaque.
-        X.beginPath();
-        X.roundRect(24, y, 96, 56, 8);
-        X.roundRect(136, y + 4, 200, 14, 7);
-        X.roundRect(136, y + 26, 340, 10, 5);
-        X.roundRect(136, y + 42, 260, 10, 5);
-        X.clip();
-        const gr = X.createLinearGradient(sx - 80, 0, sx + 80, 0); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(.5, 'rgba(255,255,255,.75)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
-        X.fillStyle = gr; X.fillRect(0, y - 2, w, 64);
-        X.restore();
+        X.save(); X.globalAlpha = sk; reusableSkeletonRow(y,w,t); X.restore();
       }
     }
     pointer([[.3, w + 30, h + 30], [.95, w - 38, 30], [1.4, w - 38, 30], [2.1, w + 30, h + 30]], [1.0], t);
@@ -500,37 +552,52 @@ MotionPrompt.pack('ui', function () {
 
   // @element 22
   // 22 スピナー（Spinner）
+  function reusableLoadingSpinner(cx,cy,t) { ring(cx,cy,26,'#e3e8f5',6); X.beginPath(); const a0=t*Math.PI*2*EP("070", "spinRate",1.3); X.arc(cx,cy,26,a0,a0+Math.PI*EP("070", "arcLength",1.35)); X.strokeStyle=C.blue; X.lineWidth=6; X.lineCap='round'; X.stroke(); }
+  function reusableLoadingDone() { circle(0,0,28,C.blue); check(0,0,11,'#fff',4); }
   CELLS[21] = ui((w, h, t) => {
     const load = seg(t, EP("070", "value1", 1.05), 1.2) * (1 - seg(t, 2.95, 3.05));
-    const done = seg(t, 2.95, EP("070", "value2", 3.15)) * (1 - seg(t, 3.75, 4.0));
+    const done = seg(t, 2.95, EP("070", "value2", 3.15)) * (1 - seg(t, EP("070", "extra1", 3.75), 4.0));
     pageLines(24, 18, 494); strokeRR(24, 90, 494, 34, 7, C.line2, 1.5);
     fillRR(w / 2 - 60, 140, 120, 40, 8, C.blue); text('发送', w / 2, 160, 16, '#fff', 600, 'center');
     const ov = Math.max(load, done);
     if (ov > 0) {
       X.fillStyle = `rgba(255,255,255,${.78 * ov})`; X.fillRect(0, 0, w, h);
-      if (load > 0) { X.save(); X.globalAlpha = load; ring(w / 2, 92, 26, '#e3e8f5', 6); X.beginPath(); const a0 = t * Math.PI * 2 * 1.3; X.arc(w / 2, 92, 26, a0, a0 + Math.PI * 1.35); X.strokeStyle = C.blue; X.lineWidth = 6; X.lineCap = 'round'; X.stroke(); X.restore(); }
-      if (done > 0) { X.save(); X.globalAlpha = done; const s = .7 + .3 * eo(seg(t, 2.95, 3.2)); X.translate(w / 2, 92); X.scale(s, s); circle(0, 0, 28, C.blue); check(0, 0, 11, '#fff', 4); X.restore(); }
+      if (load > 0) { X.save(); X.globalAlpha = load; reusableLoadingSpinner(w/2,92,t); X.restore(); }
+      if (done > 0) { X.save(); X.globalAlpha = done; const s = .7 + .3 * eo(seg(t, 2.95, 3.2)); X.translate(w / 2, 92); X.scale(s, s); reusableLoadingDone(); X.restore(); }
     }
     pointer([[.3, w + 30, h + 30], [.95, w / 2 + 6, 166], [1.5, w / 2 + 6, 166], [2.2, w + 30, h + 30]], [1.0], t);
   });
 
   // @element 23
   // 23 バッジ（Badge）
+  function reusableNotificationBell() {
+    X.beginPath(); X.moveTo(-12, 8); X.quadraticCurveTo(-11, -12, 0, -13); X.quadraticCurveTo(11, -12, 12, 8); X.lineTo(15, 11); X.lineTo(-15, 11); X.closePath();
+    X.strokeStyle = '#333'; X.lineWidth = 2.4; X.lineJoin = 'round'; X.stroke(); X.beginPath(); X.arc(0, 14, 4, 0, Math.PI); X.stroke();
+  }
+  function reusableNotificationBadge(n) { circle(0,0,12,C.blue); ring(0,0,12,'#fff',2.5); text(String(n),0,1,14,'#fff',800,'center',NUMF); }
+  function reusableEmptyBox(x, cy) {
+    X.strokeStyle = C.blue; X.lineWidth = 2.6; X.lineJoin = 'round';
+    X.beginPath(); X.moveTo(x - 26, cy - 4); X.lineTo(x - 18, cy - 22); X.lineTo(x + 18, cy - 22); X.lineTo(x + 26, cy - 4); X.lineTo(x + 26, cy + 16); X.lineTo(x - 26, cy + 16); X.closePath(); X.stroke();
+    X.beginPath(); X.moveTo(x - 26, cy - 4); X.lineTo(x - 9, cy - 4); X.lineTo(x - 6, cy + 3); X.lineTo(x + 6, cy + 3); X.lineTo(x + 9, cy - 4); X.lineTo(x + 26, cy - 4); X.stroke();
+  }
+  function reusableTrash(x, y) {
+    X.strokeStyle = '#888'; X.lineWidth = 2; X.lineJoin = 'round'; X.strokeRect(x + 4, y + 5, 16, 18); X.beginPath(); X.moveTo(x, y + 4); X.lineTo(x + 24, y + 4); X.moveTo(x + 8, y); X.lineTo(x + 16, y); X.stroke();
+  }
+  function reusableEmptyAdd(x,y) { fillRR(x-56,y,112,34,8,C.blue); text('添加',x,y+17,15,'#fff',600,'center'); }
   CELLS[22] = ui((w, h, t) => {
     X.fillStyle = '#fff'; X.fillRect(0, 0, w, 54); X.fillStyle = C.line; X.fillRect(0, 54, w, 1.5);
     fillRR(24, 19, 76, 16, 4, C.mb);
     // ベル
     const bx = w - 60, by = 27; X.save(); X.translate(bx, by);
-    X.beginPath(); X.moveTo(-12, 8); X.quadraticCurveTo(-11, -12, 0, -13); X.quadraticCurveTo(11, -12, 12, 8); X.lineTo(15, 11); X.lineTo(-15, 11); X.closePath();
-    X.strokeStyle = '#333'; X.lineWidth = 2.4; X.lineJoin = 'round'; X.stroke(); X.beginPath(); X.arc(0, 14, 4, 0, Math.PI); X.stroke(); X.restore();
+    reusableNotificationBell(); X.restore();
     const arr = [.7, 1.3, 1.9]; let n = 0; arr.forEach(c => { if (t >= c) n++; });
     const clear = eio(seg(t, 3.0, 3.25));
     if (n > 0 && clear < 1) {
-      const last = arr.filter(c => t >= c).pop(), pop = 1 - seg(t, last, last + .3);
-      const s = (n === 1 ? eo(seg(t, .7, .9)) : 1) * (1 + .3 * pop) * (1 - clear);
+      const last = arr.filter(c => t >= c).pop(), pop = 1 - seg(t, last, last + EP("071", "popDuration", 0.3));
+      const s = (n === 1 ? eo(seg(t, .7, .9)) : 1) * (1 + EP("071", "popAmount", 0.3) * pop) * (1 - clear);
       // 届いた合図の波紋
-      const k = seg(t, last, last + .5); if (k > 0 && k < 1) ring(bx + 12, by - 12, 12 + 16 * k, `rgba(31,90,232,${EP("071", "value1", .5) * (1 - k)})`, 2.5);
-      X.save(); X.translate(bx + 12, by - 12); X.scale(s, s); circle(0, 0, 12, C.blue); ring(0, 0, 12, '#fff', 2.5); text(String(n), 0, 1, 14, '#fff', 800, 'center', NUMF); X.restore();
+      const k = seg(t, last, last + EP("071", "rippleDuration", 0.5)); if (k > 0 && k < 1) ring(bx + 12, by - 12, 12 + 16 * k, `rgba(31,90,232,${EP("071", "value1", .5) * (1 - k)})`, 2.5);
+      X.save(); X.translate(bx + 12, by - 12); X.scale(s, s); reusableNotificationBadge(n); X.restore();
     }
     bar(24, 76, 220, C.line2, 12); bar(24, 102, 494); bar(24, 120, 400); fillRR(24, 140, 494, 40, 8, C.block);
     pointer([[.3, w + 30, h + 30], [2.3, w + 30, h + 30], [2.95, bx + 2, by + 4], [3.4, bx + 2, by + 4], [4.1, w + 30, h + 30]], [3.0], t);
@@ -540,31 +607,88 @@ MotionPrompt.pack('ui', function () {
   // 24 エンプティステート（Empty state）
   CELLS[23] = ui((w, h, t) => {
     const r1 = eio(seg(t, 0.95, EP("072", "value1", 1.25))), r2 = eio(seg(t, 1.65, 1.95));
-    const back = eo(seg(t, 3.35, 3.7));
-    const empty = seg(t, 1.95, 2.3) * (1 - seg(t, 3.25, 3.45));
+    const back = eo(seg(t, EP("072", "extra1", 3.35), 3.7));
+    const empty = seg(t, EP("072", "extra3", 1.95), EP("072", "extra2", 2.3)) * (1 - seg(t, 3.25, 3.45));
     bar(24, 14, 130, C.line2, 11);
     const rows = [[r1, 0], [r2, 1]];
     rows.forEach(([g, i]) => {
       const gone = back > 0 ? 1 - back : g; if (gone >= 1) return;
       const y = 40 + i * 58 - (i === 1 ? 58 * (back > 0 ? 0 : r1) : 0);
-      X.save(); X.globalAlpha = 1 - gone; X.translate(-60 * gone, 0);
+      X.save(); X.globalAlpha = 1 - gone; X.translate(-EP("072", "rowSlide", 60) * gone, 0);
       strokeRR(24, y, 494, 48, 8, C.line2, 1.5); ring(48, y + 24, 9, C.line2, 2); bar(70, y + 12, 200, C.line2, 10); bar(70, y + 28, 140, C.line, 7);
       // ゴミ箱
-      X.strokeStyle = '#888'; X.lineWidth = 2; X.lineJoin = 'round'; X.strokeRect(476, y + 18, 16, 18); X.beginPath(); X.moveTo(472, y + 17); X.lineTo(496, y + 17); X.moveTo(480, y + 13); X.lineTo(488, y + 13); X.stroke();
+      reusableTrash(472, y + 13);
       X.restore();
     });
     if (empty > 0) {
-      X.save(); X.globalAlpha = empty; const cy = 70 + 8 * (1 - empty);
-      X.strokeStyle = C.blue; X.lineWidth = 2.6; X.lineJoin = 'round';
-      X.beginPath(); X.moveTo(w / 2 - 26, cy - 4); X.lineTo(w / 2 - 18, cy - 22); X.lineTo(w / 2 + 18, cy - 22); X.lineTo(w / 2 + 26, cy - 4); X.lineTo(w / 2 + 26, cy + 16); X.lineTo(w / 2 - 26, cy + 16); X.closePath(); X.stroke();
-      X.beginPath(); X.moveTo(w / 2 - 26, cy - 4); X.lineTo(w / 2 - 9, cy - 4); X.lineTo(w / 2 - 6, cy + 3); X.lineTo(w / 2 + 6, cy + 3); X.lineTo(w / 2 + 9, cy - 4); X.lineTo(w / 2 + 26, cy - 4); X.stroke();
+      X.save(); X.globalAlpha = empty; const cy = 70 + EP("072", "emptyRise", 8) * (1 - empty);
+      reusableEmptyBox(w / 2, cy);
       text('这里还没有内容', w / 2, cy + 40, 16, '#555', 600, 'center');
-      fillRR(w / 2 - 56, cy + 62, 112, 34, 8, C.blue); text('添加', w / 2, cy + 79, 15, '#fff', 600, 'center');
+      reusableEmptyAdd(w/2,cy+62);
       X.restore();
     }
     pointer([[.3, w + 30, h + 30], [.9, 486, 67], [1.25, 486, 67], [1.6, 486, 67], [2.4, 486, 67], [3.2, w / 2 + 4, 156], [3.5, w / 2 + 4, 156], [4.2, w + 30, h + 30]], [0.95, 1.65, 3.3], t);
   });
 
+  const reusableMaterials = {
+    courseCard: (k) => { const old=X;X=k;try{k.save();reusableCourseCard(20,20,0,false);k.restore();}finally{X=old;} },
+    courseCardHover: (k) => { const old=X;X=k;try{k.save();reusableCourseCard(20,20,0,true);k.restore();}finally{X=old;} },
+    megaMenu: (k) => { const old=X;X=k;try{k.save();k.translate(24,24);reusableMegaMenu(542,0,false);k.restore();}finally{X=old;} },
+    skeletonRow: (k) => { const old=X;X=k;try{k.save();k.translate(0,20);reusableSkeletonRow(0,542,1.4);k.restore();}finally{X=old;} },
+    emptyAdd: (k) => { const old=X;X=k;try{k.save();reusableEmptyAdd(76,18);k.restore();}finally{X=old;} },
+    accordionClosed: (k) => { const old=X; X=k; try { k.save(); k.translate(0,18); reusableAccordionRow(0,0,0,58); k.restore(); } finally { X=old; } },
+    accordionOpen: (k) => { const old=X; X=k; try { k.save(); k.translate(0,18); reusableAccordionRow(0,0,1,58); k.restore(); } finally { X=old; } },
+    sliderHandle: (k) => { const old=X; X=k; try { k.save(); k.translate(128,185); k.scale(2,2); k.translate(-128,-120); reusableSliderHandle(128,120,'¥3,000',false,256); k.restore(); } finally { X=old; } },
+    sliderActive: (k) => { const old=X; X=k; try { k.save(); k.translate(128,185); k.scale(2,2); k.translate(-128,-120); reusableSliderHandle(128,120,'¥3,000',true,256); k.restore(); } finally { X=old; } },
+    pagination1: (k) => { const old=X; X=k; try { k.save(); k.translate(20,0); reusablePagination(0,36,8,0,35); k.restore(); } finally { X=old; } },
+    pagination2: (k) => { const old=X; X=k; try { k.save(); k.translate(20,0); reusablePagination(0,36,8,1,35); k.restore(); } finally { X=old; } },
+    pagination3: (k) => { const old=X; X=k; try { k.save(); k.translate(20,0); reusablePagination(0,36,8,2,35); k.restore(); } finally { X=old; } },
+    menuIcon: (k) => { const old=X; X=k; try { k.save(); k.translate(128,128); k.scale(5,5); reusableMenuIcon(0); k.restore(); } finally { X=old; } },
+    closeIcon: (k) => { const old=X; X=k; try { k.save(); k.translate(128,128); k.scale(5,5); reusableMenuIcon(1); k.restore(); } finally { X=old; } },
+    chipAll: (k) => { const old=X; X=k; try { k.save(); k.translate(20,20); reusableFilterChip('全部',0,0,0,18); k.restore(); } finally { X=old; } },
+    chipNew: (k) => { const old=X; X=k; try { k.save(); k.translate(20,20); reusableFilterChip('新品',0,0,0,18); k.restore(); } finally { X=old; } },
+    chipPopular: (k) => { const old=X; X=k; try { k.save(); k.translate(20,20); reusableFilterChip('热门',0,0,0,18); k.restore(); } finally { X=old; } },
+    chipFree: (k) => { const old=X; X=k; try { k.save(); k.translate(20,20); reusableFilterChip('免费',0,0,0,18); k.restore(); } finally { X=old; } },
+    chipNewSelected: (k) => { const old=X; X=k; try { k.save(); k.translate(20,20); reusableFilterChip('新品',0,0,1,18); k.restore(); } finally { X=old; } },
+    chipFreeSelected: (k) => { const old=X; X=k; try { k.save(); k.translate(20,20); reusableFilterChip('免费',0,0,1,18); k.restore(); } finally { X=old; } },
+    stepperOne: (k) => { const old=X; X=k; try { k.save(); k.translate(20,20); reusableStepper(0,0,200,60,1,false,false,0); k.restore(); } finally { X=old; } },
+    stepperFour: (k) => { const old=X; X=k; try { k.save(); k.translate(20,20); reusableStepper(0,0,200,60,4,false,false,0); k.restore(); } finally { X=old; } },
+    loadingSpinner: (k) => { const old=X; X=k; try { k.save(); k.translate(128,128); k.scale(3,3); reusableLoadingSpinner(0,0,.8); k.restore(); } finally { X=old; } },
+    loadingDone: (k) => { const old=X; X=k; try { k.save(); k.translate(128,128); k.scale(3,3); reusableLoadingDone(); k.restore(); } finally { X=old; } },
+    pricing0: (k) => { const old=X; X=k; try { k.save(); k.translate(20,20); reusablePricingCard(0,0,0); k.restore(); } finally { X=old; } },
+    pricing1: (k) => { const old=X; X=k; try { k.save(); k.translate(20,20); reusablePricingCard(0,0,1); k.restore(); } finally { X=old; } },
+    pricing2: (k) => { const old=X; X=k; try { k.save(); k.translate(20,20); reusablePricingCard(0,0,2); k.restore(); } finally { X=old; } },
+    carouselCircles: (k) => { const old=X; X=k; try { k.save(); k.translate(20,20); reusableCarouselCircles(0,0,330,138); k.restore(); } finally { X=old; } },
+    carouselBars: (k) => { const old=X; X=k; try { k.save(); k.translate(20,20); reusableCarouselBars(0,0,330,138); k.restore(); } finally { X=old; } },
+    segmentedDay: (k) => { const old=X; X=k; try { k.save(); k.translate(20,20); reusableSegmented(0,0,0); k.restore(); } finally { X=old; } },
+    segmentedWeek: (k) => { const old=X; X=k; try { k.save(); k.translate(20,20); reusableSegmented(0,0,1); k.restore(); } finally { X=old; } },
+    segmentedMonth: (k) => { const old=X; X=k; try { k.save(); k.translate(20,20); reusableSegmented(0,0,2); k.restore(); } finally { X=old; } },
+    modal: (k) => { const old=X; X=k; try { k.save(); k.translate(170,95); reusableModal(); k.restore(); } finally { X=old; } },
+    drawer: (k) => { const old=X; X=k; try { k.save(); k.translate(20,20); reusableDrawer(0,210,191); k.restore(); } finally { X=old; } },
+    bottomSheet: (k) => { const old=X; X=k; try { k.save(); k.translate(29,42); reusableBottomSheet(542,0,136); k.restore(); } finally { X=old; } },
+    dropdownNone: (k) => { const old=X; X=k; try { k.save(); k.translate(12,20); reusableDropdownList(0,-1); k.restore(); } finally { X=old; } },
+    dropdownSelected: (k) => { const old=X; X=k; try { k.save(); k.translate(12,20); reusableDropdownList(0,2); k.restore(); } finally { X=old; } },
+    filterResultBlue: (k) => { const old=X; X=k; try { reusableFilterResult(20,20,0); } finally { X=old; } },
+    filterResultGrey: (k) => { const old=X; X=k; try { reusableFilterResult(20,20,1); } finally { X=old; } },
+    rangeTrackFull: (k) => { const old=X; X=k; try { reusableRangeTrack(20,454,35,63.4,454); } finally { X=old; } },
+    rangeTrackMiddle: (k) => { const old=X; X=k; try { reusableRangeTrack(20,454,35,150.2,367.2); } finally { X=old; } },
+    popover: (k) => { const old=X; X=k; try { k.save(); k.translate(25,20); reusablePopover(0,0,300,120); k.restore(); } finally { X=old; } },
+    fingerMark: (k) => { const old=X; X=k; try { k.save(); k.translate(128,128); k.scale(4.2,4.2); finger([[0,0,0]],[],0,true); k.restore(); } finally { X=old; } },
+    tooltip: (k) => { const old=X; X=k; try { k.save(); k.translate(220,25); k.scale(2,2); reusableTooltip(0,0); k.restore(); } finally { X=old; } },
+    toast: (k) => { const old=X; X=k; try { k.save(); k.translate(20,22); k.scale(1.8,1.8); reusableToast(0,0,0.7); k.restore(); } finally { X=old; } },
+    notificationBell: (k) => { const old=X; X=k; try { k.save(); k.translate(128,125); k.scale(5,5); reusableNotificationBell(); k.restore(); } finally { X=old; } },
+    emptyBox: (k) => { const old=X; X=k; try { k.save(); k.translate(128,139); k.scale(3.5,3.5); reusableEmptyBox(0,0); k.restore(); } finally { X=old; } },
+    trash: (k) => { const old=X; X=k; try { k.save(); k.translate(56,55); k.scale(6,6); reusableTrash(0,0); k.restore(); } finally { X=old; } },
+    toggleOff: (k) => { const old=X; X=k; try { k.save(); k.translate(28,75); k.scale(3.1,3.1); reusableToggle(0,0,0,30); k.restore(); } finally { X=old; } },
+    toggleOn: (k) => { const old=X; X=k; try { k.save(); k.translate(28,75); k.scale(3.1,3.1); reusableToggle(0,0,1,30); k.restore(); } finally { X=old; } },
+    mountains: (k) => { const old=X; X=k; try { mountains(0,0,512,288); } finally { X=old; } },
+    mountainsTint: (k) => { const old=X; X=k; try { mountains(0,0,512,288,1); } finally { X=old; } },
+    cursor: (k) => { const old=X; X=k; try { k.save(); k.translate(55,35); k.scale(6,6); pointer([[0,0,0]],[],0); k.restore(); } finally { X=old; } },
+  };
+  for(let i=1;i<=3;i++) reusableMaterials['notificationBadge'+i]=(k)=>{const old=X;X=k;try{k.save();k.translate(128,128);k.scale(6,6);reusableNotificationBadge(i);k.restore();}finally{X=old;}};
+  for(let i=0;i<4;i++) for(const state of ['pending','current','done']) { if(i===3&&state==='current')continue; reusableMaterials['step'+i+state]=(k)=>{const old=X; X=k;try{k.save();reusableStep(50,i,state==='done',state==='current',['输入','确认','付款','已完成'][i]);k.restore();}finally{X=old;}}; }
+
   // @end
-  return { width: CW, height: CH, cycle: CYC, cells: CELLS, fonts: [] };
+  for(let row=0;row<3;row++) for(let i=0;i<7;i++) reusableMaterials['chartColumn'+row+'-'+i]=(k)=>{const old=X;X=k;try{k.save();k.translate(128,220);k.scale(1.5,1.5);reusableChartColumn(-17,0,UI_CHART_SETS[row][i],i);k.restore();}finally{X=old;}};
+  return { materials: reusableMaterials, width: CW, height: CH, cycle: CYC, cells: CELLS, fonts: [] };
 });
