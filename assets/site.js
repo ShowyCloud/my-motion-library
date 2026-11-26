@@ -159,9 +159,9 @@
     lines.push('',labels[5]); return lines.join('\n');
   };
 
-  Object.assign(I18N['zh-Hans'], {pairTitle: '站台送别 · 双景别对照', pairLeft: '左侧景别', pairRight: '右侧景别', pairRange: '画面范围', pairFocus: '叙事重点', pairTime: '同步时间线（秒）', pairMoment: '定格动作', pairWave: '举手', pairBlink: '眨眼', pairLower: '放下手', pairPlay: '同步播放', pairPause: '同步暂停'});
-  Object.assign(I18N['en'], {pairTitle: 'Platform farewell · Compare shot sizes', pairLeft: 'Left shot', pairRight: 'Right shot', pairRange: 'Framing', pairFocus: 'Story focus', pairTime: 'Shared timeline (seconds)', pairMoment: 'Freeze on', pairWave: 'Raised hand', pairBlink: 'Blink', pairLower: 'Lowering hand', pairPlay: 'Play both', pairPause: 'Pause both'});
-  Object.assign(I18N['ja'], {pairTitle: 'ホームでの別れ · ショットサイズ比較', pairLeft: '左のショット', pairRight: '右のショット', pairRange: '画面の範囲', pairFocus: '物語の焦点', pairTime: '共通タイムライン（秒）', pairMoment: '動作で停止', pairWave: '手を上げる', pairBlink: 'まばたき', pairLower: '手を下ろす', pairPlay: '両方を再生', pairPause: '両方を一時停止'});
+  Object.assign(I18N['zh-Hans'], {pairTitle:'双景别对照', pairScene:'场景', pairPlatform:'站台送别', pairHandoff:'物品交接', pairReach:'伸手', pairGrip:'接稳', pairRelease:'松手', pairLeft: '左侧景别', pairRight: '右侧景别', pairRange: '画面范围', pairFocus: '叙事重点', pairTime: '同步时间线（秒）', pairMoment: '定格动作', pairWave: '举手', pairBlink: '眨眼', pairLower: '放下手', pairPlay: '同步播放', pairPause: '同步暂停'});
+  Object.assign(I18N['en'], {pairTitle:'Compare shot sizes', pairScene:'Scene', pairPlatform:'Platform farewell', pairHandoff:'Envelope handoff', pairReach:'Reach', pairGrip:'Secure grip', pairRelease:'Release', pairLeft: 'Left shot', pairRight: 'Right shot', pairRange: 'Framing', pairFocus: 'Story focus', pairTime: 'Shared timeline (seconds)', pairMoment: 'Freeze on', pairWave: 'Raised hand', pairBlink: 'Blink', pairLower: 'Lowering hand', pairPlay: 'Play both', pairPause: 'Pause both'});
+  Object.assign(I18N['ja'], {pairTitle:'ショットサイズ比較', pairScene:'場面', pairPlatform:'ホームでの別れ', pairHandoff:'手紙の受け渡し', pairReach:'手を伸ばす', pairGrip:'受け取る', pairRelease:'手を離す', pairLeft: '左のショット', pairRight: '右のショット', pairRange: '画面の範囲', pairFocus: '物語の焦点', pairTime: '共通タイムライン（秒）', pairMoment: '動作で停止', pairWave: '手を上げる', pairBlink: 'まばたき', pairLower: '手を下ろす', pairPlay: '両方を再生', pairPause: '両方を一時停止'});
   // ------------------------------------------------------------------ state
   var store = {
     get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -214,7 +214,7 @@
   };
   function loadPack(p) {
     var s = document.createElement('script');
-    s.src = p.pack === 'custom' ? 'assets/custom-pack.js' : p.pack === 'principles' ? 'assets/principles-pack.js' : p.pack === 'cinema' ? 'assets/cinema-pack.js?v=20261126-f01' : 'packs/' + p.pack + '/pack.js';
+    s.src = p.pack === 'custom' ? 'assets/custom-pack.js' : p.pack === 'principles' ? 'assets/principles-pack.js' : p.pack === 'cinema' ? 'assets/cinema-pack.js?v=20261126-pair-scenes' : 'packs/' + p.pack + '/pack.js';
     s.onload = function () {
       var reg = MP.packs[p.pack];
       if (!reg || ready[p.pack] === 'failed') return fail();
@@ -237,14 +237,56 @@
   var clock = 0, lastNow = 0;
   var pairPanel = $('#shot-pair'), pairSlider = $('#pair-time'), pairReadout = $('#pair-readout');
   var pairShots = CAT.elements.filter(function (el) { return el.pack === 'shots'; });
-  var pairDuration = packBy.shots.cycle, pairTime = reduceMotion.matches ? STILL * pairDuration : 0;
+  var pairSceneSelect = $('#pair-scene'), pairCues = $$('.shot-pair-cues button');
+  var pairScenes = {
+    platform: {pack:'shots', duration:packBy.shots.cycle},
+    handoff: {pack:'cinema', duration:packBy.cinema.cycle}
+  };
+  var pairScene = new URLSearchParams(location.search).get('scene') === 'handoff' ? 'handoff' : 'platform';
+  var pairDuration = pairScenes[pairScene].duration, pairTime = reduceMotion.matches ? STILL * pairDuration : 0;
+  var handoffNotes = {
+    S01:['整条街和成排楼房入画，两人站在路灯之间。','先找出会面的地点。即使看不清信封，也能读出两人的相对位置。'],
+    S02:['街道仍占大半画面，两人相向站立，手臂伸向中间。','看原先分开的轮廓何时连在一起，判断接触发生在哪一侧。'],
+    S03:['两人从头到脚完整入画，信封在他们之间移动。','从两人的站位看，谁先把信送到中间，谁在接稳后把信带回身前。'],
+    S04:['从膝部附近向上取景，两副肩膀、手肘和信封都在画内。','比较两只手肘打开的先后，分辨主动递出与随后迎接。'],
+    S05:['腰部以上的双人构图把两条手臂和信封放在一起。','看两人何时同时握住信封，再看递出的一侧何时收回。'],
+    S06:['接信人的脸和胸肩占据画面，递信人退到画外。','先看他低头接信，再看他抬眼回应。交接也可以通过反应来讲。'],
+    S07:['信封、封口与两只手占据画面中央。','跟着信封看。先是一个人拿着，再由两人接触，最后只剩接信人握住。'],
+    S08:['镜头贴近信封右缘，放大接信人的拇指和纸边。','接稳时拇指压住纸边，松手时这一侧仍然握紧。对照另一幅画面确认是谁放了手。']
+  };
   var pairDirty = true, pairVisible = true;
   var pairViews = $$('.shot-pair-pane').map(function (pane, i) {
     var canvas = pane.querySelector('canvas');
     return { select: pane.querySelector('select'), canvas: canvas, ctx: canvas.getContext('2d'),
       captions: pane.querySelectorAll('dd'), id: i === 0 ? 'S03' : 'S07' };
   });
-  pairSlider.max = pairDuration;
+  function markPairCue() {
+    pairCues.forEach(function (b) {
+      if (!state.playing && b.dataset.scene === pairScene && Number(b.dataset.time) === pairTime) b.setAttribute('aria-current', 'time');
+      else b.removeAttribute('aria-current');
+    });
+  }
+  function syncPairSceneControls() {
+    pairSceneSelect.value = pairScene;
+    pairSlider.max = pairDuration;
+    pairCues.forEach(function (b) { b.hidden = b.dataset.scene !== pairScene; });
+    markPairCue();
+  }
+  syncPairSceneControls();
+  pairSceneSelect.addEventListener('change', function () {
+    pairScenes[pairScene].time = pairTime;
+    pairScene = pairSceneSelect.value;
+    pairDuration = pairScenes[pairScene].duration;
+    pairTime = pairScenes[pairScene].time || 0;
+    syncPairSceneControls();
+    refreshPairOptions();
+    pairViews.forEach(function (view) { view.ctx.clearRect(0, 0, view.canvas.width, view.canvas.height); });
+    drawPair();
+    var url = new URL(location.href);
+    if (pairScene === 'platform') url.searchParams.delete('scene');
+    else url.searchParams.set('scene', pairScene);
+    history.replaceState(history.state, '', url);
+  });
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(function (entries) {
       pairVisible = entries[0].isIntersecting;
@@ -256,8 +298,11 @@
     var el = elBy[view.id];
     view.select.value = view.id;
     view.canvas.setAttribute('aria-label', names(el).main);
-    view.captions[0].textContent = el.meaning[state.lang] || el.meaning.en;
-    view.captions[1].textContent = el.use[state.lang] || el.use.en;
+    var notes = pairScene === 'handoff' ? handoffNotes[view.id] : [el.meaning[state.lang] || el.meaning.en, el.use[state.lang] || el.use.en];
+    view.captions[0].textContent = notes[0];
+    view.captions[1].textContent = notes[1];
+    if (pairScene === 'handoff') view.canvas.dataset.handoffSize = view.id;
+    else delete view.canvas.dataset.handoffSize;
   }
   function refreshPairOptions() {
     pairViews.forEach(function (view) {
@@ -278,9 +323,11 @@
     });
   });
   function drawPair() {
-    if (pairPanel.hidden || ready.shots !== 'ok') return;
+    if (pairPanel.hidden) return;
+    var canDraw = ready[pairScenes[pairScene].pack] === 'ok';
     pairViews.forEach(function (view) {
-      var el = elBy[view.id];
+      if (!canDraw) return;
+      var el = elBy[pairScene === 'handoff' ? 'F01' : view.id];
       // Compare a single moment in the source action, even with different local playback speeds.
       var speed = el._visual && el._visual.speed || 1;
       paint(view.ctx, el, pairTime / speed, view.canvas.width / el.width);
@@ -289,17 +336,18 @@
     pairSlider.value = seconds;
     pairSlider.setAttribute('aria-valuetext', seconds + ' / ' + pairDuration + ' s');
     pairReadout.textContent = seconds + ' / ' + pairDuration.toFixed(2) + ' s';
-    pairDirty = false;
+    pairDirty = !canDraw;
   }
   function seekPair(seconds) {
     if (state.playing) togglePlay();
     pairTime = Math.max(0, Math.min(pairDuration, seconds));
+    markPairCue();
     pairDirty = true;
     drawPair();
   }
   pairSlider.addEventListener('pointerdown', function () { if (state.playing) togglePlay(); });
   pairSlider.addEventListener('input', function () { seekPair(pairSlider.valueAsNumber); });
-  $$('.shot-pair-cues button').forEach(function (b) {
+  pairCues.forEach(function (b) {
     b.addEventListener('click', function () { seekPair(Number(b.dataset.time)); });
   });
   $('#pair-play').addEventListener('click', togglePlay);
@@ -348,7 +396,7 @@
       }
       return;
     }
-    if (!pairPanel.hidden && ready.shots === 'ok') {
+    if (!pairPanel.hidden && ready[pairScenes[pairScene].pack] === 'ok') {
       if (state.playing) pairTime = (pairTime + dt) % pairDuration;
       if (pairVisible && (state.playing || pairDirty)) drawPair();
     }
@@ -561,7 +609,7 @@
   var codeCache = {};
   function fetchCode(id, lang) {
     var item = elBy[id];
-    if (item && (item._principles || item._film || item.pack === 'shots')) return fetch(item.pack === 'shots' ? 'packs/shots/pack.js' : item._film ? 'assets/cinema-pack.js?v=20261126-f01' : 'assets/principles-pack.js').then(function(r) { if (!r.ok) throw new Error(String(r.status)); return r.text(); }).then(function(code) { return item._visual ? '【示例源代码】本地修改的参数、播放速度、文字、主体图片和手臂设置另存于 data/visual-editor.json，未包含在以下代码中。\n\n' + code : code; });
+    if (item && (item._principles || item._film || item.pack === 'shots')) return fetch(item.pack === 'shots' ? 'packs/shots/pack.js' : item._film ? 'assets/cinema-pack.js?v=20261126-pair-scenes' : 'assets/principles-pack.js').then(function(r) { if (!r.ok) throw new Error(String(r.status)); return r.text(); }).then(function(code) { return item._visual ? '【示例源代码】本地修改的参数、播放速度、文字、主体图片和手臂设置另存于 data/visual-editor.json，未包含在以下代码中。\n\n' + code : code; });
     if (item && item._custom) {
       var own = (window.MP_EDITOR_DATA.custom || []).find(function (x) { return x.id === id; });
       if (own && own.motion === 'script') return Promise.resolve('自定义 Canvas 每帧代码（参数：ctx, width, height, time, options, media）：\n\n' + (own.effectCode || ''));
@@ -972,6 +1020,7 @@
   if (darkQuery.addEventListener) darkQuery.addEventListener('change', applyTheme);
 
   function applyPlay() {
+    markPairCue();
     $('#pair-play').textContent = t(state.playing ? 'pairPause' : 'pairPlay');
     var b = $('#play'), d = $('#d-play');
     b.setAttribute('aria-pressed', state.playing ? 'true' : 'false');

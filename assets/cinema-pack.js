@@ -46,7 +46,7 @@ function ramp(p, start, end) {
  return v*v*(3-2*v);
 }
 function street(k) {
- k.fillStyle='#d9e8e6'; k.fillRect(-820,-310,1640,360);
+ k.fillStyle='#d9e8e6'; k.fillRect(-820,-410,1640,510);
  if(fit(k,slots.background,-600,-270,1200,320,true)) return;
  for(let i=-5;i<=5;i++){
   const x=i*132, roof=-140-(Math.abs(i*37)%58);
@@ -88,17 +88,29 @@ cells.push((k,w,h,u)=>{
  const automatic=Math.round(Math.min(count-1,Math.floor(p*count))*4/(count-1));
  const fixed=k.canvas.dataset?.handoffShot;
  const index=fixed===undefined?automatic:Number(fixed);
- const [name,zoom,focus]=handoffShots[index] || handoffShots[automatic];
+ const [name,detailZoom,focus]=handoffShots[index] || handoffShots[automatic];
  const offer=ramp(p,.1,.43), receive=ramp(p,.24,.48), release=ramp(p,.61,.84);
  const sender=-51+7*offer, receiver=49-3*receive;
  const envelope=-28+28*offer+23*release, ey=-49-3*offer+2*release;
  const senderHand=envelope-8-47*release;
  const receiverHand=receiver-9+(8-(receiver-9))*receive+23*release;
  const scale=param('subjectScale',1);
- const cameraX=index===3?receiver*scale:index===4?envelope*scale:0;
- const cameraY=[-62,-50,-65,-78,ey][index]*scale;
- base(k);k.save();k.beginPath();k.rect(22,35,495,130);k.clip();
- k.translate(269+param('positionX',0),100);k.scale(zoom,zoom);k.translate(-cameraX,-cameraY);
+ // Both comparisons use this performance. Only the camera centre and framing change.
+ const pairSize=k.canvas.dataset?.handoffSize;
+ let cameraX=index===3?receiver:index===4?envelope:0;
+ let cameraY=[-62,-50,-65,-78,ey][index], zoom=detailZoom;
+ if(pairSize){
+  const cameras={
+   S01:[0,-95,.43], S02:[0,-62,.82], S03:[0,-49,1.85], S04:[0,-61,2.68],
+   S05:[0,-71,3.38], S06:[receiver,-79,4.55],
+   S07:[envelope,ey,9], S08:[envelope+7,ey-1,24]
+  };
+  [cameraX,cameraY,zoom]=cameras[pairSize];
+ }
+ base(k);k.save();
+ if(!pairSize){k.beginPath();k.rect(22,35,495,130);k.clip();}
+ k.translate((pairSize?w/2:269)+param('positionX',0),pairSize?h/2:100);
+ k.scale(zoom,zoom);k.translate(-cameraX*scale,-cameraY*scale);
  street(k);k.scale(scale,scale);
  handoffPerson(k,sender,1,false,p,senderHand,ey+8*release);
  handoffPerson(k,receiver,-1,true,p,receiverHand,ey+13*(1-receive));
@@ -111,7 +123,8 @@ cells.push((k,w,h,u)=>{
  linePath(k,[[senderHand-2,ey+8*release-1],[senderHand+2,ey+8*release-2-release]],'#e5b493',2);
  const rightY=ey+13*(1-receive);
  linePath(k,[[receiverHand+2,rightY-1],[receiverHand-2,rightY-2]],'#cd906d',2);
- k.restore();frame(k,22,35,495,130);stageText(k,'物品交接  /  '+name);caption(k,focus);
+ k.restore();
+ if(!pairSize){frame(k,22,35,495,130);stageText(k,'物品交接  /  '+name);caption(k,focus);}
 });
 // F02: establish two people, then show their opposing dialogue shots.
 cells.push((k,w,h,u)=>{base(k);let p=phase(u),sep=param('separation',108),first=param('firstCut',.28),second=param('secondCut',.65);scene(k);if(p<first){actor(k,269-sep,149,48,'primary',1);actor(k,269+sep,149,48,'secondary',-1);stageText(k,'① 双人全景');arrow(k,230,84,300,84,'#8299b9')}else if(p<second){actor(k,230,180,105,'primary',1);arrow(k,300,92,365,92,teal);stageText(k,'② A 的镜头')}else{actor(k,309,180,105,'secondary',-1);arrow(k,239,92,174,92,coral);stageText(k,'③ B 的镜头')}frame(k,22,35,495,130);caption(k,'建立空间 → A → B');});

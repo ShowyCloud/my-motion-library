@@ -449,7 +449,10 @@ html.has-tray { scroll-padding-bottom: calc(var(--tray-h, 0px) + 16px); }
 
 /* The two views keep the same aspect ratio and stay side by side on phones. */
 #shot-pair { margin: 1.4rem 0; padding: clamp(12px, 2.4vw, 28px); border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
-#pair-title { margin: 0 0 16px; font-size: clamp(19px, 2vw, 25px); }
+#pair-title { margin: 0; font-size: clamp(19px, 2vw, 25px); }
+.shot-pair-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 20px; margin-bottom: 16px; }
+.shot-pair-heading label { color: var(--muted); font-size: 13px; }
+#pair-scene { margin-left: 4px; padding: 5px 8px; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-radius: 6px; font: inherit; font-weight: 650; }
 .shot-pair-views { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(8px, 2vw, 24px); }
 .shot-pair-pane label { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 13px; color: var(--muted); }
 .shot-pair-pane select { font: inherit; font-weight: 650; padding: 5px 8px; max-width: 100%; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 6px; color: var(--ink); }
@@ -463,6 +466,7 @@ html.has-tray { scroll-padding-bottom: calc(var(--tray-h, 0px) + 16px); }
 .shot-pair-cues { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin-top: 10px; color: var(--muted); font-size: 13px; }
 .shot-pair-cues button { color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 5px 10px; }
 .shot-pair-cues button:hover { border-color: var(--ink); }
+.shot-pair-cues button[aria-current="time"] { border-color: var(--accent); color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 @media (max-width: 500px) {
   .shot-pair-transport { gap: 7px; }
   .shot-pair-pane dl { font-size: 13px; }

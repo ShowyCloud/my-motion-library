@@ -23,7 +23,7 @@
   d.lang = l;
 })();
 </script>
-<link rel="stylesheet" href="assets/site.css?v=20261126-shot-pair">
+<link rel="stylesheet" href="assets/site.css?v=20261126-pair-scenes">
 </head>
 <body>
 <a class="skip" href="#gallery" data-t="skip">見本の一覧へ移動</a>
@@ -91,7 +91,12 @@
     </div>
     <div class="wrap">
       <section id="shot-pair" aria-labelledby="pair-title" hidden>
-        <h3 id="pair-title" data-t="pairTitle">站台送别 · 双景别对照</h3>
+        <div class="shot-pair-heading">
+          <h3 id="pair-title" data-t="pairTitle">双景别对照</h3>
+          <label><span data-t="pairScene">场景</span>
+            <select id="pair-scene"><option value="platform" data-t="pairPlatform">站台送别</option><option value="handoff" data-t="pairHandoff">物品交接</option></select>
+          </label>
+        </div>
         <div class="shot-pair-views">
           <div class="shot-pair-pane">
             <label><span data-t="pairLeft">左侧景别</span><select id="pair-left"></select></label>
@@ -112,9 +117,12 @@
         </div>
         <div class="shot-pair-cues">
           <span data-t="pairMoment">定格动作</span>
-          <button type="button" data-time="1.65" data-t="pairWave">举手</button>
-          <button type="button" data-time="3.36" data-t="pairBlink">眨眼</button>
-          <button type="button" data-time="4.80" data-t="pairLower">放下手</button>
+          <button type="button" data-scene="platform" data-time="1.65" data-t="pairWave">举手</button>
+          <button type="button" data-scene="platform" data-time="3.36" data-t="pairBlink">眨眼</button>
+          <button type="button" data-scene="platform" data-time="4.80" data-t="pairLower">放下手</button>
+          <button type="button" data-scene="handoff" data-time="1.68" data-t="pairReach" hidden>伸手</button>
+          <button type="button" data-scene="handoff" data-time="2.40" data-t="pairGrip" hidden>接稳</button>
+          <button type="button" data-scene="handoff" data-time="3.40" data-t="pairRelease" hidden>松手</button>
         </div>
       </section>
       <p class="count" id="count" role="status" aria-live="polite"></p><p class="listen-status" id="listen-status" role="status" aria-live="polite"></p>
@@ -255,6 +263,6 @@
 <script src="assets/animation-parameters.js"></script><script src="assets/principles-parameters.js"></script><script src="assets/cinema-parameters.js"></script><script src="assets/custom-sandbox.js"></script><script src="assets/visual-common.js?v=20261101-eyes6"></script>
 <script src="assets/branding.js"></script>
 <script>MPBrand.apply(MPBrand.site, "home");</script>
-<script src="assets/general-learning.js?v=20261101-audit3"></script><script src="assets/film-audio.js?v=20261101-sound1"></script><script src="assets/site.js?v=20261126-shot-pair"></script>
+<script src="assets/general-learning.js?v=20261101-audit3"></script><script src="assets/film-audio.js?v=20261101-sound1"></script><script src="assets/site.js?v=20261126-pair-scenes"></script>
 </body>
 </html>
