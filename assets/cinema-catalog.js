@@ -22,3 +22,38 @@ const groups={
 };
 entries.forEach((e,i)=>{c.elements.push({id:e.id,pack:'cinema',no:String(i+1).padStart(2,'0'),slug:'film-'+String(i+1).padStart(2,'0'),filmGroups:Object.keys(groups).filter(key=>groups[key].includes(e.id)),category:i>=26?'lighting-sound':i===2||(i>=12&&i<18)?'camera-axis':(i===4||i===5||i===11||i>=18)?'editing-techniques':'film-techniques',width:539,height:208,cycle:4.8,name:{'zh-Hans':e.name,en:e.en,ja:e.name},meaning:zh(e.meaning),summary:zh(e.summary),use:zh(e.use),ask:zh(e.ask),spec: {'zh-Hans':[e.summary,...(e.extra||[]),'二维教学示意；播放时长、画面素材和专项参数可在本地编辑器调整。'],en:[e.summary],ja:[e.summary]},tags:Array.from(new Set(['影视技巧',e.name,e.en,...e.aliases].filter(Boolean))),_film:true,_learning:learning[e.id]||null,assetSlots:e.slots});});c.count=c.elements.length;
 })(window);
+
+// Fixed shot sizes are a gallery pack of their own, next to the camera examples.
+(function (catalog) {
+  if (!catalog || catalog.packs.some(p => p.pack === 'shots')) return;
+  const text = (zh, en) => ({'zh-Hans':zh, en:en || zh, ja:zh});
+  const categories = [
+    {slug:'space', ...text('看环境','Setting')},
+    {slug:'action', ...text('看动作','Action')},
+    {slug:'reaction', ...text('看反应','Reaction')}
+  ];
+  const shots = [
+    ['大远景','Extreme long shot','space','站台顶棚、城市轮廓和驶过的列车占据画面，送行人只是月台上的一个小点。','开场先交代车站的规模，让告别显得渺小。','先找到人物，再看列车经过了多少根立柱。'],
+    ['远景','Long shot','space','保留人物全身和两侧站台，能同时看到站牌、长椅与行李箱。','交代人物站在哪里，以及列车向哪个方向离开。','不看脸，只凭人物的位置和挥手方向判断他在送谁。'],
+    ['全景','Full shot','action','从头顶收到鞋底，双脚、行李箱和举起的手都在画内。','交代人物的完整动作和人与道具的位置关系。','留意一只手扶行李，另一只手举起，与稳稳落地的双脚形成对照。'],
+    ['中全景','Medium long shot','action','画面下沿收到膝部附近。箱体大半离开画面，手臂由垂下到举起的轨迹仍然完整。','保留身体姿态，同时突出大幅手势。','看手肘先向外打开，手腕什么时候开始左右摆动。'],
+    ['中景','Medium shot','action','取腰部附近以上，视线、肩膀和挥手可以一起读到。','把人物在做什么与他对谁做这个动作放在同一镜内。','对照眼睛和手的方向，找出手举到最高的时刻。'],
+    ['近景','Medium close-up','reaction','从胸部附近取到头顶，抬起的手进入脸旁，眉眼和嘴角开始清晰。','在人物手势和表情之间分配观众的注意力。','手放下以后，他的目光是否仍跟着列车？'],
+    ['特写','Close-up','reaction','面部占满画面高度，目光追随列车，随后眨眼。','在告别动作中单独强调人物的情绪反应。','观察嘴角的变化，试着找出视线停留的瞬间。'],
+    ['大特写','Extreme close-up','reaction','截取眼睛周围的一小块区域，能看见瞳孔移动和眼睑闭合。','让一个微小反应成为观众此刻唯一需要读懂的信息。','看瞳孔移向画面右侧，再观察眨眼与视线回落的先后。']
+  ];
+  const format = {width:539,height:208,cycle:6};
+  const pack = {pack:'shots',title:{'zh-Hans':'景别',en:'Shot sizes',ja:'ショットサイズ'},categories,
+    first:'S01',last:'S08',count:shots.length,scalable:true,...format};
+  catalog.packs.splice(catalog.packs.findIndex(p=>p.pack==='camera')+1,0,pack);
+  shots.forEach(([name,en,category,range,use,exercise],i)=>{
+    const no=String(i+1).padStart(2,'0'), id='S'+no;
+    const adjacent=shots[i+1] ? 'S'+String(i+2).padStart(2,'0') : 'S07';
+    catalog.elements.push({id,no,pack:'shots',slug:'platform-'+no,category,...format,
+      name:text(name,en),meaning:text(range),summary:text('站台送别。'+range),use:text(use),ask:text(exercise),
+      spec:text(['固定景别，六秒循环。列车向右行驶，送行人抬手挥别、眨眼，再放下手。',range]),
+      tags:['景别','站台送别',name,en,{'space':'环境','action':'动作','reaction':'表情'}[category]],
+      _learning:[exercise,[adjacent,'F01']]});
+  });
+  catalog.count=catalog.elements.length;
+})(window.MP_CATALOG);

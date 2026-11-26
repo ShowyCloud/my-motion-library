@@ -322,7 +322,7 @@
         var listen = window.MPFilmAudio && MPFilmAudio.supports(el.id) ? h('button', {type:'button',class:'tile-listen','aria-pressed':'false','aria-label':t('listenLabel',{id:el.id,name:nm.main}),text:t('listenTile')}) : null;
         var box = h('div', { class: 'tile-box' }, [a, pb, edit, listen]);
         var tl = { el: el, a: a, box: box, pick: pb, edit: edit, listen: listen, canvas: canvas, ctx: canvas.getContext('2d'), visible: !io, dirty: true, broken: false,
-          offset: reduceMotion.matches ? STILL : (el._i * 0.6180339887) % 1 };
+          offset: reduceMotion.matches ? STILL : el.pack === 'shots' ? 0 : (el._i * 0.6180339887) % 1 };
         a._tile = tl;
         pb.addEventListener('click', function () { togglePick(el.id); });
         if (listen) listen.addEventListener('click', function () { toggleTileAudio(tl); });
@@ -483,7 +483,7 @@
   var codeCache = {};
   function fetchCode(id, lang) {
     var item = elBy[id];
-    if (item && (item._principles || item._film)) return fetch(item._film ? 'assets/cinema-pack.js?v=20261126-f01' : 'assets/principles-pack.js').then(function(r) { if (!r.ok) throw new Error(String(r.status)); return r.text(); }).then(function(code) { return item._visual ? '【示例源代码】本地修改的参数、播放速度、文字、主体图片和手臂设置另存于 data/visual-editor.json，未包含在以下代码中。\n\n' + code : code; });
+    if (item && (item._principles || item._film || item.pack === 'shots')) return fetch(item.pack === 'shots' ? 'packs/shots/pack.js' : item._film ? 'assets/cinema-pack.js?v=20261126-f01' : 'assets/principles-pack.js').then(function(r) { if (!r.ok) throw new Error(String(r.status)); return r.text(); }).then(function(code) { return item._visual ? '【示例源代码】本地修改的参数、播放速度、文字、主体图片和手臂设置另存于 data/visual-editor.json，未包含在以下代码中。\n\n' + code : code; });
     if (item && item._custom) {
       var own = (window.MP_EDITOR_DATA.custom || []).find(function (x) { return x.id === id; });
       if (own && own.motion === 'script') return Promise.resolve('自定义 Canvas 每帧代码（参数：ctx, width, height, time, options, media）：\n\n' + (own.effectCode || ''));
@@ -562,7 +562,7 @@
     ask.textContent = el.ask ? el.ask[lang] || el.ask.en || '' : ''; ask.hidden = askH.hidden = !ask.textContent;
     $('#d-summary').textContent = el.summary[lang] || el.summary.en;
     var spec = $('#d-spec'); spec.textContent = '';
-    (el.spec[lang] || el.spec.en).forEach(function (s, i) { var li = h('li', { text: s }); if (lang === 'zh-Hans' && !el._custom && !el._principles && !el._film && !el._visual && el.spec.en[i]) { var orig = h('details', {class:'original-spec'}, [h('summary', {text:'查看英文原文'}), h('p', {text:el.spec.en[i]})]); li.appendChild(orig); } spec.appendChild(li); });
+    (el.spec[lang] || el.spec.en).forEach(function (s, i) { var li = h('li', { text: s }); if (lang === 'zh-Hans' && !el._custom && !el._principles && !el._film && el.pack !== 'shots' && !el._visual && el.spec.en[i]) { var orig = h('details', {class:'original-spec'}, [h('summary', {text:'查看英文原文'}), h('p', {text:el.spec.en[i]})]); li.appendChild(orig); } spec.appendChild(li); });
     var editedParams = window.MPVisual.paramSummary(el);
     if (editedParams.length) spec.insertBefore(h('li', {text:'已修改动画参数：' + editedParams.join('；') + '。原始说明中的对应数值可能已变化。'}), spec.firstChild);
     if (el._visual && el._visual.speed !== 1) spec.insertBefore(h('li', {text:'实际播放速度为 ' + el._visual.speed + ' 倍；原始时间参数需除以该倍数。'}), spec.firstChild);
@@ -582,7 +582,7 @@
     el.tags.forEach(function (s) { var translated = state.lang === 'zh-Hans' && (window.MP_ZH_TAGS || {})[s]; tags.appendChild(h('li', { text: translated || s, title: translated ? s : '' })); });
     $('#d-prompt').textContent = PROMPT(el, p.title[lang] || p.title.en, lang);
     var kit = $('#d-kit'), txt = $('#d-txt');
-    kit.hidden = txt.hidden = !!(el._custom || el._principles || el._film);
+    kit.hidden = txt.hidden = !!(el._custom || el._principles || el._film || el.pack === 'shots');
     kit.href = 'api/v1/kit/' + el.pack + '.js'; kit.textContent = t('kitLink', { pack: el.pack });
     txt.href = 'api/v1/' + (lang === 'zh-Hans' ? 'en' : lang) + '/e/' + el.id + '.txt'; txt.textContent = t('txtLink', { id: el.id });
     var pre = $('#d-code'); pre.textContent = t('codeLoading');
@@ -630,7 +630,7 @@
     if (back && back.focus) back.focus({ preventScroll: true });
   }
   function hashId() {
-    var m = /^#(\d{1,3}|(?:P(?:0[1-9]|1[0-2])|F(?:0[1-9]|1[0-9]|[1-8][0-9]|9[0-5])))$/i.exec(location.hash);
+    var m = /^#(\d{1,3}|(?:S0[1-8]|P(?:0[1-9]|1[0-2])|F(?:0[1-9]|1[0-9]|[1-8][0-9]|9[0-5])))$/i.exec(location.hash);
     return m ? ('000' + m[1].toUpperCase()).slice(-3) : null;
   }
   function syncFromHash() {
@@ -688,7 +688,7 @@
   function cleanIds(list) {
     var out = [];
     (list || []).forEach(function (x) {
-      var m = /^#?(\d{1,3}|(?:P(?:0[1-9]|1[0-2])|F(?:0[1-9]|1[0-9]|[1-8][0-9]|9[0-5])))$/i.exec(String(x).trim());
+      var m = /^#?(\d{1,3}|(?:S0[1-8]|P(?:0[1-9]|1[0-2])|F(?:0[1-9]|1[0-9]|[1-8][0-9]|9[0-5])))$/i.exec(String(x).trim());
       var id = m && ('000' + m[1].toUpperCase()).slice(-3);
       if (id && elBy[id] && out.indexOf(id) < 0) out.push(id);
     });
