@@ -33,8 +33,86 @@ function stageText(k,s){t(k,s,269,19,17)}
 // A brief visual cue marks the actual cut without moving it or obscuring the subject.
 function lessonCut(k,p,cuts){if(!lessonMode||!cuts.some(c=>p>=c&&p<c+.035))return;k.save();k.fillStyle='rgba(28,48,76,.86)';k.beginPath();k.roundRect(455,39,49,19,5);k.fill();t(k,'切镜',479,49,11,'#fff');k.restore()}
 const cells=[];
-// F01: Five distinct shot sizes shown by changing the on-screen subject scale.
-cells.push((k,w,h,u)=>{base(k);let p=phase(u),count=param('shotCount',5),index=Math.min(count-1,Math.floor(p*count)),z=[.5,.75,1,1.45,2.15][Math.round(index*4/(count-1))],labels=['远景','全景','中景','近景','特写'],label=labels[Math.round(index*4/(count-1))];scene(k);k.save();k.beginPath();k.rect(22,35,495,130);k.clip();actor(k,269+param('positionX',0),145+Math.max(0,z-1.45)*60,50*z,'primary',1);k.restore();frame(k,22,35,495,130);stageText(k,label+' · '+(index+1)+' / '+count);caption(k,'同一场景：景别改变画面信息');});
+// F01. Each camera crops one continuous street scene in world coordinates.
+const handoffShots = [
+ ['远景', .46, '街道与路灯占据画面，两人在什么地方见面？'],
+ ['全景', 1.12, '从头到脚都看得见，两人之间隔了几步？'],
+ ['中景', 1.82, '从腰部往上看，谁先伸手，谁在等待？'],
+ ['近景', 2.9, '看接信人的脸，他先看信，还是先看对方？'],
+ ['特写', 6.8, '只看手指与封口，接稳之后，递信人何时松手？']
+];
+function ramp(p, start, end) {
+ const v = Math.max(0, Math.min(1, (p-start)/(end-start)));
+ return v*v*(3-2*v);
+}
+function street(k) {
+ k.fillStyle='#d9e8e6'; k.fillRect(-820,-310,1640,360);
+ if(fit(k,slots.background,-600,-270,1200,320,true)) return;
+ for(let i=-5;i<=5;i++){
+  const x=i*132, roof=-140-(Math.abs(i*37)%58);
+  k.fillStyle=i%2?'#afc6c4':'#c2d4d0'; k.fillRect(x,roof,126,-roof);
+  k.fillStyle='#e4efea';
+  for(let n=0;n<3;n++) k.fillRect(x+13+n*36,roof+14,18,29);
+ }
+ k.fillStyle='#b2bfbc'; k.fillRect(-820,-4,1640,95);
+ for(const x of [-190,135,410]){
+  linePath(k,[[x,0],[x,-118],[x+19,-118]],'#566e75',3);
+  k.fillStyle='#ffdf9c';k.fillRect(x+12,-118,19,6);
+ }
+}
+function handoffPerson(k,x,facing,receiver,p,handX,handY){
+ k.save(); k.translate(x,0); k.scale(facing,1);
+ const coat=receiver?'#a7483c':'#275d70', skin=receiver?'#cd906d':'#e5b493';
+ const lookUp=ramp(p,.55,.68)*(1-ramp(p,.85,.97));
+ const replaced=!receiver && MotionPrompt.packs.principles.drawSubject(k,0,-49,50,98,true);
+ if(!replaced){
+  k.lineCap='round';
+  linePath(k,[[-6,-36],[-10,-4],[-14,-2]],'#293d47',7);
+  linePath(k,[[6,-36],[9,-3],[14,-2]],'#334954',7);
+  k.fillStyle=coat;k.beginPath();k.roundRect(-13,-68,26,36,5);k.fill();
+  k.save();k.translate(0,-78);k.rotate(receiver?.16-.24*lookUp:.06);
+  k.fillStyle=skin;k.beginPath();k.ellipse(0,-3,10,14,0,0,2*PI);k.fill();
+  k.beginPath();k.moveTo(8,-8);k.lineTo(13,-2);k.lineTo(8,-1);k.fill();
+  k.fillStyle='#334148';k.beginPath();k.ellipse(-2,-13,10,6,-.12,0,2*PI);k.fill();
+  k.fillStyle='#25363c';k.beginPath();k.arc(6,-6+(receiver?1.4-2.5*lookUp:0),1.4,0,2*PI);k.fill();
+  linePath(k,[[3,-9-lookUp],[8,-8.5-lookUp]],'#503e38',1.1);
+  linePath(k,[[5,3],[8,3-lookUp]],'#855348',.9);k.restore();
+ }
+ const hx=(handX-x)*facing;
+ k.lineCap='round';linePath(k,[[6,-62],[Math.max(10,hx*.5),handY+8],[hx-3,handY+1]],coat,6);
+ k.fillStyle=skin;k.beginPath();k.ellipse(hx-1,handY,4.2,2.5,-.12,0,2*PI);k.fill();
+ k.restore();
+}
+cells.push((k,w,h,u)=>{
+ const p=phase(u),count=Math.max(2,Math.min(5,Math.round(param('shotCount',5))));
+ const automatic=Math.round(Math.min(count-1,Math.floor(p*count))*4/(count-1));
+ const fixed=k.canvas.dataset?.handoffShot;
+ const index=fixed===undefined?automatic:Number(fixed);
+ const [name,zoom,focus]=handoffShots[index] || handoffShots[automatic];
+ const offer=ramp(p,.1,.43), receive=ramp(p,.24,.48), release=ramp(p,.61,.84);
+ const sender=-51+7*offer, receiver=49-3*receive;
+ const envelope=-28+28*offer+23*release, ey=-49-3*offer+2*release;
+ const senderHand=envelope-8-47*release;
+ const receiverHand=receiver-9+(8-(receiver-9))*receive+23*release;
+ const scale=param('subjectScale',1);
+ const cameraX=index===3?receiver*scale:index===4?envelope*scale:0;
+ const cameraY=[-62,-50,-65,-78,ey][index]*scale;
+ base(k);k.save();k.beginPath();k.rect(22,35,495,130);k.clip();
+ k.translate(269+param('positionX',0),100);k.scale(zoom,zoom);k.translate(-cameraX,-cameraY);
+ street(k);k.scale(scale,scale);
+ handoffPerson(k,sender,1,false,p,senderHand,ey+8*release);
+ handoffPerson(k,receiver,-1,true,p,receiverHand,ey+13*(1-receive));
+ k.fillStyle='#f7d08c';k.strokeStyle='#875d3f';k.lineWidth=.8;
+ k.fillRect(envelope-8,ey-4.5,16,9);k.strokeRect(envelope-8,ey-4.5,16,9);
+ linePath(k,[[envelope-8,ey-4.5],[envelope,ey+1],[envelope+8,ey-4.5]],'#875d3f',.85);
+ k.fillStyle='#a84838';k.beginPath();k.arc(envelope,ey+.6,1.3,0,2*PI);k.fill();
+ // Draw the thumbs over the paper so that the shared grip and its release are visible.
+ k.lineCap='round';
+ linePath(k,[[senderHand-2,ey+8*release-1],[senderHand+2,ey+8*release-2-release]],'#e5b493',2);
+ const rightY=ey+13*(1-receive);
+ linePath(k,[[receiverHand+2,rightY-1],[receiverHand-2,rightY-2]],'#cd906d',2);
+ k.restore();frame(k,22,35,495,130);stageText(k,'物品交接  /  '+name);caption(k,focus);
+});
 // F02: establish two people, then show their opposing dialogue shots.
 cells.push((k,w,h,u)=>{base(k);let p=phase(u),sep=param('separation',108),first=param('firstCut',.28),second=param('secondCut',.65);scene(k);if(p<first){actor(k,269-sep,149,48,'primary',1);actor(k,269+sep,149,48,'secondary',-1);stageText(k,'① 双人全景');arrow(k,230,84,300,84,'#8299b9')}else if(p<second){actor(k,230,180,105,'primary',1);arrow(k,300,92,365,92,teal);stageText(k,'② A 的镜头')}else{actor(k,309,180,105,'secondary',-1);arrow(k,239,92,174,92,coral);stageText(k,'③ B 的镜头')}frame(k,22,35,495,130);caption(k,'建立空间 → A → B');});
 // F03: top-down axis and two-shot image; the second camera can cross the line.

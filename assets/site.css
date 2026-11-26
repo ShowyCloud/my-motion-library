@@ -447,5 +447,11 @@ html.has-tray { scroll-padding-bottom: calc(var(--tray-h, 0px) + 16px); }
   .tiles { grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); }
 }
 
+#shot-comparison { min-width: 0; margin: 0; padding: 12px 16px 16px; border: 0; background: var(--surface); color: var(--ink); }
+#shot-comparison legend { float: left; width: 100%; margin-bottom: 8px; font-weight: 700; }
+.shot-choices { display: flex; flex-wrap: wrap; gap: 6px; clear: both; }
+#shot-reading { margin: 10px 0 12px; font-size: 14px; }
+#shot-comparison a { display: inline-block; margin: 5px 0 5px 8px; font-size: 13px; }
+
 /* Read-only public site: local editing requires the desktop service. */
 .tile-edit,#d-edit,.scene-edit,.handoff-timeline{display:none!important}

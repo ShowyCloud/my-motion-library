@@ -23,7 +23,7 @@
   d.lang = l;
 })();
 </script>
-<link rel="stylesheet" href="assets/site.css?v=20261104-ui1">
+<link rel="stylesheet" href="assets/site.css?v=20261126-f01">
 </head>
 <body>
 <a class="skip" href="#gallery" data-t="skip">見本の一覧へ移動</a>
@@ -163,7 +163,21 @@
     </div>
   </div>
   <div class="d-body">
-    <div class="d-stage"><canvas id="d-canvas" aria-hidden="true"></canvas></div>
+    <div class="d-stage"><canvas id="d-canvas" aria-hidden="true"></canvas>
+      <fieldset id="shot-comparison" hidden>
+        <legend>物品交接 · 切换景别</legend>
+        <div class="shot-choices" role="group" aria-label="取景范围">
+          <button type="button" class="chip" data-shot="0">远景</button>
+          <button type="button" class="chip" data-shot="1">全景</button>
+          <button type="button" class="chip" data-shot="2">中景</button>
+          <button type="button" class="chip" data-shot="3">近景</button>
+          <button type="button" class="chip" data-shot="4">特写</button>
+        </div>
+        <p id="shot-reading" aria-live="polite"></p>
+        <button type="button" id="hold-handoff" class="btn btn-s">定格在双方碰到信封时</button>
+        <a href="scenes.html#handoff">查看完整场景</a>
+      </fieldset>
+    </div>
     <div class="d-head">
       <h2 id="d-name" tabindex="-1"></h2>
       <p class="d-sub" id="d-sub"></p>
@@ -207,13 +221,13 @@
 
 <script src="assets/runtime.js"></script><script src="assets/principles-pack.js"></script><script src="assets/course-subject-motion.js?v=6"></script><script src="assets/subject-eyes.js?v=8"></script>
 <script src="assets/catalog.js"></script>
-<script src="assets/principles-catalog.js"></script><script src="assets/cinema-learning.js?v=20261101-sound1"></script><script src="assets/cinema-catalog.js?v=20261101-eyes6"></script>
+<script src="assets/principles-catalog.js"></script><script src="assets/cinema-learning.js?v=20261126-f01"></script><script src="assets/cinema-catalog.js?v=20261126-f01"></script>
 <script src="assets/zh-details.js?v=20261030-motioncheck2"></script>
 <script src="assets/zh-tags.js?v=20261030b"></script>
 <script src="data/visual-editor.js"></script>
 <script src="assets/animation-parameters.js"></script><script src="assets/principles-parameters.js"></script><script src="assets/cinema-parameters.js"></script><script src="assets/custom-sandbox.js"></script><script src="assets/visual-common.js?v=20261101-eyes6"></script>
 <script src="assets/branding.js"></script>
 <script>MPBrand.apply(MPBrand.site, "home");</script>
-<script src="assets/general-learning.js?v=20261101-audit3"></script><script src="assets/film-audio.js?v=20261101-sound1"></script><script src="assets/site.js?v=20261101-eyes6"></script>
+<script src="assets/general-learning.js?v=20261101-audit3"></script><script src="assets/film-audio.js?v=20261101-sound1"></script><script src="assets/site.js?v=20261126-f01"></script>
 </body>
 </html>

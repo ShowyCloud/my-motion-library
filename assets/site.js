@@ -211,7 +211,7 @@
   };
   function loadPack(p) {
     var s = document.createElement('script');
-    s.src = p.pack === 'custom' ? 'assets/custom-pack.js' : p.pack === 'principles' ? 'assets/principles-pack.js' : p.pack === 'cinema' ? 'assets/cinema-pack.js?v=20261101-eyes6' : 'packs/' + p.pack + '/pack.js';
+    s.src = p.pack === 'custom' ? 'assets/custom-pack.js' : p.pack === 'principles' ? 'assets/principles-pack.js' : p.pack === 'cinema' ? 'assets/cinema-pack.js?v=20261126-f01' : 'packs/' + p.pack + '/pack.js';
     s.onload = function () {
       var reg = MP.packs[p.pack];
       if (!reg || ready[p.pack] === 'failed') return fail();
@@ -483,7 +483,7 @@
   var codeCache = {};
   function fetchCode(id, lang) {
     var item = elBy[id];
-    if (item && (item._principles || item._film)) return fetch(item._film ? 'assets/cinema-pack.js?v=20261101-eyes6' : 'assets/principles-pack.js').then(function(r) { if (!r.ok) throw new Error(String(r.status)); return r.text(); }).then(function(code) { return item._visual ? '【示例源代码】本地修改的参数、播放速度、文字、主体图片和手臂设置另存于 data/visual-editor.json，未包含在以下代码中。\n\n' + code : code; });
+    if (item && (item._principles || item._film)) return fetch(item._film ? 'assets/cinema-pack.js?v=20261126-f01' : 'assets/principles-pack.js').then(function(r) { if (!r.ok) throw new Error(String(r.status)); return r.text(); }).then(function(code) { return item._visual ? '【示例源代码】本地修改的参数、播放速度、文字、主体图片和手臂设置另存于 data/visual-editor.json，未包含在以下代码中。\n\n' + code : code; });
     if (item && item._custom) {
       var own = (window.MP_EDITOR_DATA.custom || []).find(function (x) { return x.id === id; });
       if (own && own.motion === 'script') return Promise.resolve('自定义 Canvas 每帧代码（参数：ctx, width, height, time, options, media）：\n\n' + (own.effectCode || ''));
@@ -512,6 +512,33 @@
     }
     detail.scale = scale; detail.dirty = true;
   }
+  // A camera choice belongs only to this detail canvas. Tiles keep playing their montage.
+  var shotPanel = $('#shot-comparison');
+  var shotReadings = [
+    '远景包括街道、建筑和路灯。先找到两个人，再看环境如何交代会面地点。',
+    '全景保留双方从头到脚的身形。看两个人相隔多远，以及谁先向前探身。',
+    '中景取双方腰部以上。看递信人先伸手，接信人稍后才伸手回应。',
+    '近景对准接信人的脸和肩胸。接稳时，他从信封抬眼看向对方。',
+    '特写跟随信封和两只手。看两人短暂共持，随后左边的手松开。'
+  ];
+  function chooseShot(index) {
+    detail.canvas.dataset.handoffShot = String(index);
+    shotPanel.querySelectorAll('[data-shot]').forEach(function (button) {
+      button.setAttribute('aria-pressed', String(Number(button.dataset.shot) === index));
+    });
+    $('#shot-reading').textContent = shotReadings[index];
+    detail.dirty = true;
+  }
+  shotPanel.addEventListener('click', function (event) {
+    var button = event.target.closest('[data-shot]');
+    if (button) chooseShot(Number(button.dataset.shot));
+  });
+  $('#hold-handoff').addEventListener('click', function () {
+    if (!detail.el || detail.el.id !== 'F01') return;
+    detail.u = detail.el.cycle * .53;
+    if (state.playing) togglePlay();
+    detail.dirty = true;
+  });
   function fillDetail(el) {
     stopTileAudio();
     var p = packBy[el.pack], nm = names(el), lang = state.lang;
@@ -520,6 +547,9 @@
     var c = p.categories.filter(function (x) { return x.slug === (visibleGroup || el.category); })[0];
     detail.el = el; detail.broken = false;
     detail.u = state.playing ? 0 : STILL * el.cycle; // start from the top of the move
+    shotPanel.hidden = el.id !== 'F01';
+    if (!shotPanel.hidden) chooseShot(1);
+    else delete detail.canvas.dataset.handoffShot;
     detail.ctx = detail.canvas.getContext('2d');
     detail.canvas.style.aspectRatio = el.width + '/' + el.height;
     $('#d-id').textContent = '#' + el.id;
