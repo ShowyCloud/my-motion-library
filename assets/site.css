@@ -447,6 +447,27 @@ html.has-tray { scroll-padding-bottom: calc(var(--tray-h, 0px) + 16px); }
   .tiles { grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); }
 }
 
+/* The two views keep the same aspect ratio and stay side by side on phones. */
+#shot-pair { margin: 1.4rem 0; padding: clamp(12px, 2.4vw, 28px); border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+#pair-title { margin: 0 0 16px; font-size: clamp(19px, 2vw, 25px); }
+.shot-pair-views { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(8px, 2vw, 24px); }
+.shot-pair-pane label { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 13px; color: var(--muted); }
+.shot-pair-pane select { font: inherit; font-weight: 650; padding: 5px 8px; max-width: 100%; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 6px; color: var(--ink); }
+.shot-pair-pane canvas { display: block; width: 100%; height: auto; margin: 10px 0; border-radius: 6px; background: var(--bg); }
+.shot-pair-pane dl { margin: 0; font-size: 14px; line-height: 1.55; }
+.shot-pair-pane dt { font-weight: 650; color: var(--muted); font-size: 12px; }
+.shot-pair-pane dd { margin: 2px 0 8px; }
+.shot-pair-transport { display: grid; grid-template-columns: auto minmax(40px, 1fr) auto; align-items: center; gap: 12px; margin-top: 12px; padding-top: 14px; border-top: 1px solid var(--line); }
+#pair-time { width: 100%; margin: 0; min-height: 32px; accent-color: var(--accent); cursor: pointer; }
+#pair-readout { font: 13px var(--mono); white-space: nowrap; }
+.shot-pair-cues { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin-top: 10px; color: var(--muted); font-size: 13px; }
+.shot-pair-cues button { color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 5px 10px; }
+.shot-pair-cues button:hover { border-color: var(--ink); }
+@media (max-width: 500px) {
+  .shot-pair-transport { gap: 7px; }
+  .shot-pair-pane dl { font-size: 13px; }
+  #pair-readout { font-size: 11px; }
+}
 #shot-comparison { min-width: 0; margin: 0; padding: 12px 16px 16px; border: 0; background: var(--surface); color: var(--ink); }
 #shot-comparison legend { float: left; width: 100%; margin-bottom: 8px; font-weight: 700; }
 .shot-choices { display: flex; flex-wrap: wrap; gap: 6px; clear: both; }

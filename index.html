@@ -23,7 +23,7 @@
   d.lang = l;
 })();
 </script>
-<link rel="stylesheet" href="assets/site.css?v=20261126-f01">
+<link rel="stylesheet" href="assets/site.css?v=20261126-shot-pair">
 </head>
 <body>
 <a class="skip" href="#gallery" data-t="skip">見本の一覧へ移動</a>
@@ -90,6 +90,33 @@
       </div>
     </div>
     <div class="wrap">
+      <section id="shot-pair" aria-labelledby="pair-title" hidden>
+        <h3 id="pair-title" data-t="pairTitle">站台送别 · 双景别对照</h3>
+        <div class="shot-pair-views">
+          <div class="shot-pair-pane">
+            <label><span data-t="pairLeft">左侧景别</span><select id="pair-left"></select></label>
+            <canvas width="1078" height="416" aria-labelledby="pair-left-caption"></canvas>
+            <dl id="pair-left-caption"><dt data-t="pairRange">画面范围</dt><dd></dd><dt data-t="pairFocus">叙事重点</dt><dd></dd></dl>
+          </div>
+          <div class="shot-pair-pane">
+            <label><span data-t="pairRight">右侧景别</span><select id="pair-right"></select></label>
+            <canvas width="1078" height="416" aria-labelledby="pair-right-caption"></canvas>
+            <dl id="pair-right-caption"><dt data-t="pairRange">画面范围</dt><dd></dd><dt data-t="pairFocus">叙事重点</dt><dd></dd></dl>
+          </div>
+        </div>
+        <div class="shot-pair-transport">
+          <button type="button" id="pair-play" class="btn btn-main"></button>
+          <label for="pair-time" class="sr" data-t="pairTime">同步时间线（秒）</label>
+          <input type="range" id="pair-time" min="0" max="6" step="0.01" value="0">
+          <span id="pair-readout" aria-hidden="true"></span>
+        </div>
+        <div class="shot-pair-cues">
+          <span data-t="pairMoment">定格动作</span>
+          <button type="button" data-time="1.65" data-t="pairWave">举手</button>
+          <button type="button" data-time="3.36" data-t="pairBlink">眨眼</button>
+          <button type="button" data-time="4.80" data-t="pairLower">放下手</button>
+        </div>
+      </section>
       <p class="count" id="count" role="status" aria-live="polite"></p><p class="listen-status" id="listen-status" role="status" aria-live="polite"></p>
       <div id="grid"></div>
       <div class="empty" id="empty" hidden><p data-t="empty">見つかりませんでした。別の言葉や番号で探してみてください。</p><button class="btn btn-ghost" id="reset-filters" type="button" data-t="resetFilters">清除筛选条件</button></div>
@@ -228,6 +255,6 @@
 <script src="assets/animation-parameters.js"></script><script src="assets/principles-parameters.js"></script><script src="assets/cinema-parameters.js"></script><script src="assets/custom-sandbox.js"></script><script src="assets/visual-common.js?v=20261101-eyes6"></script>
 <script src="assets/branding.js"></script>
 <script>MPBrand.apply(MPBrand.site, "home");</script>
-<script src="assets/general-learning.js?v=20261101-audit3"></script><script src="assets/film-audio.js?v=20261101-sound1"></script><script src="assets/site.js?v=20261126-shots"></script>
+<script src="assets/general-learning.js?v=20261101-audit3"></script><script src="assets/film-audio.js?v=20261101-sound1"></script><script src="assets/site.js?v=20261126-shot-pair"></script>
 </body>
 </html>

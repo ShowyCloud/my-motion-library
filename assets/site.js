@@ -159,6 +159,9 @@
     lines.push('',labels[5]); return lines.join('\n');
   };
 
+  Object.assign(I18N['zh-Hans'], {pairTitle: '站台送别 · 双景别对照', pairLeft: '左侧景别', pairRight: '右侧景别', pairRange: '画面范围', pairFocus: '叙事重点', pairTime: '同步时间线（秒）', pairMoment: '定格动作', pairWave: '举手', pairBlink: '眨眼', pairLower: '放下手', pairPlay: '同步播放', pairPause: '同步暂停'});
+  Object.assign(I18N['en'], {pairTitle: 'Platform farewell · Compare shot sizes', pairLeft: 'Left shot', pairRight: 'Right shot', pairRange: 'Framing', pairFocus: 'Story focus', pairTime: 'Shared timeline (seconds)', pairMoment: 'Freeze on', pairWave: 'Raised hand', pairBlink: 'Blink', pairLower: 'Lowering hand', pairPlay: 'Play both', pairPause: 'Pause both'});
+  Object.assign(I18N['ja'], {pairTitle: 'ホームでの別れ · ショットサイズ比較', pairLeft: '左のショット', pairRight: '右のショット', pairRange: '画面の範囲', pairFocus: '物語の焦点', pairTime: '共通タイムライン（秒）', pairMoment: '動作で停止', pairWave: '手を上げる', pairBlink: 'まばたき', pairLower: '手を下ろす', pairPlay: '両方を再生', pairPause: '両方を一時停止'});
   // ------------------------------------------------------------------ state
   var store = {
     get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -232,6 +235,75 @@
   var detail = { canvas: $('#d-canvas'), ctx: null, scale: 1, dirty: false, el: null, broken: false, u: 0 };
   var STILL = 0.4; // paused views show this fraction of the loop, where most moves have something on screen
   var clock = 0, lastNow = 0;
+  var pairPanel = $('#shot-pair'), pairSlider = $('#pair-time'), pairReadout = $('#pair-readout');
+  var pairShots = CAT.elements.filter(function (el) { return el.pack === 'shots'; });
+  var pairDuration = packBy.shots.cycle, pairTime = reduceMotion.matches ? STILL * pairDuration : 0;
+  var pairDirty = true, pairVisible = true;
+  var pairViews = $$('.shot-pair-pane').map(function (pane, i) {
+    var canvas = pane.querySelector('canvas');
+    return { select: pane.querySelector('select'), canvas: canvas, ctx: canvas.getContext('2d'),
+      captions: pane.querySelectorAll('dd'), id: i === 0 ? 'S03' : 'S07' };
+  });
+  pairSlider.max = pairDuration;
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      pairVisible = entries[0].isIntersecting;
+      if (pairVisible) pairDirty = true;
+    }).observe(pairPanel);
+  }
+
+  function refreshPairView(view) {
+    var el = elBy[view.id];
+    view.select.value = view.id;
+    view.canvas.setAttribute('aria-label', names(el).main);
+    view.captions[0].textContent = el.meaning[state.lang] || el.meaning.en;
+    view.captions[1].textContent = el.use[state.lang] || el.use.en;
+  }
+  function refreshPairOptions() {
+    pairViews.forEach(function (view) {
+      view.select.replaceChildren();
+      pairShots.forEach(function (el) { view.select.add(new Option(names(el).main, el.id)); });
+      refreshPairView(view);
+    });
+    pairDirty = true;
+  }
+  pairViews.forEach(function (view, i) {
+    view.select.addEventListener('change', function () {
+      var other = pairViews[1 - i];
+      if (view.select.value === other.id) { other.id = view.id; refreshPairView(other); }
+      view.id = view.select.value;
+      refreshPairView(view);
+      pairDirty = true;
+      drawPair();
+    });
+  });
+  function drawPair() {
+    if (pairPanel.hidden || ready.shots !== 'ok') return;
+    pairViews.forEach(function (view) {
+      var el = elBy[view.id];
+      // Compare a single moment in the source action, even with different local playback speeds.
+      var speed = el._visual && el._visual.speed || 1;
+      paint(view.ctx, el, pairTime / speed, view.canvas.width / el.width);
+    });
+    var seconds = pairTime.toFixed(2);
+    pairSlider.value = seconds;
+    pairSlider.setAttribute('aria-valuetext', seconds + ' / ' + pairDuration + ' s');
+    pairReadout.textContent = seconds + ' / ' + pairDuration.toFixed(2) + ' s';
+    pairDirty = false;
+  }
+  function seekPair(seconds) {
+    if (state.playing) togglePlay();
+    pairTime = Math.max(0, Math.min(pairDuration, seconds));
+    pairDirty = true;
+    drawPair();
+  }
+  pairSlider.addEventListener('pointerdown', function () { if (state.playing) togglePlay(); });
+  pairSlider.addEventListener('input', function () { seekPair(pairSlider.valueAsNumber); });
+  $$('.shot-pair-cues button').forEach(function (b) {
+    b.addEventListener('click', function () { seekPair(Number(b.dataset.time)); });
+  });
+  $('#pair-play').addEventListener('click', togglePlay);
+
 
   function paint(ctx, el, u, scale) {
     var reg = MP.packs[el.pack];
@@ -275,6 +347,10 @@
         if (!paint(detail.ctx, el, detail.u, detail.scale)) detail.broken = true;
       }
       return;
+    }
+    if (!pairPanel.hidden && ready.shots === 'ok') {
+      if (state.playing) pairTime = (pairTime + dt) % pairDuration;
+      if (pairVisible && (state.playing || pairDirty)) drawPair();
     }
     for (var i = 0; i < tiles.length; i++) {
       var tl = tiles[i];
@@ -411,6 +487,8 @@
     return b;
   }
   function buildChips() {
+    pairPanel.hidden = state.pack !== 'shots';
+    pairDirty = true;
     var packs = $('#packs'), cats = $('#cats');
     packs.textContent = ''; cats.textContent = '';
     packs.appendChild(chip(t('all'), state.pack === 'all', String(CAT.count), function () { setFilter('all', 'all'); }));
@@ -846,6 +924,7 @@
   function applyText() {
     var lang = state.lang;
     root.lang = lang;
+    refreshPairOptions();
     if (window.MPBrand && MPBrand.site.name) I18N[lang].title = MPBrand.site.name;
     $$('[data-t]').forEach(function (n) { n.textContent = t(n.getAttribute('data-t'), { n: CAT.count }); });
     $$('[data-t-html]').forEach(function (n) { n.innerHTML = t(n.getAttribute('data-t-html')); }); // own strings only
@@ -893,6 +972,7 @@
   if (darkQuery.addEventListener) darkQuery.addEventListener('change', applyTheme);
 
   function applyPlay() {
+    $('#pair-play').textContent = t(state.playing ? 'pairPause' : 'pairPlay');
     var b = $('#play'), d = $('#d-play');
     b.setAttribute('aria-pressed', state.playing ? 'true' : 'false');
     b.setAttribute('aria-label', t(state.playing ? 'pauseLabel' : 'playLabel'));
